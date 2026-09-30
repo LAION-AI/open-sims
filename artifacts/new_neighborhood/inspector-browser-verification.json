@@ -1,0 +1,54 @@
+{
+  "url": "http://127.0.0.1:8769",
+  "status": "partial_browser_verification",
+  "complete_end_to_end_run": false,
+  "automated_evidence": {
+    "new_neighborhood_screenshots": [
+      "00-neighborhood-overview.png",
+      "00-family-home-interior.png",
+      "00-school-interior.png",
+      "00-hospital-interior.png",
+      "00-supermarket-interior.png",
+      "00-real-food-state.png",
+      "01-portrait-overview.png",
+      "02-affect-narratives.png",
+      "03-possession-details.png",
+      "04-people-portraits.png",
+      "05-relationship-graph.png"
+    ],
+    "relationship_graph_targeted_diagnosis": {
+      "runs": 2,
+      "script": "scripts/diagnose_graph_click.py",
+      "before": {
+        "selected": "resident_001",
+        "inspector_person": "resident_001"
+      },
+      "clicked_node": "resident_002",
+      "immediate": {
+        "selected": "resident_002",
+        "dialog_open": false
+      },
+      "after_2_5_seconds": {
+        "inspector_person": "resident_002"
+      },
+      "network": {
+        "request": "GET /api/actors/resident_002",
+        "response_status": 200
+      },
+      "page_errors_observed": [],
+      "console_errors_observed": [],
+      "request_failures_observed": []
+    },
+    "legacy_save_ui_run": {
+      "report": "artifacts/story/inspector-browser-verification.json",
+      "result": "17/17 checks passed on port 8768, including graph SVG/list/keyboard selection and 390px overflow"
+    }
+  },
+  "unresolved_or_unverified": [
+    "The last full port-8769 run timed out waiting for the inspector person to match the SVG node after click; that failure did not reproduce in either focused diagnosis.",
+    "The full port-8769 flow did not reach mobile screenshots or mobile overflow checks; the earlier port-8768 mobile result does not prove the new map build's mobile state.",
+    "Two earlier full port-8769 attempts ended on HTTP connection reset/socket hang-up while requesting actor/state data. Server health remained available afterward; no root cause was proven."
+  ],
+  "ui_changes_after_targeted_diagnosis": false,
+  "browser_rerun_performed_after_root_freeze_request": false
+}

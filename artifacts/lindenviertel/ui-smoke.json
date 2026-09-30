@@ -1,0 +1,31 @@
+{
+  "url": "http://127.0.0.1:8769",
+  "checks": {
+    "neighborhood_loaded": true,
+    "graph_click_selects_person": true,
+    "graph_keyboard_selects_person": true,
+    "graph_space_does_not_control_time": true,
+    "graph_search_filters": true,
+    "escape_closes": true,
+    "mobile_possessions": true,
+    "mobile_no_horizontal_overflow": true,
+    "mobile_close": true,
+    "paused_clock_unchanged": true
+  },
+  "errors": [],
+  "initial_state": {
+    "clock": 30600,
+    "paused": true
+  },
+  "mobile_widths": {
+    "page": 390,
+    "viewport": 390,
+    "dialog": 390,
+    "inner": 390
+  },
+  "final_state": {
+    "clock": 30600,
+    "paused": true
+  },
+  "passed": true
+}

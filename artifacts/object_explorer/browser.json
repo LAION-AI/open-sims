@@ -1,0 +1,26 @@
+{
+  "checks": {
+    "all_speed_presets": true,
+    "canvas_object_selection": true,
+    "authoritative_projection": true,
+    "capability_labels": true,
+    "roof_hides_object_picking": true,
+    "search_exact_id": true,
+    "list_focuses_building": true,
+    "old_server_fallback_is_explicit": true,
+    "old_server_raw_state_is_fresh": true,
+    "mobile_fits": true,
+    "escape_closes": true,
+    "plan_available": true,
+    "inspection_keeps_world_unchanged": true
+  },
+  "errors": [],
+  "database": ":memory:",
+  "live_save_touched": false,
+  "mobile_widths": {
+    "page": 390,
+    "viewport": 390,
+    "panel": 366
+  },
+  "passed": true
+}

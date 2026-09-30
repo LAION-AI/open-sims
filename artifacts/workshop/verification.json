@@ -1,0 +1,22 @@
+{
+  "generator_version": "housing-0.4.0",
+  "generated_at": "2026-09-28T18:47:46.423748+00:00",
+  "room_types": 32,
+  "object_types": 116,
+  "building_valid": 36,
+  "building_attempts": 36,
+  "region_valid": 12,
+  "region_attempts": 12,
+  "public_to_room_routes": 288,
+  "walker_seconds_per_residential_building": 600,
+  "walker_invariant_errors": [],
+  "api_adapter_tests": "mocked only; no external generation called",
+  "codex_development_agents": [
+    "gpt-6-luna/luna_beds",
+    "gpt-6-luna/luna_buildings",
+    "gpt-6-luna/luna_civic",
+    "gpt-6-sol/spatial_plausibility"
+  ],
+  "elapsed_seconds": 10.21,
+  "failures": []
+}

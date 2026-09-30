@@ -1,0 +1,357 @@
+{
+  "generator_version": "housing-0.4.0",
+  "generated_at": "2026-09-28T18:43:06.703804+00:00",
+  "scope": "Batch verification of the isolated housing laboratory, not a city-scale performance claim",
+  "room_type_count": 32,
+  "catalog_object_count": 116,
+  "observed_object_types": 116,
+  "unobserved_object_types": [],
+  "room_attempts": 2048,
+  "room_valid": 2048,
+  "room_results": [
+    {
+      "kind": "living",
+      "name": "Wohnzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 3,
+      "orientations": 4,
+      "optional_omissions": 235
+    },
+    {
+      "kind": "bedroom",
+      "name": "Schlafzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 5,
+      "orientations": 4,
+      "optional_omissions": 160
+    },
+    {
+      "kind": "kitchen",
+      "name": "Küche",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 241
+    },
+    {
+      "kind": "bathroom",
+      "name": "Badezimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 3,
+      "orientations": 4,
+      "optional_omissions": 102
+    },
+    {
+      "kind": "hall",
+      "name": "Flur",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 87
+    },
+    {
+      "kind": "child",
+      "name": "Kinderzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 5,
+      "orientations": 4,
+      "optional_omissions": 63
+    },
+    {
+      "kind": "teen",
+      "name": "Jugendzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 5,
+      "orientations": 4,
+      "optional_omissions": 215
+    },
+    {
+      "kind": "party",
+      "name": "Partyraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 164
+    },
+    {
+      "kind": "dining",
+      "name": "Esszimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 40
+    },
+    {
+      "kind": "office",
+      "name": "Arbeitszimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 78
+    },
+    {
+      "kind": "guest",
+      "name": "Gästezimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 3,
+      "orientations": 4,
+      "optional_omissions": 104
+    },
+    {
+      "kind": "nursery",
+      "name": "Babyzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 46
+    },
+    {
+      "kind": "laundry",
+      "name": "Waschküche",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 79
+    },
+    {
+      "kind": "pantry",
+      "name": "Vorratsraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 47
+    },
+    {
+      "kind": "library",
+      "name": "Bibliothek",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 95
+    },
+    {
+      "kind": "music",
+      "name": "Musikzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 73
+    },
+    {
+      "kind": "gym",
+      "name": "Fitnessraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 70
+    },
+    {
+      "kind": "workshop",
+      "name": "Werkstatt & Atelier",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 58
+    },
+    {
+      "kind": "conservatory",
+      "name": "Wintergarten",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 96
+    },
+    {
+      "kind": "gaming",
+      "name": "Spielzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 108
+    },
+    {
+      "kind": "school_classroom",
+      "name": "Klassenzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 3,
+      "families": 2,
+      "orientations": 2,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "school_lab",
+      "name": "Naturwissenschaftlicher Fachraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "school_biology",
+      "name": "Biologieraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "school_physics",
+      "name": "Physikraum",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "school_staff",
+      "name": "Lehrerzimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "school_cafeteria",
+      "name": "Schulkantine",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "hospital_exam",
+      "name": "Untersuchungszimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "hospital_ward",
+      "name": "Pflegestation",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "hospital_reception",
+      "name": "Krankenhaus-Empfang",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "fire_equipment",
+      "name": "Geräteraum der Feuerwehr",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "fire_garage",
+      "name": "Feuerwehrgarage",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 2,
+      "orientations": 4,
+      "optional_omissions": 0
+    },
+    {
+      "kind": "home_care",
+      "name": "Häusliches Pflegezimmer",
+      "attempts": 64,
+      "valid": 64,
+      "unique_geometry": 64,
+      "families": 1,
+      "orientations": 4,
+      "optional_omissions": 37
+    }
+  ],
+  "room_ms_median": 20.12,
+  "room_ms_p95": 61.26,
+  "house_attempts": 32,
+  "house_valid": 32,
+  "block_attempts": 100,
+  "block_valid": 100,
+  "fixed_living_attempts": 64,
+  "fixed_living_unique_geometry": 64,
+  "fixed_living_families": [
+    "Gesprächsecke",
+    "Lesesalon",
+    "Medienabend"
+  ],
+  "navigation_seconds": 1800,
+  "navigation_metrics": {
+    "walk_steps": 3225,
+    "stairs_trips": 33,
+    "elevator_trips": 56,
+    "arrivals": 85,
+    "queue_wait_seconds": 68
+  },
+  "navigation_invariant_errors": [],
+  "failures": [],
+  "elapsed_seconds": 69.32
+}

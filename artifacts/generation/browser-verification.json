@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "generator_version": "housing-0.4.0",
+  "room_type_count": 32,
+  "object_type_count": 116,
+  "checks": [
+    "Initial room, validation badge, four generated variants",
+    "Furniture hit testing, footprint inspector, zoom and pan",
+    "Variant selection and JSON export",
+    "All 32 room types generate through the UI, with room-specific furniture previews",
+    "Three-floor house, floor buttons and keyboard switching",
+    "Real Python clock, timed stairs/lift, transit position and FIFO contention",
+    "Manual route intent, readable log, selected-person floor follow",
+    "Connected eight-plot district view",
+    "390px mobile view has no horizontal overflow",
+    "Offline object catalog renders all 116 sprites; search filters and restores the catalog",
+    "Standalone file:// report: gallery, clearances, five floors, measured table"
+  ],
+  "browser_errors": [],
+  "browser": "145.0.7632.6",
+  "navigation_metrics": {
+    "walk_steps": 1061,
+    "stairs_trips": 13,
+    "elevator_trips": 19,
+    "arrivals": 28,
+    "queue_wait_seconds": 30
+  },
+  "screenshots": [
+    "01-living-room.png",
+    "02-object-contract.png",
+    "03-house-ground-floor.png",
+    "04-house-upper-floor.png",
+    "05-portal-in-progress.png",
+    "06-connected-block.png",
+    "07-mobile-atelier.png",
+    "08-whitepaper-supplement.png",
+    "09-offline-gallery.png",
+    "catalog-all-objects.png",
+    "catalog-conservatory.png",
+    "catalog-gaming.png",
+    "catalog-gym.png",
+    "catalog-music.png",
+    "catalog-nursery.png",
+    "catalog-workshop.png"
+  ]
+}

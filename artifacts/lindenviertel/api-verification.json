@@ -1,0 +1,29 @@
+{
+  "url": "http://127.0.0.1:8769",
+  "health": {
+    "status": "ok",
+    "fault": null,
+    "invariants": [],
+    "population": 44,
+    "households": 20,
+    "llm_enabled": false,
+    "simulation_fields": false
+  },
+  "clock": 30600,
+  "paused": true,
+  "layout": "neighborhood-v1",
+  "captures": [
+    {
+      "file": "api-school.png",
+      "bytes": 151274,
+      "mime": "image/png"
+    },
+    {
+      "file": "api-relationships.png",
+      "bytes": 391757,
+      "mime": "image/png"
+    }
+  ],
+  "unchanged_clock": true,
+  "passed": true
+}

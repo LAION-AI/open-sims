@@ -1,0 +1,241 @@
+{
+  "created_at": "2026-09-29T06:25:38.642255+00:00",
+  "database": "C:\\Users\\chris\\Documents\\OpenSims2\\data\\mosswood-lindenviertel-20260929.sqlite3",
+  "layout": "neighborhood-v1",
+  "seed": 73,
+  "clock": 30600,
+  "paused": true,
+  "population": 44,
+  "households": 20,
+  "buildings": 33,
+  "fixtures": 364,
+  "map_size_m": [
+    128,
+    180
+  ],
+  "jobs": {
+    "Illustrator": 4,
+    "Carpenter": 4,
+    "Baker": 3,
+    "Teacher": 2,
+    "Designer": 3,
+    "Gardener": 3,
+    "Bookseller": 3,
+    "Tailor": 2,
+    "Independent artist": 4,
+    "Firefighter": 3,
+    "Civic clerk": 3,
+    "Office analyst": 3,
+    "Fitness coach": 2,
+    "Retail assistant": 3,
+    "Nurse": 2
+  },
+  "multi_emotion_residents": 24,
+  "invariants": [],
+  "replay_matches": true,
+  "beats": 319,
+  "planning": {
+    "layout_id": "neighborhood-v1",
+    "name": "Mosswood Lindenviertel",
+    "seed": 73,
+    "roads": [
+      {
+        "name": "Neighbourhood Lane 21",
+        "class": "local",
+        "bounds": [
+          0,
+          21,
+          128,
+          2
+        ]
+      },
+      {
+        "name": "Neighbourhood Lane 48",
+        "class": "local",
+        "bounds": [
+          0,
+          48,
+          128,
+          2
+        ]
+      },
+      {
+        "name": "Market Avenue",
+        "class": "arterial",
+        "bounds": [
+          0,
+          74,
+          128,
+          3
+        ]
+      },
+      {
+        "name": "Neighbourhood Lane 99",
+        "class": "local",
+        "bounds": [
+          0,
+          99,
+          128,
+          2
+        ]
+      },
+      {
+        "name": "Commons Avenue",
+        "class": "arterial",
+        "bounds": [
+          0,
+          125,
+          128,
+          3
+        ]
+      },
+      {
+        "name": "Neighbourhood Lane 151",
+        "class": "local",
+        "bounds": [
+          0,
+          151,
+          128,
+          2
+        ]
+      },
+      {
+        "name": "Neighbourhood Lane 175",
+        "class": "local",
+        "bounds": [
+          0,
+          175,
+          128,
+          2
+        ]
+      },
+      {
+        "name": "West Connector",
+        "class": "local",
+        "bounds": [
+          1,
+          0,
+          2,
+          180
+        ]
+      },
+      {
+        "name": "East Connector",
+        "class": "local",
+        "bounds": [
+          126,
+          0,
+          2,
+          180
+        ]
+      },
+      {
+        "name": "Mid-block walk",
+        "class": "pedestrian",
+        "bounds": [
+          26,
+          21,
+          1,
+          54
+        ]
+      },
+      {
+        "name": "Mid-block walk",
+        "class": "pedestrian",
+        "bounds": [
+          51,
+          0,
+          1,
+          49
+        ]
+      },
+      {
+        "name": "Mid-block walk",
+        "class": "pedestrian",
+        "bounds": [
+          77,
+          74,
+          1,
+          52
+        ]
+      },
+      {
+        "name": "Mid-block walk",
+        "class": "pedestrian",
+        "bounds": [
+          102,
+          125,
+          1,
+          51
+        ]
+      }
+    ],
+    "parks": [
+      {
+        "id": "park_0_2",
+        "name": "School Green",
+        "bounds": [
+          54,
+          56,
+          19,
+          15
+        ]
+      },
+      {
+        "id": "park_1_2",
+        "name": "Clover Green",
+        "bounds": [
+          54,
+          81,
+          19,
+          15
+        ]
+      }
+    ],
+    "street_hierarchy": [
+      "arterial",
+      "local",
+      "pedestrian"
+    ],
+    "runtime_floors": [
+      0
+    ],
+    "scope": "2-D active neighborhood; no multi-floor runtime claim",
+    "connected_walkable_cells": 19951,
+    "validated_entrances": 33,
+    "validated_object_anchors": 546
+  },
+  "rules": {
+    "id": "mosswood.everyday",
+    "version": "3.0.0",
+    "sha256": "8f1820507751980f9bee364318271c54a18213ee6f89ff715c344767199a5e12",
+    "schema_version": 1,
+    "units": {
+      "time": "integer world seconds",
+      "distance": "meters",
+      "needs": "urgency, 0 satisfied to 1 critical",
+      "money": "fictional coins"
+    },
+    "coverage": {
+      "needs": "modeled",
+      "actions": "modeled",
+      "emotions": "simultaneous evidenced appraisals; separate self narrative; EmoNet-Face vocabulary",
+      "thoughts": "template from accepted decision",
+      "beliefs": "bounded observations and initialized knowledge",
+      "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+      "speech": "unmodeled",
+      "physiology": "game abstraction",
+      "personality": "five bounded gameplay traits; not a psychological diagnosis",
+      "relationships": "explicit kinship/status plus directional quality dimensions",
+      "ambitions": "event-driven progress and utility preferences",
+      "fears": "observed triggers, cooldowns and temporary appraisal",
+      "household_routines": "reserved multi-step meal and cleanup plans",
+      "work": "assigned physical workplace and commute; simplified paid tasks",
+      "possessions": "unique owned portable food and wearable items with location/state",
+      "city": "hierarchical laboratory plus appended live service destinations; no traffic or geodata reconstruction"
+    }
+  },
+  "reload_invariants": [],
+  "reload_replay_matches": true,
+  "reload_paused": true
+}

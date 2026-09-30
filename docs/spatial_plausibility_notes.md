@@ -1,0 +1,11 @@
+# Spatial plausibility in housing 0.4
+
+The building generator keeps the requested rectangular footprint and exact room count. It sizes each room from a hard furniture minimum, a preferred area, and a maximum area. A row receives only enough width to approach the preferred areas; unused cells remain unassigned and appear in `validation.footprint_coverage`. A large requested rectangle is therefore not represented as a set of inflated bedrooms or bathrooms.
+
+The default family brief is 18 × 19 m, six rooms, two floors, for two adults and one child. It yields a living room, kitchen, bathroom, laundry, adult bedroom, and child bedroom. The kitchen and bathroom have smaller furniture-tested minima than the living and sleeping rooms. Room heights vary independently while corridor-facing walls and doors stay aligned, creating staggered outer room boundaries. The corridor, stairs, and optional lift remain connected. Each room reports its `area_budget_m2` and actual area.
+
+The classroom uses a fixed four-column teaching arrangement with a continuous central aisle. At 12 × 12 m it contains 20 actual pupil desk-and-chair pairs; at 12 × 14 m it contains 24. Every pair is drawn and counted from the generated objects. The independent room validator checks the count, desk-to-chair pairing, unobstructed access cells, and free-floor connectivity. `room.capacity.students` and building `validation.student_capacity` reflect these objects. A classroom smaller than 12 × 12 m is rejected rather than assigned fictional capacity.
+
+The workshop's six-room school preset is 36 × 30 m, which provides the 12 × 14 m, 24-seat classroom. Smaller valid school briefs can provide 20 seats. A 35 × 27 m request for all six school rooms is rejected because the minimum room widths plus walls and circulation do not fit.
+
+The generator still uses orthogonal metre cells, a central corridor, and at most two room bands per floor. It does not yet generate irregular exterior polygons, courtyards with their own terrain type, or enforce the civic template's adjacency/privacy intent. Very large briefs can have substantial unassigned area; the workshop reports this count for each floor. Furniture search is bounded and rejects layouts it cannot validate. The established room, building, navigation, and region checks remain the gate for accepted plans.

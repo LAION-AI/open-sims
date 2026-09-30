@@ -1,0 +1,581 @@
+{
+  "id": "living-76",
+  "kind": "living",
+  "name": "Wohnzimmer",
+  "seed": 76,
+  "generator_version": "housing-0.4.0",
+  "width": 8,
+  "height": 7,
+  "cell_size_m": 1,
+  "family": "Gesprächsecke",
+  "style": "coastal",
+  "palette": {
+    "name": "Blau & Birke",
+    "floor": "#ddcba6",
+    "wall": "#e6e7d6",
+    "fabric": "#7d9fa7",
+    "accent": "#c5a36c",
+    "rug": "#b8cbd0"
+  },
+  "doors": [
+    {
+      "side": "south",
+      "cell": [
+        3,
+        6
+      ]
+    }
+  ],
+  "windows": [
+    {
+      "side": "north",
+      "cells": [
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          0
+        ]
+      ]
+    }
+  ],
+  "protected": [
+    [
+      3,
+      5
+    ],
+    [
+      3,
+      6
+    ]
+  ],
+  "zones": [
+    {
+      "name": "Freier Türbereich",
+      "cells": [
+        [
+          3,
+          5
+        ],
+        [
+          3,
+          6
+        ]
+      ],
+      "reason": "Tür und Eintritt bleiben frei"
+    }
+  ],
+  "objects": [
+    {
+      "kind": "sofa",
+      "name": "Dreisitziges Sofa",
+      "sprite": "sofa",
+      "x": 3,
+      "y": 0,
+      "w": 3,
+      "h": 1,
+      "base_w": 3,
+      "base_h": 1,
+      "orientation": 0,
+      "blocking": true,
+      "clearance": [
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "anchors": [
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.973,
+      "id": "living-76:object:00",
+      "floor": 0,
+      "required": true,
+      "reason": "Funktionsmöbel des Raumprogramms"
+    },
+    {
+      "kind": "coffee_table",
+      "name": "Couchtisch",
+      "sprite": "table",
+      "x": 3,
+      "y": 2,
+      "w": 2,
+      "h": 1,
+      "base_w": 2,
+      "base_h": 1,
+      "orientation": 0,
+      "blocking": true,
+      "clearance": [
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "anchors": [
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.1884,
+      "id": "living-76:object:01",
+      "floor": 0,
+      "required": true,
+      "reason": "Funktionsmöbel des Raumprogramms"
+    },
+    {
+      "kind": "armchair",
+      "name": "Sessel",
+      "sprite": "armchair",
+      "x": 6,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "base_w": 1,
+      "base_h": 1,
+      "orientation": 1,
+      "blocking": true,
+      "clearance": [
+        [
+          5,
+          2
+        ]
+      ],
+      "anchors": [
+        [
+          5,
+          2
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.9979,
+      "id": "living-76:object:02",
+      "floor": 0,
+      "required": true,
+      "reason": "Funktionsmöbel des Raumprogramms"
+    },
+    {
+      "kind": "chess_table",
+      "name": "Schachtisch",
+      "sprite": "chess_table",
+      "x": 0,
+      "y": 5,
+      "w": 1,
+      "h": 1,
+      "base_w": 1,
+      "base_h": 1,
+      "orientation": 2,
+      "blocking": true,
+      "clearance": [
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "anchors": [
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.9634,
+      "id": "living-76:object:03",
+      "floor": 0,
+      "required": false,
+      "reason": "Optionale Ergänzung innerhalb von Laufwegen und Dichtebudget"
+    },
+    {
+      "kind": "aquarium",
+      "name": "Aquarium",
+      "sprite": "aquarium",
+      "x": 0,
+      "y": 1,
+      "w": 1,
+      "h": 2,
+      "base_w": 2,
+      "base_h": 1,
+      "orientation": 3,
+      "blocking": true,
+      "clearance": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "anchors": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.9927,
+      "id": "living-76:object:04",
+      "floor": 0,
+      "required": false,
+      "reason": "Optionale Ergänzung innerhalb von Laufwegen und Dichtebudget"
+    },
+    {
+      "kind": "display_cabinet",
+      "name": "Glasvitrine",
+      "sprite": "display_cabinet",
+      "x": 5,
+      "y": 6,
+      "w": 2,
+      "h": 1,
+      "base_w": 2,
+      "base_h": 1,
+      "orientation": 2,
+      "blocking": true,
+      "clearance": [
+        [
+          6,
+          5
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "anchors": [
+        [
+          6,
+          5
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "tall": true,
+      "placement_score": 1.9168,
+      "id": "living-76:object:05",
+      "floor": 0,
+      "required": false,
+      "reason": "Optionale Ergänzung innerhalb von Laufwegen und Dichtebudget"
+    },
+    {
+      "kind": "floor_lamp",
+      "name": "Stehleuchte",
+      "sprite": "floor_lamp",
+      "x": 7,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "base_w": 1,
+      "base_h": 1,
+      "orientation": 1,
+      "blocking": true,
+      "clearance": [
+        [
+          6,
+          0
+        ]
+      ],
+      "anchors": [
+        [
+          6,
+          0
+        ]
+      ],
+      "tall": false,
+      "placement_score": 2.6098,
+      "id": "living-76:object:06",
+      "floor": 0,
+      "required": false,
+      "reason": "Optionale Ergänzung innerhalb von Laufwegen und Dichtebudget"
+    },
+    {
+      "kind": "side_table",
+      "name": "Beistelltisch",
+      "sprite": "table",
+      "x": 2,
+      "y": 2,
+      "w": 1,
+      "h": 1,
+      "base_w": 1,
+      "base_h": 1,
+      "orientation": 0,
+      "blocking": true,
+      "clearance": [
+        [
+          2,
+          3
+        ]
+      ],
+      "anchors": [
+        [
+          2,
+          3
+        ]
+      ],
+      "tall": false,
+      "placement_score": 1.9749,
+      "id": "living-76:object:07",
+      "floor": 0,
+      "required": false,
+      "reason": "Optionale Ergänzung innerhalb von Laufwegen und Dichtebudget"
+    }
+  ],
+  "required_kinds": [
+    "sofa",
+    "coffee_table",
+    "armchair"
+  ],
+  "omitted": [
+    {
+      "kind": "plant",
+      "reason": "Gestalterisches Dichtebudget erreicht"
+    },
+    {
+      "kind": "bookshelf",
+      "reason": "Gestalterisches Dichtebudget erreicht"
+    },
+    {
+      "kind": "sideboard",
+      "reason": "Gestalterisches Dichtebudget erreicht"
+    }
+  ],
+  "trace": [
+    "Raumprogramm: Gesprächsecke",
+    "2 Zellen für Eintritt und freie Nutzung geschützt",
+    "Pflichtmöbel zuerst, Dekoration zuletzt",
+    "Bedienflächen und alle freien Zellen per Flood-Fill geprüft",
+    "8 Möbel, 3 optionale Möbel bewusst ausgelassen"
+  ],
+  "search": {
+    "nodes": 3,
+    "candidates": 1168
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "walkable_cells": 43,
+    "occupied_cells": 13,
+    "usable_anchors": 14,
+    "free_fraction": 0.768,
+    "reachable_cells": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        6
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        6
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        3,
+        3
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        3,
+        6
+      ],
+      [
+        4,
+        1
+      ],
+      [
+        4,
+        3
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        5,
+        1
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        5,
+        4
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        6,
+        1
+      ],
+      [
+        6,
+        3
+      ],
+      [
+        6,
+        4
+      ],
+      [
+        6,
+        5
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        7,
+        2
+      ],
+      [
+        7,
+        3
+      ],
+      [
+        7,
+        4
+      ],
+      [
+        7,
+        5
+      ],
+      [
+        7,
+        6
+      ]
+    ]
+  },
+  "signature": "12a84736c22c8a50"
+}

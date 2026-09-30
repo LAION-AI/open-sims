@@ -1,0 +1,176 @@
+{
+  "passed": true,
+  "seeds": 24,
+  "room_routes_checked": 357,
+  "main_map_unchanged": true,
+  "results": [
+    {
+      "seed": 0,
+      "buildings": 13,
+      "room_routes_checked": 58,
+      "public_cells": 2341,
+      "jobs": 26
+    },
+    {
+      "seed": 1,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2266,
+      "jobs": 26
+    },
+    {
+      "seed": 2,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2340,
+      "jobs": 26
+    },
+    {
+      "seed": 3,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2368,
+      "jobs": 26
+    },
+    {
+      "seed": 4,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2425,
+      "jobs": 26
+    },
+    {
+      "seed": 5,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2355,
+      "jobs": 26
+    },
+    {
+      "seed": 6,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2292,
+      "jobs": 26
+    },
+    {
+      "seed": 7,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2254,
+      "jobs": 26
+    },
+    {
+      "seed": 8,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2418,
+      "jobs": 26
+    },
+    {
+      "seed": 9,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2406,
+      "jobs": 26
+    },
+    {
+      "seed": 10,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2353,
+      "jobs": 26
+    },
+    {
+      "seed": 11,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2383,
+      "jobs": 26
+    },
+    {
+      "seed": 12,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2319,
+      "jobs": 26
+    },
+    {
+      "seed": 13,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2408,
+      "jobs": 26
+    },
+    {
+      "seed": 14,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2391,
+      "jobs": 26
+    },
+    {
+      "seed": 15,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2307,
+      "jobs": 26
+    },
+    {
+      "seed": 16,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2339,
+      "jobs": 26
+    },
+    {
+      "seed": 17,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2423,
+      "jobs": 26
+    },
+    {
+      "seed": 18,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2384,
+      "jobs": 26
+    },
+    {
+      "seed": 19,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2373,
+      "jobs": 26
+    },
+    {
+      "seed": 20,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2418,
+      "jobs": 26
+    },
+    {
+      "seed": 21,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2296,
+      "jobs": 26
+    },
+    {
+      "seed": 22,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2322,
+      "jobs": 26
+    },
+    {
+      "seed": 23,
+      "buildings": 13,
+      "room_routes_checked": 13,
+      "public_cells": 2385,
+      "jobs": 26
+    }
+  ]
+}

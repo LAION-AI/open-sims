@@ -1,0 +1,114 @@
+{
+  "url": "http://127.0.0.1:8768",
+  "checks": {
+    "portrait_enlarged": {
+      "passed": true,
+      "detail": null
+    },
+    "compact_affect": {
+      "passed": true,
+      "detail": null
+    },
+    "two_distinct_narratives": {
+      "passed": true,
+      "detail": null
+    },
+    "concrete_possessions": {
+      "passed": true,
+      "detail": null
+    },
+    "people_have_portraits": {
+      "passed": true,
+      "detail": null
+    },
+    "graph_only_own_edges": {
+      "passed": true,
+      "detail": {
+        "rendered": 14,
+        "canonical": 14
+      }
+    },
+    "graph_portraits": {
+      "passed": true,
+      "detail": null
+    },
+    "relationship_layer_colors": {
+      "passed": true,
+      "detail": [
+        "#c8798f",
+        "#c3a264",
+        "#79a586"
+      ]
+    },
+    "type_filter": {
+      "passed": true,
+      "detail": {
+        "filtered": 8,
+        "total": 14,
+        "type": "Kollegium"
+      }
+    },
+    "graph_list_selects_person": {
+      "passed": true,
+      "detail": null
+    },
+    "escape_closes_dialog": {
+      "passed": true,
+      "detail": null
+    },
+    "name_filter_empty": {
+      "passed": true,
+      "detail": null
+    },
+    "mobile_no_horizontal_overflow": {
+      "passed": true,
+      "detail": {
+        "document": 390,
+        "viewport": 390,
+        "dialog": 390,
+        "dialogClient": 390
+      }
+    },
+    "mobile_dialog_close": {
+      "passed": true,
+      "detail": null
+    },
+    "no_browser_errors": {
+      "passed": true,
+      "detail": {
+        "page": [],
+        "console": [],
+        "requests": []
+      }
+    }
+  },
+  "page_errors": [],
+  "console_errors": [],
+  "failed_requests": [],
+  "screenshots": [
+    "artifacts/story/01-portrait-overview.png",
+    "artifacts/story/02-affect-narratives.png",
+    "artifacts/story/03-possession-details.png",
+    "artifacts/story/04-people-portraits.png",
+    "artifacts/story/05-relationship-graph.png",
+    "artifacts/story/06-relationship-filter.png",
+    "artifacts/story/07-mobile-portrait-possession.png",
+    "artifacts/story/08-mobile-relationship-dialog.png"
+  ],
+  "observations": {
+    "chosen_actor": "resident_008",
+    "edge_count": 14,
+    "item_count": 8,
+    "edge_colors": [
+      "#c8798f",
+      "#c3a264",
+      "#79a586"
+    ],
+    "mobile_widths": {
+      "document": 390,
+      "viewport": 390,
+      "dialog": 390,
+      "dialogClient": 390
+    }
+  }
+}

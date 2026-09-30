@@ -1,0 +1,255 @@
+{
+  "generated_at": "2026-09-29T07:05:07.897927+00:00",
+  "seed": 73,
+  "layout": "neighborhood-v1",
+  "live_database_touched": false,
+  "test_results": null,
+  "simulation": {
+    "hours": 24,
+    "elapsed_seconds": 283.871,
+    "invariants": [],
+    "replay_matches": true,
+    "rules": {
+      "id": "mosswood.everyday",
+      "version": "3.0.0",
+      "sha256": "8f1820507751980f9bee364318271c54a18213ee6f89ff715c344767199a5e12",
+      "schema_version": 1,
+      "units": {
+        "time": "integer world seconds",
+        "distance": "meters",
+        "needs": "urgency, 0 satisfied to 1 critical",
+        "money": "fictional coins"
+      },
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "simultaneous evidenced appraisals; separate self narrative; EmoNet-Face vocabulary",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks",
+        "possessions": "unique owned portable food and wearable items with location/state",
+        "city": "hierarchical laboratory plus appended live service destinations; no traffic or geodata reconstruction"
+      }
+    },
+    "hourly_activity": [
+      {
+        "hour": 1,
+        "completed": 293,
+        "interrupted": 0,
+        "decisions": 328,
+        "beat_count": 926
+      },
+      {
+        "hour": 2,
+        "completed": 123,
+        "interrupted": 0,
+        "decisions": 123,
+        "beat_count": 1333
+      },
+      {
+        "hour": 3,
+        "completed": 130,
+        "interrupted": 0,
+        "decisions": 130,
+        "beat_count": 1753
+      },
+      {
+        "hour": 4,
+        "completed": 125,
+        "interrupted": 0,
+        "decisions": 125,
+        "beat_count": 2169
+      },
+      {
+        "hour": 5,
+        "completed": 107,
+        "interrupted": 0,
+        "decisions": 107,
+        "beat_count": 2546
+      },
+      {
+        "hour": 6,
+        "completed": 143,
+        "interrupted": 0,
+        "decisions": 143,
+        "beat_count": 3030
+      },
+      {
+        "hour": 7,
+        "completed": 238,
+        "interrupted": 1,
+        "decisions": 239,
+        "beat_count": 3752
+      },
+      {
+        "hour": 8,
+        "completed": 259,
+        "interrupted": 0,
+        "decisions": 258,
+        "beat_count": 4509
+      },
+      {
+        "hour": 9,
+        "completed": 199,
+        "interrupted": 2,
+        "decisions": 201,
+        "beat_count": 5156
+      },
+      {
+        "hour": 10,
+        "completed": 113,
+        "interrupted": 0,
+        "decisions": 113,
+        "beat_count": 5549
+      },
+      {
+        "hour": 11,
+        "completed": 133,
+        "interrupted": 3,
+        "decisions": 136,
+        "beat_count": 5982
+      },
+      {
+        "hour": 12,
+        "completed": 167,
+        "interrupted": 6,
+        "decisions": 173,
+        "beat_count": 6537
+      },
+      {
+        "hour": 13,
+        "completed": 179,
+        "interrupted": 10,
+        "decisions": 189,
+        "beat_count": 7132
+      },
+      {
+        "hour": 14,
+        "completed": 209,
+        "interrupted": 2,
+        "decisions": 211,
+        "beat_count": 7784
+      },
+      {
+        "hour": 15,
+        "completed": 92,
+        "interrupted": 4,
+        "decisions": 96,
+        "beat_count": 8118
+      },
+      {
+        "hour": 16,
+        "completed": 53,
+        "interrupted": 3,
+        "decisions": 56,
+        "beat_count": 8329
+      },
+      {
+        "hour": 17,
+        "completed": 60,
+        "interrupted": 4,
+        "decisions": 64,
+        "beat_count": 8570
+      },
+      {
+        "hour": 18,
+        "completed": 44,
+        "interrupted": 5,
+        "decisions": 49,
+        "beat_count": 8773
+      },
+      {
+        "hour": 19,
+        "completed": 111,
+        "interrupted": 16,
+        "decisions": 127,
+        "beat_count": 9199
+      },
+      {
+        "hour": 20,
+        "completed": 219,
+        "interrupted": 13,
+        "decisions": 232,
+        "beat_count": 9915
+      },
+      {
+        "hour": 21,
+        "completed": 156,
+        "interrupted": 4,
+        "decisions": 160,
+        "beat_count": 10441
+      },
+      {
+        "hour": 22,
+        "completed": 88,
+        "interrupted": 5,
+        "decisions": 93,
+        "beat_count": 10770
+      },
+      {
+        "hour": 23,
+        "completed": 81,
+        "interrupted": 4,
+        "decisions": 85,
+        "beat_count": 11078
+      },
+      {
+        "hour": 24,
+        "completed": 129,
+        "interrupted": 8,
+        "decisions": 137,
+        "beat_count": 11536
+      }
+    ],
+    "quality_checks": {
+      "interruption_to_completion_ratio": 0.0261,
+      "maximum_ratio": 2.0,
+      "passed": true,
+      "scope": "Heuristic cancellation-loop alarm; not a realism certificate"
+    },
+    "population": 44,
+    "fixtures": 364,
+    "metrics": {
+      "events_processed": 11585,
+      "decisions": 3575,
+      "completed_actions": 3451,
+      "interrupted_actions": 90,
+      "declined_chats": 20,
+      "last_advance_ms": 5860.299,
+      "queue_size": 102,
+      "path_queries": 2039,
+      "beat_count": 11536
+    },
+    "consumed_meals_in_retained_state": {
+      "pizza": 123,
+      "pancake": 49
+    },
+    "outfits_changed": 42,
+    "workplace_buildings": [
+      "cafe",
+      "fire_station",
+      "gym",
+      "home_04",
+      "home_08",
+      "home_13",
+      "home_17",
+      "hospital",
+      "office_hub",
+      "school",
+      "shop",
+      "studio",
+      "supermarket",
+      "town_hall",
+      "workshop"
+    ]
+  },
+  "passed": true
+}

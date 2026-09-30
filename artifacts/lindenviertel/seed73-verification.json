@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-09-29T06:39:45.162396+00:00",
+  "seed": 73,
+  "layout": "neighborhood-v1",
+  "live_database_touched": false,
+  "test_results": null,
+  "simulation": {
+    "hours": 24,
+    "elapsed_seconds": 732.675,
+    "invariants": [],
+    "replay_matches": true,
+    "rules": {
+      "id": "mosswood.everyday",
+      "version": "3.0.0",
+      "sha256": "8f1820507751980f9bee364318271c54a18213ee6f89ff715c344767199a5e12",
+      "schema_version": 1,
+      "units": {
+        "time": "integer world seconds",
+        "distance": "meters",
+        "needs": "urgency, 0 satisfied to 1 critical",
+        "money": "fictional coins"
+      },
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "simultaneous evidenced appraisals; separate self narrative; EmoNet-Face vocabulary",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks",
+        "possessions": "unique owned portable food and wearable items with location/state",
+        "city": "hierarchical laboratory plus appended live service destinations; no traffic or geodata reconstruction"
+      }
+    },
+    "population": 44,
+    "fixtures": 364,
+    "metrics": {
+      "events_processed": 73546,
+      "decisions": 24223,
+      "completed_actions": 3454,
+      "interrupted_actions": 20736,
+      "declined_chats": 23,
+      "last_advance_ms": 17624.809,
+      "queue_size": 157,
+      "path_queries": 2246,
+      "beat_count": 52830
+    },
+    "consumed_meals_in_retained_state": {
+      "pizza": 123,
+      "pancake": 49
+    },
+    "outfits_changed": 42,
+    "workplace_buildings": [
+      "cafe",
+      "fire_station",
+      "gym",
+      "home_04",
+      "home_08",
+      "home_13",
+      "home_17",
+      "hospital",
+      "office_hub",
+      "school",
+      "shop",
+      "studio",
+      "supermarket",
+      "town_hall",
+      "workshop"
+    ]
+  },
+  "passed": true
+}

@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-09-29T06:26:27.515437+00:00",
+  "seed": 42,
+  "live_database_touched": false,
+  "test_results": {
+    "count": 149,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true,
+    "elapsed_seconds": 298.533,
+    "log": ".....................................................................................................................................................\n----------------------------------------------------------------------\nRan 149 tests in 294.601s\n\nOK\n"
+  },
+  "simulation": {
+    "hours": 24,
+    "elapsed_seconds": 386.951,
+    "invariants": [],
+    "replay_matches": true,
+    "rules": {
+      "id": "mosswood.everyday",
+      "version": "3.0.0",
+      "sha256": "8f1820507751980f9bee364318271c54a18213ee6f89ff715c344767199a5e12",
+      "schema_version": 1,
+      "units": {
+        "time": "integer world seconds",
+        "distance": "meters",
+        "needs": "urgency, 0 satisfied to 1 critical",
+        "money": "fictional coins"
+      },
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "simultaneous evidenced appraisals; separate self narrative; EmoNet-Face vocabulary",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks",
+        "possessions": "unique owned portable food and wearable items with location/state",
+        "city": "hierarchical laboratory plus appended live service destinations; no traffic or geodata reconstruction"
+      }
+    },
+    "population": 44,
+    "fixtures": 364,
+    "metrics": {
+      "events_processed": 11898,
+      "decisions": 3674,
+      "completed_actions": 3554,
+      "interrupted_actions": 86,
+      "declined_chats": 16,
+      "last_advance_ms": 43702.595,
+      "queue_size": 103,
+      "path_queries": 2042,
+      "beat_count": 11790
+    },
+    "consumed_meals_in_retained_state": {
+      "pizza": 130,
+      "pancake": 52
+    },
+    "outfits_changed": 44,
+    "workplace_buildings": [
+      "cafe",
+      "fire_station",
+      "gym",
+      "home_04",
+      "home_08",
+      "home_13",
+      "home_17",
+      "hospital",
+      "office_hub",
+      "school",
+      "shop",
+      "studio",
+      "supermarket",
+      "town_hall",
+      "workshop"
+    ]
+  },
+  "passed": true
+}

@@ -1,0 +1,521 @@
+{
+  "passed": true,
+  "base_url": "http://127.0.0.1:8766",
+  "checks": [
+    {
+      "name": "initial_building_valid",
+      "passed": true,
+      "detail": {
+        "valid": true,
+        "errors": [],
+        "reachable_cells": 211,
+        "total_walkable_cells": 211,
+        "reachable_anchors": 69,
+        "floor_count": 2,
+        "stairs_links": 1,
+        "lift_links": 1,
+        "required_room_count": 6,
+        "room_count": 6,
+        "sleep_capacity": {
+          "required": 3,
+          "provided": 3,
+          "adults_required": 2,
+          "adults_provided": 2,
+          "children_required": 1,
+          "children_provided": 1,
+          "teens_required": 0,
+          "teens_provided": 0
+        },
+        "sleep_capacity_valid": true,
+        "footprint_coverage": {
+          "floors": [
+            {
+              "floor": 0,
+              "footprint_cells": 342,
+              "assigned_cells": 168,
+              "unassigned_cells": 174,
+              "assigned_fraction": 0.491
+            },
+            {
+              "floor": 1,
+              "footprint_cells": 342,
+              "assigned_cells": 129,
+              "unassigned_cells": 213,
+              "assigned_fraction": 0.377
+            }
+          ],
+          "footprint_cells": 684,
+          "assigned_cells": 297,
+          "unassigned_cells": 387,
+          "assigned_fraction": 0.434
+        },
+        "student_capacity": 0
+      }
+    },
+    {
+      "name": "initial_family_six_rooms_18x19",
+      "passed": true,
+      "detail": {
+        "rooms": 6,
+        "levels": 2
+      }
+    },
+    {
+      "name": "family_room_area_order",
+      "passed": true,
+      "detail": {
+        "living": 42,
+        "kitchen": 30,
+        "bathroom": 25,
+        "laundry": 36,
+        "bedroom": 49,
+        "child": 48
+      }
+    },
+    {
+      "name": "floor_controls_rendered",
+      "passed": true,
+      "detail": 2
+    },
+    {
+      "name": "floor_button_changes_floor",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "keyboard_floor_navigation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "zoom_control_changes_scale",
+      "passed": true,
+      "detail": {
+        "before": 24.36842105263158,
+        "after": 31.678947368421053
+      }
+    },
+    {
+      "name": "canvas_pan_changes_camera",
+      "passed": true,
+      "detail": {
+        "before": {
+          "x": 0,
+          "y": 7
+        },
+        "after": {
+          "x": 70,
+          "y": 42
+        }
+      }
+    },
+    {
+      "name": "object_click_shows_actions",
+      "passed": true,
+      "detail": {
+        "object_id": "building-42-18x19-6-2-0:floor:0:room:0:object:0",
+        "name": "Dreisitziges Sofa",
+        "actions": 5
+      }
+    },
+    {
+      "name": "npc_step_invariants",
+      "passed": true,
+      "detail": {
+        "clock": 30,
+        "arrivals": 0,
+        "errors": []
+      }
+    },
+    {
+      "name": "npc_step_invariants",
+      "passed": true,
+      "detail": {
+        "clock": 60,
+        "arrivals": 3,
+        "errors": []
+      }
+    },
+    {
+      "name": "npc_step_invariants",
+      "passed": true,
+      "detail": {
+        "clock": 90,
+        "arrivals": 5,
+        "errors": []
+      }
+    },
+    {
+      "name": "npc_step_invariants",
+      "passed": true,
+      "detail": {
+        "clock": 120,
+        "arrivals": 6,
+        "errors": []
+      }
+    },
+    {
+      "name": "impossible_footprint_rejected",
+      "passed": true,
+      "detail": "Footprint 12x10 cannot fit room minima and circulation: {'bathroom': [4, 5], 'kitchen': [5, 5], 'laundry': [6, 6], 'living': [6, 6]}"
+    },
+    {
+      "name": "impossible_footprint_returns_http_422",
+      "passed": true,
+      "detail": [
+        {
+          "url": "http://127.0.0.1:8766/api/generation/building",
+          "status": 422
+        }
+      ]
+    },
+    {
+      "name": "rejection_preserves_previous_design",
+      "passed": true,
+      "detail": {
+        "previous": "building-42-18x19-6-2-0",
+        "current": "building-42-18x19-6-2-0"
+      }
+    },
+    {
+      "name": "basement_toggle_three_floors_elevations",
+      "passed": true,
+      "detail": {
+        "rooms": 6,
+        "elevations": [
+          -1,
+          0,
+          1
+        ],
+        "floor_labels": [
+          "UG",
+          "EG",
+          "1. OG"
+        ]
+      }
+    },
+    {
+      "name": "basement_floor_labels",
+      "passed": true,
+      "detail": [
+        "UG",
+        "EG",
+        "1. OG"
+      ]
+    },
+    {
+      "name": "preset_school",
+      "passed": true,
+      "detail": {
+        "rooms": 6,
+        "levels": 1,
+        "program": [
+          "school_classroom",
+          "school_lab",
+          "school_biology",
+          "school_physics",
+          "school_staff",
+          "school_cafeteria"
+        ],
+        "expected_program": [
+          "school_classroom",
+          "school_lab",
+          "school_biology",
+          "school_physics",
+          "school_staff",
+          "school_cafeteria"
+        ]
+      }
+    },
+    {
+      "name": "school_24_real_pupil_places",
+      "passed": true,
+      "detail": {
+        "students": 24,
+        "seats": 24,
+        "teachers": 1
+      }
+    },
+    {
+      "name": "preset_hospital",
+      "passed": true,
+      "detail": {
+        "rooms": 3,
+        "levels": 1,
+        "program": [
+          "hospital_reception",
+          "hospital_exam",
+          "hospital_ward"
+        ],
+        "expected_program": [
+          "hospital_reception",
+          "hospital_exam",
+          "hospital_ward"
+        ]
+      }
+    },
+    {
+      "name": "preset_fire_station",
+      "passed": true,
+      "detail": {
+        "rooms": 2,
+        "levels": 1,
+        "program": [
+          "fire_equipment",
+          "fire_garage"
+        ],
+        "expected_program": [
+          "fire_equipment",
+          "fire_garage"
+        ]
+      }
+    },
+    {
+      "name": "region_plot_selection",
+      "passed": true,
+      "detail": {
+        "plots": 4,
+        "plot_id": "plot-0"
+      }
+    },
+    {
+      "name": "region_public_to_room_route",
+      "passed": true,
+      "detail": "42 \u00f6ffentliche Wegzellen + 14 Geb\u00e4udeschritte. \u00dcbergang an der Haust\u00fcr gepr\u00fcft."
+    },
+    {
+      "name": "region_open_building",
+      "passed": true,
+      "detail": {
+        "rooms": 8,
+        "levels": 2
+      }
+    },
+    {
+      "name": "offline_demo_awaits_review",
+      "passed": true,
+      "detail": {
+        "state": "awaiting_review",
+        "provider": "offline-fixture",
+        "model": "not-an-llm"
+      }
+    },
+    {
+      "name": "offline_demo_valid_previews_and_logs",
+      "passed": true,
+      "detail": {
+        "valid": true,
+        "previews": 1,
+        "events": 6,
+        "room_checks": 16,
+        "building_checks": 0
+      }
+    },
+    {
+      "name": "browser_factory_external_calls_disabled",
+      "passed": true,
+      "detail": {
+        "jobs": [
+          {
+            "id": "job_6b5a3ebd302341ef",
+            "focus": "Kleine zus\u00e4tzliche Lesepl\u00e4tze",
+            "provider": "offline-fixture",
+            "model": "not-an-llm",
+            "state": "awaiting_review",
+            "created": "2026-09-28T18:50:01.445301+00:00",
+            "updated": "2026-09-28T18:50:02.022108+00:00",
+            "error": null
+          },
+          {
+            "id": "job_6b91a912fb8b47c4",
+            "focus": "Kleine zus\u00e4tzliche Lesepl\u00e4tze",
+            "provider": "offline-fixture",
+            "model": "not-an-llm",
+            "state": "awaiting_review",
+            "created": "2026-09-28T18:45:01.573554+00:00",
+            "updated": "2026-09-28T18:45:01.817765+00:00",
+            "error": null
+          }
+        ],
+        "external_enabled_in_web": false,
+        "codex_delegation": "interactive_session_only",
+        "max_demo_workers": 1
+      }
+    },
+    {
+      "name": "publish_checkbox_starts_unchecked",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchecked_publish_is_not_sent",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "unchecked_publish_keeps_job_awaiting_review",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "unchecked_publish_keeps_library_unchanged",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "mobile_390_no_text_or_page_overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "clippedTextCandidates": []
+      }
+    },
+    {
+      "name": "desktop_1600_no_text_or_page_overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1600,
+        "documentWidth": 1600,
+        "horizontalOverflow": false,
+        "clippedTextCandidates": []
+      }
+    },
+    {
+      "name": "offline_agent_gallery_served",
+      "passed": true,
+      "detail": 200
+    },
+    {
+      "name": "standalone_file_gallery_renders",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "standalone_file_basement_navigation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "no_external_network_requests",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no_browser_runtime_errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "no_unexpected_console_errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "actual_counts": {
+    "room_types": 32,
+    "object_types": 116,
+    "initial_building": {
+      "rooms": 6,
+      "levels": 2,
+      "objects": 41
+    },
+    "selected_object_actions": 5,
+    "npc_actors": 3,
+    "npc_steps": [
+      {
+        "clock": 30,
+        "arrivals": 0,
+        "errors": []
+      },
+      {
+        "clock": 60,
+        "arrivals": 3,
+        "errors": []
+      },
+      {
+        "clock": 90,
+        "arrivals": 5,
+        "errors": []
+      },
+      {
+        "clock": 120,
+        "arrivals": 6,
+        "errors": []
+      }
+    ],
+    "basement_building": {
+      "rooms": 6,
+      "levels": 3,
+      "elevations": [
+        -1,
+        0,
+        1
+      ]
+    },
+    "presets": {
+      "school": {
+        "rooms": 6,
+        "levels": 1
+      },
+      "hospital": {
+        "rooms": 3,
+        "levels": 1
+      },
+      "fire_station": {
+        "rooms": 2,
+        "levels": 1
+      }
+    },
+    "region": {
+      "plots": 4,
+      "route_public_cells": 42,
+      "opened_rooms": 8
+    },
+    "offline_job": {
+      "state": "awaiting_review",
+      "previews": 1,
+      "room_checks": 16,
+      "building_checks": 0,
+      "events": 6
+    }
+  },
+  "screenshots": [
+    "artifacts/workshop/01-desktop-building.png",
+    "artifacts/workshop/02-rejected-brief-preserved.png",
+    "artifacts/workshop/03-basement-building.png",
+    "artifacts/workshop/04-school-24-seats.png",
+    "artifacts/workshop/04-region-route-overview.png",
+    "artifacts/workshop/04-region-opened-building.png",
+    "artifacts/workshop/05-factory-offline-review.png",
+    "artifacts/workshop/06-unchecked-publish-blocked.png",
+    "artifacts/workshop/07-mobile-390.png",
+    "artifacts/workshop/08-desktop-1600-final.png",
+    "artifacts/workshop/09-agent-gallery.png"
+  ],
+  "external_requests": [],
+  "browser_errors": [],
+  "console_errors": [],
+  "expected_http_errors": [
+    {
+      "status": 422,
+      "endpoint": "/api/generation/building",
+      "console_messages": [
+        "Failed to load resource: the server responded with a status of 422 (Unprocessable Content)"
+      ]
+    }
+  ],
+  "offline_docs": {
+    "checked": true,
+    "available": true,
+    "status": 200,
+    "file_protocol_tested": true
+  },
+  "publication_attempts": 0,
+  "browser_version": "145.0.7632.6",
+  "generator_version": "housing-0.4.0",
+  "room_type_count": 32,
+  "object_type_count": 116
+}

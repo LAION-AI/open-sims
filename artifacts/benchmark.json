@@ -1,0 +1,129 @@
+{
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.14.2",
+  "processor": "Intel64 Family 6 Model 142 Stepping 9, GenuineIntel",
+  "seed": 42,
+  "population": 44,
+  "households": 20,
+  "objects": 320,
+  "rule_manifest": {
+    "id": "mosswood.everyday",
+    "version": "1.0.0",
+    "sha256": "c0dc3f5dc648ac9c229dee0450648de97d6c5e518916b369e6601620a4c51121",
+    "schema_version": 1,
+    "units": {
+      "time": "integer world seconds",
+      "distance": "meters",
+      "needs": "urgency, 0 satisfied to 1 critical",
+      "money": "fictional coins"
+    },
+    "coverage": {
+      "needs": "modeled",
+      "actions": "modeled",
+      "emotions": "rule appraisal",
+      "thoughts": "template from accepted decision",
+      "beliefs": "bounded observations and initialized knowledge",
+      "theory_of_mind": "unmodeled",
+      "speech": "unmodeled",
+      "physiology": "game abstraction"
+    }
+  },
+  "simulated_hours": 168,
+  "elapsed_seconds": 271.556,
+  "latency_ms_per_5_world_minutes": {
+    "p50": 92.143,
+    "p95": 397.813,
+    "p99": 639.869,
+    "max": 1227.899
+  },
+  "invariant_errors": [],
+  "replay_matches": true,
+  "max_queue_size": 167,
+  "metrics": {
+    "events_processed": 53025,
+    "decisions": 16886,
+    "completed_actions": 16212,
+    "interrupted_actions": 634,
+    "declined_chats": 836,
+    "last_advance_ms": 90.432,
+    "queue_size": 110,
+    "path_queries": 2866,
+    "beat_count": 51062
+  },
+  "action_counts": {
+    "eat": 2446,
+    "relax": 1649,
+    "drink": 3533,
+    "toilet": 2471,
+    "garden": 1142,
+    "read": 1185,
+    "shower": 1507,
+    "stroll": 645,
+    "work": 1467,
+    "wait": 92,
+    "sleep": 638
+  },
+  "rule_counts": {
+    "initialization": 1,
+    "social.accept.v1": 111,
+    "decision.utility.v1": 16775,
+    "social.decline.v1": 836,
+    "travel.arrive.v1": 16486,
+    "action.complete.v1": 16212,
+    "action.interrupt.v1": 634,
+    "calendar.day.v1": 7
+  },
+  "daily": [
+    {
+      "simulated_days": 1,
+      "beats": 7052,
+      "queue": 109,
+      "elapsed_seconds": 25.32,
+      "wellbeing": 0.693
+    },
+    {
+      "simulated_days": 2,
+      "beats": 14247,
+      "queue": 115,
+      "elapsed_seconds": 47.31,
+      "wellbeing": 0.638
+    },
+    {
+      "simulated_days": 3,
+      "beats": 21701,
+      "queue": 109,
+      "elapsed_seconds": 70.96,
+      "wellbeing": 0.668
+    },
+    {
+      "simulated_days": 4,
+      "beats": 29087,
+      "queue": 113,
+      "elapsed_seconds": 111.87,
+      "wellbeing": 0.639
+    },
+    {
+      "simulated_days": 5,
+      "beats": 36448,
+      "queue": 110,
+      "elapsed_seconds": 170.65,
+      "wellbeing": 0.662
+    },
+    {
+      "simulated_days": 6,
+      "beats": 43647,
+      "queue": 109,
+      "elapsed_seconds": 236.28,
+      "wellbeing": 0.644
+    },
+    {
+      "simulated_days": 7,
+      "beats": 51062,
+      "queue": 110,
+      "elapsed_seconds": 271.55,
+      "wellbeing": 0.641
+    }
+  ],
+  "history_bytes": 518410240,
+  "scope": "44 resident neighborhood only; no extrapolation to cities, animals or language-model costs"
+}

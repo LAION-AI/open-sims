@@ -1,0 +1,5832 @@
+{
+  "generated_at": "2026-09-28T18:42:03.189711+00:00",
+  "seed": 42,
+  "simulated_hours": 24,
+  "population": 44,
+  "households": 20,
+  "objects": 349,
+  "rules": {
+    "id": "mosswood.everyday",
+    "version": "2.0.0",
+    "sha256": "d833aaed1a19bc03e5609dd51625c6badbdcdc77dbb58970f5db589137f9dde0",
+    "schema_version": 1,
+    "units": {
+      "time": "integer world seconds",
+      "distance": "meters",
+      "needs": "urgency, 0 satisfied to 1 critical",
+      "money": "fictional coins"
+    },
+    "coverage": {
+      "needs": "modeled",
+      "actions": "modeled",
+      "emotions": "rule appraisal",
+      "thoughts": "template from accepted decision",
+      "beliefs": "bounded observations and initialized knowledge",
+      "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+      "speech": "unmodeled",
+      "physiology": "game abstraction",
+      "personality": "five bounded gameplay traits; not a psychological diagnosis",
+      "relationships": "explicit kinship/status plus directional quality dimensions",
+      "ambitions": "event-driven progress and utility preferences",
+      "fears": "observed triggers, cooldowns and temporary appraisal",
+      "household_routines": "reserved multi-step meal and cleanup plans",
+      "work": "assigned physical workplace and commute; simplified paid tasks"
+    }
+  },
+  "python": "3.14.2",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "elapsed_seconds": 65.081,
+  "max_queue": 146,
+  "beats": 11355,
+  "invariant_errors": [],
+  "replay_matches": true,
+  "completed_actions": {
+    "bin_trash": 175,
+    "buy_groceries": 12,
+    "chat": 96,
+    "clear_dishes": 182,
+    "creative_hobby": 34,
+    "drink": 390,
+    "eat": 36,
+    "eat_meal": 188,
+    "empty_trash": 167,
+    "fetch_ingredients": 191,
+    "garden": 104,
+    "prepare_meal": 190,
+    "read": 106,
+    "relax": 149,
+    "serve_meal": 190,
+    "shower": 160,
+    "stock_fridge": 12,
+    "stroll": 72,
+    "toilet": 257,
+    "wait": 6,
+    "wash_dishes": 179,
+    "wipe_counter": 140,
+    "work": 242
+  },
+  "accepted_social_categories": {
+    "ask_advice": 4,
+    "celebrate": 4,
+    "check_in": 4,
+    "compliment": 4,
+    "confide": 2,
+    "greet": 3,
+    "invite_activity": 2,
+    "offer_help": 3,
+    "play_together": 3,
+    "set_boundary": 4,
+    "share_interest": 7,
+    "small_talk": 4,
+    "tell_joke": 4
+  },
+  "declined_social_categories": {
+    "ask_date": 2,
+    "celebrate": 2,
+    "check_in": 1,
+    "compliment": 5,
+    "flirt": 1,
+    "gossip": 1,
+    "greet": 2,
+    "offer_help": 1,
+    "play_together": 1,
+    "set_boundary": 1,
+    "share_interest": 2,
+    "small_talk": 3,
+    "tell_joke": 3
+  },
+  "rule_counts": {
+    "initialization": 1,
+    "social.decline.v1": 25,
+    "decision.utility.v1": 3384,
+    "social.accept.v2": 48,
+    "travel.arrive.v1": 2882,
+    "animal.patrol.v1": 1440,
+    "psychology.fear.v2": 26,
+    "action.complete.v1": 3278,
+    "routine.replan.v2": 150,
+    "action.interrupt.v1": 120,
+    "calendar.day.v1": 1
+  },
+  "examples": [
+    {
+      "id": "beat_00000004",
+      "at": 29701,
+      "rule": "social.accept.v2",
+      "text": "Elliot Bennett and Maya Bennett agree: Tell joke."
+    },
+    {
+      "id": "beat_00000006",
+      "at": 29702,
+      "rule": "social.accept.v2",
+      "text": "Sofia Rivera and Leo Rivera agree: Set boundary."
+    },
+    {
+      "id": "beat_00000009",
+      "at": 29704,
+      "rule": "social.accept.v2",
+      "text": "Jun Chen and Nora Chen agree: Share interest."
+    },
+    {
+      "id": "beat_00000010",
+      "at": 29704,
+      "rule": "social.accept.v2",
+      "text": "Robin Santos and Yuki Santos agree: Compliment."
+    },
+    {
+      "id": "beat_00000016",
+      "at": 29708,
+      "rule": "social.accept.v2",
+      "text": "Omar Ito and Chloe Ito agree: Celebrate."
+    },
+    {
+      "id": "beat_00000028",
+      "at": 29713,
+      "rule": "social.accept.v2",
+      "text": "Petra Novak and Arjun Novak agree: Play together."
+    },
+    {
+      "id": "beat_00000029",
+      "at": 29713,
+      "rule": "social.accept.v2",
+      "text": "Zoe Dubois and Jules Dubois agree: Invite to activity."
+    },
+    {
+      "id": "beat_00000032",
+      "at": 29715,
+      "rule": "social.accept.v2",
+      "text": "Meera Shah and Luca Shah agree: Small talk."
+    },
+    {
+      "id": "beat_00000046",
+      "at": 29722,
+      "rule": "social.accept.v2",
+      "text": "Asha Silva and Nikhil Silva agree: Celebrate."
+    },
+    {
+      "id": "beat_00000066",
+      "at": 29760,
+      "rule": "psychology.fear.v2",
+      "text": "Ines Kim felt uneasy: a dog was visible nearby."
+    },
+    {
+      "id": "beat_00000343",
+      "at": 31153,
+      "rule": "social.accept.v2",
+      "text": "Ruby Rossi and Oliver Rossi agree: Compliment."
+    },
+    {
+      "id": "beat_00000506",
+      "at": 31582,
+      "rule": "routine.replan.v2",
+      "text": "Luca Shah reconsidered a household step because its preconditions changed."
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "resident_001",
+      "kind": "human",
+      "name": "Maya Bennett",
+      "age": 73,
+      "household_id": "household_01",
+      "home_id": "home_01",
+      "position": [
+        15,
+        9
+      ],
+      "appearance": {
+        "shirt": "#cb775c",
+        "skin": "#e9ba94",
+        "hair": "#574338",
+        "style": 0
+      },
+      "profile": {
+        "job": "Illustrator",
+        "interests": [
+          "gardening",
+          "walking"
+        ],
+        "traits": [
+          "Practical",
+          "Reserved",
+          "Green-fingered"
+        ]
+      },
+      "preferences": {
+        "cooking": 0.51,
+        "relaxing": 0.25,
+        "reading": 0.46,
+        "gardening": 0.77,
+        "craft": 0.21,
+        "socializing": 0.55,
+        "walking": 0.73
+      },
+      "needs": {
+        "hunger": 0.35584999999999994,
+        "thirst": 0.7421916666666668,
+        "bladder": 0.4361666666666667,
+        "fatigue": 0.0,
+        "hygiene": 0.1593511111111111,
+        "social": 1.0,
+        "fun": 0.7067916666666669,
+        "comfort": 0.0
+      },
+      "needs_at": 105188,
+      "need_rates": {
+        "hunger": 3.0555555555555554e-05,
+        "thirst": 4.722222222222223e-05,
+        "bladder": 3.3333333333333335e-05,
+        "fatigue": -3.9722222222222215e-05,
+        "hygiene": 1.4444444444444444e-05,
+        "social": 1.5277777777777777e-05,
+        "fun": 2.0833333333333333e-05,
+        "comfort": -1.369047619047619e-05
+      },
+      "money": 294,
+      "inventory": {
+        "phone": 1,
+        "house_key": 1,
+        "food_scraps": 1,
+        "dirty_dish": 1
+      },
+      "skills": {
+        "cooking": 0.343,
+        "craft": 0.495,
+        "gardening": 0.433
+      },
+      "schedule": {
+        "start": 32400,
+        "end": 61200,
+        "work_target_seconds": 14400,
+        "work_seconds": 0,
+        "day": 1
+      },
+      "goals": [
+        {
+          "id": "wellbeing",
+          "title": "Take care of myself",
+          "kind": "ongoing",
+          "progress": 0.769
+        },
+        {
+          "id": "work",
+          "title": "Finish today's work",
+          "kind": "daily",
+          "progress": 0.0
+        },
+        {
+          "id": "hobby",
+          "title": "Make time for gardening",
+          "kind": "daily",
+          "progress": 0
+        }
+      ],
+      "relations": {
+        "resident_002": {
+          "closeness": 0.665,
+          "trust": 0.763,
+          "last_interaction": 58607,
+          "kind": "Housemate",
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.65,
+              "status": "established"
+            },
+            "friendship": {
+              "score": 0.018,
+              "status": "developing"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.5,
+              "status": "co_resident"
+            }
+          },
+          "last_evidence_id": "beat_00004903"
+        },
+        "resident_003": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "child"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_005": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "grandchild"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_007": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "grandchild"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_008": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "child"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_010": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "grandchild"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_013": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_017": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_021": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_025": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_029": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_033": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_037": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_041": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        }
+      },
+      "perceptions": [
+        {
+          "id": "perception_resident_001_8300_16",
+          "observer": "resident_001",
+          "at": 79703,
+          "modality": "participation",
+          "content": "I finished carrying dinner to the table.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00008300",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_8379_16",
+          "observer": "resident_001",
+          "at": 80304,
+          "modality": "participation",
+          "content": "I finished eating a meal.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00008379",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_8392_16",
+          "observer": "resident_001",
+          "at": 80395,
+          "modality": "participation",
+          "content": "I finished clearing dirty dishes.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00008392",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_8444_16",
+          "observer": "resident_001",
+          "at": 80645,
+          "modality": "participation",
+          "content": "I finished washing dishes.",
+          "source_entity": "object_0003",
+          "source_beat": "beat_00008444",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_8561_16",
+          "observer": "resident_001",
+          "at": 82174,
+          "modality": "participation",
+          "content": "I finished tending the garden.",
+          "source_entity": "object_0015",
+          "source_beat": "beat_00008561",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_8581_16",
+          "observer": "resident_001",
+          "at": 82383,
+          "modality": "participation",
+          "content": "I finished having a drink.",
+          "source_entity": "object_0003",
+          "source_beat": "beat_00008581",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10310_16",
+          "observer": "resident_001",
+          "at": 102488,
+          "modality": "participation",
+          "content": "I finished having a drink.",
+          "source_entity": "object_0003",
+          "source_beat": "beat_00010310",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10322_16",
+          "observer": "resident_001",
+          "at": 102582,
+          "modality": "participation",
+          "content": "I finished putting scraps in the bin.",
+          "source_entity": "object_0330",
+          "source_beat": "beat_00010322",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10352_16",
+          "observer": "resident_001",
+          "at": 102763,
+          "modality": "participation",
+          "content": "I finished taking out the trash.",
+          "source_entity": "object_0330",
+          "source_beat": "beat_00010352",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10386_16",
+          "observer": "resident_001",
+          "at": 103015,
+          "modality": "participation",
+          "content": "I finished using the bathroom.",
+          "source_entity": "object_0012",
+          "source_beat": "beat_00010386",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10404_16",
+          "observer": "resident_001",
+          "at": 103151,
+          "modality": "participation",
+          "content": "I finished getting ingredients.",
+          "source_entity": "object_0002",
+          "source_beat": "beat_00010404",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10476_16",
+          "observer": "resident_001",
+          "at": 103754,
+          "modality": "participation",
+          "content": "I finished preparing a meal.",
+          "source_entity": "object_0004",
+          "source_beat": "beat_00010476",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10487_16",
+          "observer": "resident_001",
+          "at": 103853,
+          "modality": "participation",
+          "content": "I finished carrying dinner to the table.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00010487",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10546_16",
+          "observer": "resident_001",
+          "at": 104454,
+          "modality": "participation",
+          "content": "I finished eating a meal.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00010546",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10602_16",
+          "observer": "resident_001",
+          "at": 105068,
+          "modality": "participation",
+          "content": "I finished taking a shower.",
+          "source_entity": "object_0013",
+          "source_beat": "beat_00010602",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_001_10613_16",
+          "observer": "resident_001",
+          "at": 105172,
+          "modality": "participation",
+          "content": "I finished clearing dirty dishes.",
+          "source_entity": "object_0006",
+          "source_beat": "beat_00010613",
+          "reliability": "direct"
+        }
+      ],
+      "memories": [
+        {
+          "id": "memory_perception_resident_001_8300_16",
+          "at": 79703,
+          "content": "I finished carrying dinner to the table.",
+          "source_percepts": [
+            "perception_resident_001_8300_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_8379_16",
+          "at": 80304,
+          "content": "I finished eating a meal.",
+          "source_percepts": [
+            "perception_resident_001_8379_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_8392_16",
+          "at": 80395,
+          "content": "I finished clearing dirty dishes.",
+          "source_percepts": [
+            "perception_resident_001_8392_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_8444_16",
+          "at": 80645,
+          "content": "I finished washing dishes.",
+          "source_percepts": [
+            "perception_resident_001_8444_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_8561_16",
+          "at": 82174,
+          "content": "I finished tending the garden.",
+          "source_percepts": [
+            "perception_resident_001_8561_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_8581_16",
+          "at": 82383,
+          "content": "I finished having a drink.",
+          "source_percepts": [
+            "perception_resident_001_8581_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10310_16",
+          "at": 102488,
+          "content": "I finished having a drink.",
+          "source_percepts": [
+            "perception_resident_001_10310_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10322_16",
+          "at": 102582,
+          "content": "I finished putting scraps in the bin.",
+          "source_percepts": [
+            "perception_resident_001_10322_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10352_16",
+          "at": 102763,
+          "content": "I finished taking out the trash.",
+          "source_percepts": [
+            "perception_resident_001_10352_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10386_16",
+          "at": 103015,
+          "content": "I finished using the bathroom.",
+          "source_percepts": [
+            "perception_resident_001_10386_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10404_16",
+          "at": 103151,
+          "content": "I finished getting ingredients.",
+          "source_percepts": [
+            "perception_resident_001_10404_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10476_16",
+          "at": 103754,
+          "content": "I finished preparing a meal.",
+          "source_percepts": [
+            "perception_resident_001_10476_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10487_16",
+          "at": 103853,
+          "content": "I finished carrying dinner to the table.",
+          "source_percepts": [
+            "perception_resident_001_10487_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10546_16",
+          "at": 104454,
+          "content": "I finished eating a meal.",
+          "source_percepts": [
+            "perception_resident_001_10546_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10602_16",
+          "at": 105068,
+          "content": "I finished taking a shower.",
+          "source_percepts": [
+            "perception_resident_001_10602_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_001_10613_16",
+          "at": 105172,
+          "content": "I finished clearing dirty dishes.",
+          "source_percepts": [
+            "perception_resident_001_10613_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        }
+      ],
+      "beliefs": [
+        {
+          "id": "belief_perception_resident_001_8300_16",
+          "proposition": "I finished carrying dinner to the table.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8300_16"
+          ],
+          "valid_from": 79703
+        },
+        {
+          "id": "belief_perception_resident_001_8379_16",
+          "proposition": "I finished eating a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8379_16"
+          ],
+          "valid_from": 80304
+        },
+        {
+          "id": "belief_perception_resident_001_8392_16",
+          "proposition": "I finished clearing dirty dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8392_16"
+          ],
+          "valid_from": 80395
+        },
+        {
+          "id": "belief_perception_resident_001_8444_16",
+          "proposition": "I finished washing dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8444_16"
+          ],
+          "valid_from": 80645
+        },
+        {
+          "id": "belief_perception_resident_001_8561_16",
+          "proposition": "I finished tending the garden.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8561_16"
+          ],
+          "valid_from": 82174
+        },
+        {
+          "id": "belief_perception_resident_001_8581_16",
+          "proposition": "I finished having a drink.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_8581_16"
+          ],
+          "valid_from": 82383
+        },
+        {
+          "id": "belief_perception_resident_001_10310_16",
+          "proposition": "I finished having a drink.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10310_16"
+          ],
+          "valid_from": 102488
+        },
+        {
+          "id": "belief_perception_resident_001_10322_16",
+          "proposition": "I finished putting scraps in the bin.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10322_16"
+          ],
+          "valid_from": 102582
+        },
+        {
+          "id": "belief_perception_resident_001_10352_16",
+          "proposition": "I finished taking out the trash.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10352_16"
+          ],
+          "valid_from": 102763
+        },
+        {
+          "id": "belief_perception_resident_001_10386_16",
+          "proposition": "I finished using the bathroom.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10386_16"
+          ],
+          "valid_from": 103015
+        },
+        {
+          "id": "belief_perception_resident_001_10404_16",
+          "proposition": "I finished getting ingredients.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10404_16"
+          ],
+          "valid_from": 103151
+        },
+        {
+          "id": "belief_perception_resident_001_10476_16",
+          "proposition": "I finished preparing a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10476_16"
+          ],
+          "valid_from": 103754
+        },
+        {
+          "id": "belief_perception_resident_001_10487_16",
+          "proposition": "I finished carrying dinner to the table.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10487_16"
+          ],
+          "valid_from": 103853
+        },
+        {
+          "id": "belief_perception_resident_001_10546_16",
+          "proposition": "I finished eating a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10546_16"
+          ],
+          "valid_from": 104454
+        },
+        {
+          "id": "belief_perception_resident_001_10602_16",
+          "proposition": "I finished taking a shower.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10602_16"
+          ],
+          "valid_from": 105068
+        },
+        {
+          "id": "belief_perception_resident_001_10613_16",
+          "proposition": "I finished clearing dirty dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_001_10613_16"
+          ],
+          "valid_from": 105172
+        }
+      ],
+      "emotion": {
+        "type": "Uncomfortable",
+        "valence": 0.63,
+        "arousal": 0.6,
+        "intensity": 0.269,
+        "cause": "Completed clear_dishes; appraised my own needs",
+        "since": 105172,
+        "expires_at": null
+      },
+      "thought": {
+        "text": "I need some rest. Tomorrow can wait.",
+        "trigger": "decision_71",
+        "since": 105173
+      },
+      "action": {
+        "id": "action_resident_001_71",
+        "kind": "sleep",
+        "label": "Sleeping",
+        "target_id": "object_0009",
+        "phase": "using",
+        "started_at": 105173,
+        "arrives_at": 105188,
+        "ends_at": 130388,
+        "duration": 25200,
+        "path": [
+          [
+            8,
+            13
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            10,
+            13
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            12
+          ],
+          [
+            15,
+            12
+          ],
+          [
+            16,
+            12
+          ],
+          [
+            17,
+            12
+          ],
+          [
+            17,
+            11
+          ],
+          [
+            17,
+            10
+          ],
+          [
+            16,
+            10
+          ],
+          [
+            15,
+            10
+          ],
+          [
+            15,
+            9
+          ]
+        ],
+        "reason": "Fatigue pressure is 5%",
+        "definition_version": "2.0.0",
+        "reservation_id": "action_resident_001_71",
+        "partner_id": null
+      },
+      "decision_id": 71,
+      "last_decision": {
+        "at": 105173,
+        "id": 71,
+        "chosen": "sleep",
+        "candidates": [
+          {
+            "kind": "garden",
+            "target_id": "object_0015",
+            "anchor": [
+              22,
+              12
+            ],
+            "distance": 15,
+            "score": 0.30507,
+            "terms": {
+              "need_relief": 0.2273,
+              "preference": 0.0924,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0183,
+              "travel_and_time_cost": 0.0329
+            }
+          },
+          {
+            "kind": "read",
+            "target_id": "object_0007",
+            "anchor": [
+              12,
+              9
+            ],
+            "distance": 8,
+            "score": 0.26131,
+            "terms": {
+              "need_relief": 0.2562,
+              "preference": 0.0552,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0256,
+              "travel_and_time_cost": 0.0245
+            }
+          },
+          {
+            "kind": "sleep",
+            "target_id": "object_0009",
+            "anchor": [
+              15,
+              9
+            ],
+            "distance": 11,
+            "score": 0.17836,
+            "terms": {
+              "need_relief": 0.0038,
+              "preference": 0.036,
+              "commitment": 0.35,
+              "critical": 0,
+              "personality": -0.0199,
+              "travel_and_time_cost": 0.1915
+            }
+          },
+          {
+            "kind": "relax",
+            "target_id": "object_0005",
+            "anchor": [
+              8,
+              11
+            ],
+            "distance": 2,
+            "score": 0.10841,
+            "terms": {
+              "need_relief": 0.0954,
+              "preference": 0.03,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0036,
+              "travel_and_time_cost": 0.0134
+            }
+          },
+          {
+            "kind": "stroll",
+            "target_id": "object_0317",
+            "anchor": [
+              36,
+              62
+            ],
+            "distance": 77,
+            "score": 0.10499,
+            "terms": {
+              "need_relief": 0.1322,
+              "preference": 0.0876,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0069,
+              "travel_and_time_cost": 0.1218
+            }
+          },
+          {
+            "kind": "drink",
+            "target_id": "object_0303",
+            "anchor": [
+              10,
+              56
+            ],
+            "distance": 45,
+            "score": 0.05083,
+            "terms": {
+              "need_relief": 0.0783,
+              "preference": 0.0612,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0199,
+              "travel_and_time_cost": 0.0688
+            }
+          },
+          {
+            "kind": "toilet",
+            "target_id": "object_0012",
+            "anchor": [
+              18,
+              12
+            ],
+            "distance": 11,
+            "score": 0.00678,
+            "terms": {
+              "need_relief": 0.0088,
+              "preference": 0.036,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0199,
+              "travel_and_time_cost": 0.0182
+            }
+          },
+          {
+            "kind": "shower",
+            "target_id": "object_0013",
+            "anchor": [
+              18,
+              14
+            ],
+            "distance": 11,
+            "score": -0.00456,
+            "terms": {
+              "need_relief": 0.0,
+              "preference": 0.036,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0199,
+              "travel_and_time_cost": 0.0207
+            }
+          },
+          {
+            "kind": "eat",
+            "target_id": "object_0303",
+            "anchor": [
+              10,
+              56
+            ],
+            "distance": 45,
+            "score": -0.033,
+            "terms": {
+              "need_relief": 0.0007,
+              "preference": 0.0612,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0199,
+              "travel_and_time_cost": 0.075
+            }
+          },
+          {
+            "kind": "wait",
+            "target_id": null,
+            "anchor": [
+              8,
+              13
+            ],
+            "distance": 0,
+            "score": -0.15,
+            "terms": {
+              "fallback": true
+            }
+          },
+          {
+            "kind": "work",
+            "target_id": "object_0325",
+            "anchor": [
+              50,
+              132
+            ],
+            "distance": 161,
+            "score": -1.20509,
+            "terms": {
+              "need_relief": 0.0331,
+              "preference": 0.0252,
+              "commitment": -1,
+              "critical": 0,
+              "personality": -0.0031,
+              "travel_and_time_cost": 0.2602
+            }
+          }
+        ],
+        "rejected": [],
+        "random_draw": 0.843221473300688,
+        "policy": "stable named softmax draw"
+      },
+      "cooldowns": {
+        "chat": 51467,
+        "drink": 102518,
+        "stroll": 30919,
+        "eat": 64380,
+        "clear_dishes": 105202,
+        "wash_dishes": 80675,
+        "wipe_counter": 56450,
+        "work": 53506,
+        "toilet": 103045,
+        "shower": 105098,
+        "fetch_ingredients": 103181,
+        "prepare_meal": 103784,
+        "serve_meal": 103883,
+        "eat_meal": 104484,
+        "relax": 60045,
+        "bin_trash": 102612,
+        "empty_trash": 102793,
+        "garden": 82204,
+        "sleep": 102409
+      },
+      "effects": [],
+      "owner": "procedural",
+      "owner_epoch": 1,
+      "version": 202,
+      "last_beat": "beat_00010616",
+      "family": {
+        "parent_ids": [],
+        "partner_id": "resident_002",
+        "relationship_status": "married",
+        "known_kin_ids": [
+          "resident_003",
+          "resident_005",
+          "resident_007",
+          "resident_008",
+          "resident_010"
+        ]
+      },
+      "psychology": {
+        "schema_version": 1,
+        "big_five": {
+          "openness": 0.408,
+          "conscientiousness": 0.414,
+          "extraversion": 0.444,
+          "agreeableness": 0.407,
+          "neuroticism": 0.579
+        },
+        "traits": [
+          "Practical"
+        ],
+        "ambitions": [
+          {
+            "id": "ambition_primary",
+            "kind": "stability",
+            "title": "Create a comfortable routine",
+            "progress": 0.0834,
+            "completed": false,
+            "updated_at": 60015,
+            "evidence_id": "beat_00005111"
+          }
+        ],
+        "hobbies": [
+          {
+            "id": "hobby_gardening",
+            "kind": "gardening",
+            "enjoyment": 0.77,
+            "practice_seconds": 3000,
+            "last_practiced": 82174,
+            "last_evidence_id": "beat_00008561"
+          },
+          {
+            "id": "hobby_walking",
+            "kind": "walking",
+            "enjoyment": 0.73,
+            "practice_seconds": 900,
+            "last_practiced": 30889,
+            "last_evidence_id": "beat_00000319"
+          },
+          {
+            "id": "hobby_socializing",
+            "kind": "socializing",
+            "enjoyment": 0.55,
+            "practice_seconds": 90,
+            "last_practiced": 29791,
+            "last_evidence_id": "beat_00000074"
+          }
+        ],
+        "fears": [
+          {
+            "id": "fear_rejection",
+            "kind": "social_rejection",
+            "intensity": 0.4247,
+            "last_updated": 50567,
+            "evidence_id": "beat_00003156",
+            "expires_at": 64967
+          },
+          {
+            "id": "fear_stagnation",
+            "kind": "stagnation",
+            "intensity": 0.1816,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_conflict",
+            "kind": "conflict",
+            "intensity": 0.1614,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_dogs",
+            "kind": "dogs",
+            "intensity": 0.1766,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_job_loss",
+            "kind": "job_loss",
+            "intensity": 0.2944,
+            "last_updated": 29700
+          }
+        ],
+        "theory_of_mind": {
+          "known_people": {
+            "resident_002": {
+              "observations": [
+                {
+                  "at": 29700,
+                  "observation": "social:ask_date:declined",
+                  "evidence_id": "beat_00000002",
+                  "modality": "participation"
+                },
+                {
+                  "at": 29700,
+                  "observation": "Elliot Bennett declined a conversation.",
+                  "evidence_id": "beat_00000002",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 29701,
+                  "observation": "Elliot Bennett agreed to spend time talking with me.",
+                  "evidence_id": "beat_00000004",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 29791,
+                  "observation": "social:tell_joke:positive",
+                  "evidence_id": "beat_00000073",
+                  "modality": "participation"
+                },
+                {
+                  "at": 29791,
+                  "observation": "We completed tell joke with Elliot Bennett.",
+                  "evidence_id": "beat_00000074",
+                  "modality": "participation"
+                },
+                {
+                  "at": 50567,
+                  "observation": "social:share_interest:declined",
+                  "evidence_id": "beat_00003156",
+                  "modality": "participation"
+                },
+                {
+                  "at": 50567,
+                  "observation": "Elliot Bennett declined a conversation.",
+                  "evidence_id": "beat_00003156",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 58607,
+                  "observation": "social:tell_joke:declined",
+                  "evidence_id": "beat_00004903",
+                  "modality": "participation"
+                }
+              ],
+              "inferences": {
+                "availability": {
+                  "value": "may prefer space",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00004903"
+                  ],
+                  "updated_at": 58607
+                },
+                "rapport": {
+                  "value": "interaction was receptive",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00000004"
+                  ],
+                  "updated_at": 29701
+                }
+              }
+            }
+          },
+          "max_observations_per_person": 12,
+          "policy": "direct_observations_only"
+        },
+        "action_model": {
+          "policy": "seeded_if_then_weighted",
+          "last_choice": null
+        },
+        "social_appraisal": {
+          "type": "Reserved",
+          "category": "tell_joke",
+          "outcome": "declined",
+          "evidence_id": "beat_00004903",
+          "expires_at": 59507
+        }
+      },
+      "routine": {
+        "id": "plan_resident_001_65",
+        "kind": "meal",
+        "steps": [
+          {
+            "kind": "fetch_ingredients",
+            "target_id": "object_0002"
+          },
+          {
+            "kind": "prepare_meal",
+            "target_id": "object_0004"
+          },
+          {
+            "kind": "serve_meal",
+            "target_id": "object_0006"
+          },
+          {
+            "kind": "eat_meal",
+            "target_id": "object_0006"
+          },
+          {
+            "kind": "clear_dishes",
+            "target_id": "object_0006"
+          },
+          {
+            "kind": "wash_dishes",
+            "target_id": "object_0003"
+          },
+          {
+            "kind": "bin_trash",
+            "target_id": "object_0330"
+          },
+          {
+            "kind": "empty_trash",
+            "target_id": "object_0330"
+          },
+          {
+            "kind": "wipe_counter",
+            "target_id": "object_0004"
+          }
+        ],
+        "index": 5,
+        "started_at": 103016,
+        "status": "active"
+      },
+      "workplace": {
+        "target_id": "object_0325",
+        "building_id": "studio",
+        "workplace_id": "studio",
+        "station_kind": "illustrator_station",
+        "work_from_home": false
+      },
+      "workplace_id": "studio",
+      "locations": [
+        {
+          "id": "mosswood",
+          "name": "Mosswood",
+          "bounds": [
+            0,
+            0,
+            128,
+            154
+          ],
+          "parent": null
+        },
+        {
+          "id": "home_01",
+          "name": "Bennett house",
+          "bounds": [
+            6,
+            6,
+            15,
+            11
+          ],
+          "parent": "mosswood"
+        },
+        {
+          "id": "home_01_bedroom",
+          "name": "Bedroom",
+          "bounds": [
+            15,
+            7,
+            5,
+            4
+          ],
+          "parent": "home_01"
+        }
+      ],
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "rule appraisal",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks"
+      },
+      "clock": 116100,
+      "intentions": [
+        {
+          "text": "Sleeping until about 12:13",
+          "status": "committed",
+          "target_id": "object_0009",
+          "deadline": 130388,
+          "prerequisites": [
+            "Reach interaction anchor",
+            "Hold reservation"
+          ]
+        },
+        {
+          "text": "Having a drink",
+          "status": "possible next action, not a promise",
+          "score": 0.87085
+        },
+        {
+          "text": "Tending the garden",
+          "status": "possible next action, not a promise",
+          "score": 0.57984
+        },
+        {
+          "text": "Reading a book",
+          "status": "possible next action, not a promise",
+          "score": 0.5701
+        }
+      ],
+      "planned_steps": [
+        {
+          "kind": "fetch_ingredients",
+          "target_id": "object_0002",
+          "label": "Getting ingredients",
+          "status": "completed",
+          "target_name": "Kitchen pantry"
+        },
+        {
+          "kind": "prepare_meal",
+          "target_id": "object_0004",
+          "label": "Preparing a meal",
+          "status": "completed",
+          "target_name": "Kitchen counter"
+        },
+        {
+          "kind": "serve_meal",
+          "target_id": "object_0006",
+          "label": "Carrying dinner to the table",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "eat_meal",
+          "target_id": "object_0006",
+          "label": "Eating a meal",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "clear_dishes",
+          "target_id": "object_0006",
+          "label": "Clearing dirty dishes",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "wash_dishes",
+          "target_id": "object_0003",
+          "label": "Washing dishes",
+          "status": "next",
+          "target_name": "Kitchen sink"
+        },
+        {
+          "kind": "bin_trash",
+          "target_id": "object_0330",
+          "label": "Putting scraps in the bin",
+          "status": "planned",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "empty_trash",
+          "target_id": "object_0330",
+          "label": "Taking out the trash",
+          "status": "planned",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "wipe_counter",
+          "target_id": "object_0004",
+          "label": "Wiping the kitchen counter",
+          "status": "planned",
+          "target_name": "Kitchen counter"
+        }
+      ],
+      "household_objects": [
+        {
+          "id": "object_0002",
+          "name": "Kitchen pantry",
+          "kind": "fridge",
+          "daily": {
+            "pantry_stock": 7
+          }
+        },
+        {
+          "id": "object_0003",
+          "name": "Kitchen sink",
+          "kind": "sink",
+          "daily": {
+            "washed_total": 8
+          }
+        },
+        {
+          "id": "object_0004",
+          "name": "Kitchen counter",
+          "kind": "counter",
+          "daily": {
+            "mess": 0,
+            "cleaned_total": 9
+          }
+        },
+        {
+          "id": "object_0006",
+          "name": "Coffee table",
+          "kind": "table",
+          "daily": {
+            "served_meals": 0,
+            "dirty_dishes": 0
+          }
+        },
+        {
+          "id": "object_0330",
+          "name": "Kitchen bin",
+          "kind": "bin",
+          "daily": {
+            "trash": 0,
+            "disposed_total": 8
+          }
+        }
+      ],
+      "social_categories": {
+        "greet": {
+          "label": "Greet",
+          "duration_seconds": 45,
+          "tone": "warm",
+          "base": 0.35
+        },
+        "small_talk": {
+          "label": "Small talk",
+          "duration_seconds": 180,
+          "tone": "warm",
+          "base": 0.42
+        },
+        "share_interest": {
+          "label": "Share interest",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.46
+        },
+        "offer_help": {
+          "label": "Offer help",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "ask_advice": {
+          "label": "Ask advice",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.36
+        },
+        "tell_joke": {
+          "label": "Tell joke",
+          "duration_seconds": 90,
+          "tone": "play",
+          "base": 0.4
+        },
+        "compliment": {
+          "label": "Compliment",
+          "duration_seconds": 75,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "apologize": {
+          "label": "Apologize",
+          "duration_seconds": 150,
+          "tone": "repair",
+          "base": 0.32
+        },
+        "check_in": {
+          "label": "Check in",
+          "duration_seconds": 180,
+          "tone": "care",
+          "base": 0.41
+        },
+        "confide": {
+          "label": "Confide",
+          "duration_seconds": 360,
+          "tone": "care",
+          "base": 0.26
+        },
+        "invite_activity": {
+          "label": "Invite to activity",
+          "duration_seconds": 90,
+          "tone": "warm",
+          "base": 0.37
+        },
+        "celebrate": {
+          "label": "Celebrate",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.43
+        },
+        "play_together": {
+          "label": "Play together",
+          "duration_seconds": 300,
+          "tone": "play",
+          "base": 0.42
+        },
+        "coordinate_work": {
+          "label": "Coordinate work",
+          "duration_seconds": 240,
+          "tone": "task",
+          "base": 0.38
+        },
+        "set_boundary": {
+          "label": "Set boundary",
+          "duration_seconds": 120,
+          "tone": "boundary",
+          "base": 0.28
+        },
+        "gossip": {
+          "label": "Gossip",
+          "duration_seconds": 180,
+          "tone": "tension",
+          "base": 0.24
+        },
+        "reconcile": {
+          "label": "Reconcile",
+          "duration_seconds": 300,
+          "tone": "repair",
+          "base": 0.27
+        },
+        "flirt": {
+          "label": "Flirt",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.24,
+          "romantic": true
+        },
+        "ask_date": {
+          "label": "Ask for date",
+          "duration_seconds": 90,
+          "tone": "romance",
+          "base": 0.2,
+          "romantic": true
+        },
+        "express_affection": {
+          "label": "Express affection",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.25,
+          "romantic": true
+        }
+      }
+    },
+    {
+      "id": "resident_004",
+      "kind": "human",
+      "name": "Leo Rivera",
+      "age": 48,
+      "household_id": "household_02",
+      "home_id": "home_02",
+      "position": [
+        41,
+        9
+      ],
+      "appearance": {
+        "shirt": "#83996b",
+        "skin": "#f0cfad",
+        "hair": "#d4b372",
+        "style": 3
+      },
+      "profile": {
+        "job": "Teacher",
+        "interests": [
+          "gardening",
+          "walking"
+        ],
+        "traits": [
+          "Practical",
+          "Reserved",
+          "Green-fingered"
+        ]
+      },
+      "preferences": {
+        "cooking": 0.65,
+        "relaxing": 0.38,
+        "reading": 0.24,
+        "gardening": 0.97,
+        "craft": 0.48,
+        "socializing": 0.58,
+        "walking": 0.72
+      },
+      "needs": {
+        "hunger": 0.49842222222222227,
+        "thirst": 0.6320694444444446,
+        "bladder": 0.5151666666666667,
+        "fatigue": 0.0,
+        "hygiene": 0.2267488888888889,
+        "social": 1.0,
+        "fun": 0.247,
+        "comfort": 0.0
+      },
+      "needs_at": 104740,
+      "need_rates": {
+        "hunger": 3.0555555555555554e-05,
+        "thirst": 4.722222222222223e-05,
+        "bladder": 3.3333333333333335e-05,
+        "fatigue": -3.9722222222222215e-05,
+        "hygiene": 1.4444444444444444e-05,
+        "social": 1.5277777777777777e-05,
+        "fun": 2.0833333333333333e-05,
+        "comfort": -1.369047619047619e-05
+      },
+      "money": 377,
+      "inventory": {
+        "phone": 1,
+        "house_key": 1
+      },
+      "skills": {
+        "cooking": 0.38200000000000006,
+        "craft": 0.595,
+        "gardening": 0.47700000000000004
+      },
+      "schedule": {
+        "start": 32400,
+        "end": 61200,
+        "work_target_seconds": 14400,
+        "work_seconds": 0,
+        "day": 1
+      },
+      "goals": [
+        {
+          "id": "wellbeing",
+          "title": "Take care of myself",
+          "kind": "ongoing",
+          "progress": 0.81
+        },
+        {
+          "id": "work",
+          "title": "Finish today's work",
+          "kind": "daily",
+          "progress": 0.0
+        },
+        {
+          "id": "hobby",
+          "title": "Make time for gardening",
+          "kind": "daily",
+          "progress": 0.8333333333333334
+        }
+      ],
+      "relations": {
+        "resident_003": {
+          "closeness": 0.765,
+          "trust": 0.817,
+          "last_interaction": 56889,
+          "kind": "Housemate",
+          "respect": 0.4,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.65,
+              "status": "established"
+            },
+            "friendship": {
+              "score": 0.054,
+              "status": "developing"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.5,
+              "status": "co_resident"
+            }
+          },
+          "last_evidence_id": "beat_00004572"
+        },
+        "resident_005": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "child"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_007": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "child"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_012": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_020": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_028": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_044": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        }
+      },
+      "perceptions": [
+        {
+          "id": "perception_resident_004_9626_16",
+          "observer": "resident_004",
+          "at": 98100,
+          "modality": "sight",
+          "content": "I saw a dog nearby.",
+          "source_entity": "dog_clover",
+          "source_beat": "beat_00009626",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_9673_16",
+          "observer": "resident_004",
+          "at": 98364,
+          "modality": "participation",
+          "content": "I finished putting groceries away.",
+          "source_entity": "object_0017",
+          "source_beat": "beat_00009673",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_9695_16",
+          "observer": "resident_004",
+          "at": 98485,
+          "modality": "participation",
+          "content": "I finished getting ingredients.",
+          "source_entity": "object_0017",
+          "source_beat": "beat_00009695",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_9790_16",
+          "observer": "resident_004",
+          "at": 99088,
+          "modality": "participation",
+          "content": "I finished preparing a meal.",
+          "source_entity": "object_0019",
+          "source_beat": "beat_00009790",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_9810_16",
+          "observer": "resident_004",
+          "at": 99187,
+          "modality": "participation",
+          "content": "I finished carrying dinner to the table.",
+          "source_entity": "object_0021",
+          "source_beat": "beat_00009810",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_9926_16",
+          "observer": "resident_004",
+          "at": 99788,
+          "modality": "participation",
+          "content": "I finished eating a meal.",
+          "source_entity": "object_0021",
+          "source_beat": "beat_00009926",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10018_16",
+          "observer": "resident_004",
+          "at": 100402,
+          "modality": "participation",
+          "content": "I finished taking a shower.",
+          "source_entity": "object_0028",
+          "source_beat": "beat_00010018",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10063_16",
+          "observer": "resident_004",
+          "at": 100645,
+          "modality": "participation",
+          "content": "I finished using the bathroom.",
+          "source_entity": "object_0027",
+          "source_beat": "beat_00010063",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10269_16",
+          "observer": "resident_004",
+          "at": 102170,
+          "modality": "participation",
+          "content": "I finished tending the garden.",
+          "source_entity": "object_0030",
+          "source_beat": "beat_00010269",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10289_16",
+          "observer": "resident_004",
+          "at": 102284,
+          "modality": "participation",
+          "content": "I finished clearing dirty dishes.",
+          "source_entity": "object_0021",
+          "source_beat": "beat_00010289",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10317_16",
+          "observer": "resident_004",
+          "at": 102534,
+          "modality": "participation",
+          "content": "I finished washing dishes.",
+          "source_entity": "object_0018",
+          "source_beat": "beat_00010317",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10339_16",
+          "observer": "resident_004",
+          "at": 102715,
+          "modality": "participation",
+          "content": "I finished having a drink.",
+          "source_entity": "object_0018",
+          "source_beat": "beat_00010339",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10515_16",
+          "observer": "resident_004",
+          "at": 104244,
+          "modality": "participation",
+          "content": "I finished tending the garden.",
+          "source_entity": "object_0030",
+          "source_beat": "beat_00010515",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10532_16",
+          "observer": "resident_004",
+          "at": 104360,
+          "modality": "participation",
+          "content": "I finished putting scraps in the bin.",
+          "source_entity": "object_0331",
+          "source_beat": "beat_00010532",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10556_16",
+          "observer": "resident_004",
+          "at": 104541,
+          "modality": "participation",
+          "content": "I finished taking out the trash.",
+          "source_entity": "object_0331",
+          "source_beat": "beat_00010556",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_004_10574_16",
+          "observer": "resident_004",
+          "at": 104724,
+          "modality": "participation",
+          "content": "I finished wiping the kitchen counter.",
+          "source_entity": "object_0019",
+          "source_beat": "beat_00010574",
+          "reliability": "direct"
+        }
+      ],
+      "memories": [
+        {
+          "id": "memory_perception_resident_004_9626_16",
+          "at": 98100,
+          "content": "I saw a dog nearby.",
+          "source_percepts": [
+            "perception_resident_004_9626_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_9673_16",
+          "at": 98364,
+          "content": "I finished putting groceries away.",
+          "source_percepts": [
+            "perception_resident_004_9673_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_9695_16",
+          "at": 98485,
+          "content": "I finished getting ingredients.",
+          "source_percepts": [
+            "perception_resident_004_9695_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_9790_16",
+          "at": 99088,
+          "content": "I finished preparing a meal.",
+          "source_percepts": [
+            "perception_resident_004_9790_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_9810_16",
+          "at": 99187,
+          "content": "I finished carrying dinner to the table.",
+          "source_percepts": [
+            "perception_resident_004_9810_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_9926_16",
+          "at": 99788,
+          "content": "I finished eating a meal.",
+          "source_percepts": [
+            "perception_resident_004_9926_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10018_16",
+          "at": 100402,
+          "content": "I finished taking a shower.",
+          "source_percepts": [
+            "perception_resident_004_10018_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10063_16",
+          "at": 100645,
+          "content": "I finished using the bathroom.",
+          "source_percepts": [
+            "perception_resident_004_10063_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10269_16",
+          "at": 102170,
+          "content": "I finished tending the garden.",
+          "source_percepts": [
+            "perception_resident_004_10269_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10289_16",
+          "at": 102284,
+          "content": "I finished clearing dirty dishes.",
+          "source_percepts": [
+            "perception_resident_004_10289_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10317_16",
+          "at": 102534,
+          "content": "I finished washing dishes.",
+          "source_percepts": [
+            "perception_resident_004_10317_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10339_16",
+          "at": 102715,
+          "content": "I finished having a drink.",
+          "source_percepts": [
+            "perception_resident_004_10339_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10515_16",
+          "at": 104244,
+          "content": "I finished tending the garden.",
+          "source_percepts": [
+            "perception_resident_004_10515_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10532_16",
+          "at": 104360,
+          "content": "I finished putting scraps in the bin.",
+          "source_percepts": [
+            "perception_resident_004_10532_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10556_16",
+          "at": 104541,
+          "content": "I finished taking out the trash.",
+          "source_percepts": [
+            "perception_resident_004_10556_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_004_10574_16",
+          "at": 104724,
+          "content": "I finished wiping the kitchen counter.",
+          "source_percepts": [
+            "perception_resident_004_10574_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        }
+      ],
+      "beliefs": [
+        {
+          "id": "belief_perception_resident_004_9626_16",
+          "proposition": "I saw a dog nearby.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9626_16"
+          ],
+          "valid_from": 98100
+        },
+        {
+          "id": "belief_perception_resident_004_9673_16",
+          "proposition": "I finished putting groceries away.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9673_16"
+          ],
+          "valid_from": 98364
+        },
+        {
+          "id": "belief_perception_resident_004_9695_16",
+          "proposition": "I finished getting ingredients.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9695_16"
+          ],
+          "valid_from": 98485
+        },
+        {
+          "id": "belief_perception_resident_004_9790_16",
+          "proposition": "I finished preparing a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9790_16"
+          ],
+          "valid_from": 99088
+        },
+        {
+          "id": "belief_perception_resident_004_9810_16",
+          "proposition": "I finished carrying dinner to the table.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9810_16"
+          ],
+          "valid_from": 99187
+        },
+        {
+          "id": "belief_perception_resident_004_9926_16",
+          "proposition": "I finished eating a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_9926_16"
+          ],
+          "valid_from": 99788
+        },
+        {
+          "id": "belief_perception_resident_004_10018_16",
+          "proposition": "I finished taking a shower.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10018_16"
+          ],
+          "valid_from": 100402
+        },
+        {
+          "id": "belief_perception_resident_004_10063_16",
+          "proposition": "I finished using the bathroom.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10063_16"
+          ],
+          "valid_from": 100645
+        },
+        {
+          "id": "belief_perception_resident_004_10269_16",
+          "proposition": "I finished tending the garden.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10269_16"
+          ],
+          "valid_from": 102170
+        },
+        {
+          "id": "belief_perception_resident_004_10289_16",
+          "proposition": "I finished clearing dirty dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10289_16"
+          ],
+          "valid_from": 102284
+        },
+        {
+          "id": "belief_perception_resident_004_10317_16",
+          "proposition": "I finished washing dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10317_16"
+          ],
+          "valid_from": 102534
+        },
+        {
+          "id": "belief_perception_resident_004_10339_16",
+          "proposition": "I finished having a drink.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10339_16"
+          ],
+          "valid_from": 102715
+        },
+        {
+          "id": "belief_perception_resident_004_10515_16",
+          "proposition": "I finished tending the garden.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10515_16"
+          ],
+          "valid_from": 104244
+        },
+        {
+          "id": "belief_perception_resident_004_10532_16",
+          "proposition": "I finished putting scraps in the bin.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10532_16"
+          ],
+          "valid_from": 104360
+        },
+        {
+          "id": "belief_perception_resident_004_10556_16",
+          "proposition": "I finished taking out the trash.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10556_16"
+          ],
+          "valid_from": 104541
+        },
+        {
+          "id": "belief_perception_resident_004_10574_16",
+          "proposition": "I finished wiping the kitchen counter.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_004_10574_16"
+          ],
+          "valid_from": 104724
+        }
+      ],
+      "emotion": {
+        "type": "Uncomfortable",
+        "valence": 0.695,
+        "arousal": 0.564,
+        "intensity": 0.31,
+        "cause": "Completed wipe_counter; appraised my own needs",
+        "since": 104724,
+        "expires_at": null
+      },
+      "thought": {
+        "text": "I need some rest. Tomorrow can wait.",
+        "trigger": "decision_69",
+        "since": 104725
+      },
+      "action": {
+        "id": "action_resident_004_69",
+        "kind": "sleep",
+        "label": "Sleeping",
+        "target_id": "object_0025",
+        "phase": "using",
+        "started_at": 104725,
+        "arrives_at": 104740,
+        "ends_at": 129940,
+        "duration": 25200,
+        "path": [
+          [
+            33,
+            8
+          ],
+          [
+            33,
+            9
+          ],
+          [
+            34,
+            9
+          ],
+          [
+            35,
+            9
+          ],
+          [
+            36,
+            9
+          ],
+          [
+            37,
+            9
+          ],
+          [
+            37,
+            10
+          ],
+          [
+            37,
+            11
+          ],
+          [
+            37,
+            12
+          ],
+          [
+            38,
+            12
+          ],
+          [
+            39,
+            12
+          ],
+          [
+            40,
+            12
+          ],
+          [
+            41,
+            12
+          ],
+          [
+            41,
+            11
+          ],
+          [
+            41,
+            10
+          ],
+          [
+            41,
+            9
+          ]
+        ],
+        "reason": "Fatigue pressure is 12%",
+        "definition_version": "2.0.0",
+        "reservation_id": "action_resident_004_69",
+        "partner_id": null
+      },
+      "decision_id": 69,
+      "last_decision": {
+        "at": 104725,
+        "id": 69,
+        "chosen": "sleep",
+        "candidates": [
+          {
+            "kind": "sleep",
+            "target_id": "object_0025",
+            "anchor": [
+              41,
+              9
+            ],
+            "distance": 9,
+            "score": 0.24782,
+            "terms": {
+              "need_relief": 0.026,
+              "preference": 0.036,
+              "commitment": 0.35,
+              "critical": 0,
+              "personality": 0.0243,
+              "travel_and_time_cost": 0.1885
+            }
+          },
+          {
+            "kind": "garden",
+            "target_id": "object_0030",
+            "anchor": [
+              46,
+              12
+            ],
+            "distance": 17,
+            "score": 0.1735,
+            "terms": {
+              "need_relief": 0.0001,
+              "preference": 0.1164,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0929,
+              "travel_and_time_cost": 0.0359
+            }
+          },
+          {
+            "kind": "drink",
+            "target_id": "object_0018",
+            "anchor": [
+              32,
+              8
+            ],
+            "distance": 1,
+            "score": 0.11333,
+            "terms": {
+              "need_relief": 0.0138,
+              "preference": 0.078,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0243,
+              "travel_and_time_cost": 0.0028
+            }
+          },
+          {
+            "kind": "relax",
+            "target_id": "object_0020",
+            "anchor": [
+              33,
+              11
+            ],
+            "distance": 3,
+            "score": 0.0864,
+            "terms": {
+              "need_relief": 0.0027,
+              "preference": 0.0456,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.053,
+              "travel_and_time_cost": 0.0149
+            }
+          },
+          {
+            "kind": "toilet",
+            "target_id": "object_0027",
+            "anchor": [
+              42,
+              12
+            ],
+            "distance": 13,
+            "score": 0.07076,
+            "terms": {
+              "need_relief": 0.0316,
+              "preference": 0.036,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0243,
+              "travel_and_time_cost": 0.0212
+            }
+          },
+          {
+            "kind": "garden",
+            "target_id": "object_0030",
+            "anchor": [
+              46,
+              12
+            ],
+            "distance": 17,
+            "score": 0.06754,
+            "routine_kind": "hobby",
+            "routine_steps": [
+              {
+                "kind": "garden",
+                "target_id": "object_0030"
+              }
+            ],
+            "routine_index": 0,
+            "new_routine": true,
+            "terms": {
+              "plan_goal": 0.0001,
+              "continuity": 0,
+              "personality": 0.0929,
+              "travel_cost": 0.0255
+            }
+          },
+          {
+            "kind": "shower",
+            "target_id": "object_0028",
+            "anchor": [
+              42,
+              14
+            ],
+            "distance": 15,
+            "score": 0.03962,
+            "terms": {
+              "need_relief": 0.006,
+              "preference": 0.036,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0243,
+              "travel_and_time_cost": 0.0267
+            }
+          },
+          {
+            "kind": "stroll",
+            "target_id": "object_0317",
+            "anchor": [
+              36,
+              62
+            ],
+            "distance": 57,
+            "score": 0.02803,
+            "terms": {
+              "need_relief": 0.0001,
+              "preference": 0.0864,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0333,
+              "travel_and_time_cost": 0.0918
+            }
+          },
+          {
+            "kind": "eat",
+            "target_id": "object_0303",
+            "anchor": [
+              12,
+              56
+            ],
+            "distance": 69,
+            "score": 0.02408,
+            "terms": {
+              "need_relief": 0.0328,
+              "preference": 0.078,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0243,
+              "travel_and_time_cost": 0.111
+            }
+          },
+          {
+            "kind": "read",
+            "target_id": "object_0022",
+            "anchor": [
+              36,
+              9
+            ],
+            "distance": 4,
+            "score": -0.00246,
+            "terms": {
+              "need_relief": 0.0001,
+              "preference": 0.0288,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0129,
+              "travel_and_time_cost": 0.0185
+            }
+          },
+          {
+            "kind": "wait",
+            "target_id": null,
+            "anchor": [
+              33,
+              8
+            ],
+            "distance": 0,
+            "score": -0.15,
+            "terms": {
+              "fallback": true
+            }
+          },
+          {
+            "kind": "work",
+            "target_id": "object_0324",
+            "anchor": [
+              17,
+              132
+            ],
+            "distance": 140,
+            "score": -1.17804,
+            "terms": {
+              "need_relief": 0.0,
+              "preference": 0.0576,
+              "commitment": -1,
+              "critical": 0,
+              "personality": -0.0069,
+              "travel_and_time_cost": 0.2288
+            }
+          }
+        ],
+        "rejected": [],
+        "random_draw": 0.554739625018104,
+        "policy": "stable named softmax draw"
+      },
+      "cooldowns": {
+        "chat": 57489,
+        "relax": 56748,
+        "fetch_ingredients": 98515,
+        "prepare_meal": 99118,
+        "serve_meal": 99217,
+        "eat_meal": 99818,
+        "work": 53485,
+        "fear:dogs": 101700,
+        "drink": 102745,
+        "toilet": 100675,
+        "bin_trash": 104390,
+        "empty_trash": 104571,
+        "wipe_counter": 104754,
+        "clear_dishes": 102314,
+        "shower": 100432,
+        "wash_dishes": 102564,
+        "garden": 104274,
+        "sleep": 97267,
+        "buy_groceries": 98064,
+        "stock_fridge": 98394
+      },
+      "effects": [],
+      "owner": "procedural",
+      "owner_epoch": 1,
+      "version": 201,
+      "last_beat": "beat_00010577",
+      "family": {
+        "parent_ids": [],
+        "partner_id": "resident_003",
+        "relationship_status": "married",
+        "known_kin_ids": [
+          "resident_005",
+          "resident_007"
+        ]
+      },
+      "psychology": {
+        "schema_version": 1,
+        "big_five": {
+          "openness": 0.69,
+          "conscientiousness": 0.372,
+          "extraversion": 0.31,
+          "agreeableness": 0.397,
+          "neuroticism": 0.715
+        },
+        "traits": [
+          "Curious",
+          "Cautious"
+        ],
+        "ambitions": [
+          {
+            "id": "ambition_primary",
+            "kind": "stability",
+            "title": "Create a comfortable routine",
+            "progress": 0.0834,
+            "completed": false,
+            "updated_at": 56718,
+            "evidence_id": "beat_00004524"
+          }
+        ],
+        "hobbies": [
+          {
+            "id": "hobby_gardening",
+            "kind": "gardening",
+            "enjoyment": 0.97,
+            "practice_seconds": 7500,
+            "last_practiced": 104244,
+            "last_evidence_id": "beat_00010515"
+          },
+          {
+            "id": "hobby_walking",
+            "kind": "walking",
+            "enjoyment": 0.72,
+            "practice_seconds": 0,
+            "last_practiced": null
+          },
+          {
+            "id": "hobby_cooking",
+            "kind": "cooking",
+            "enjoyment": 0.65,
+            "practice_seconds": 6060,
+            "last_practiced": 102715,
+            "last_evidence_id": "beat_00010339"
+          }
+        ],
+        "fears": [
+          {
+            "id": "fear_rejection",
+            "kind": "social_rejection",
+            "intensity": 0.2987,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_stagnation",
+            "kind": "stagnation",
+            "intensity": 0.238,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_conflict",
+            "kind": "conflict",
+            "intensity": 0.1594,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_dogs",
+            "kind": "dogs",
+            "intensity": 0.4339,
+            "last_updated": 98100,
+            "evidence_id": "beat_00009626",
+            "expires_at": 112500
+          },
+          {
+            "id": "fear_job_loss",
+            "kind": "job_loss",
+            "intensity": 0.0691,
+            "last_updated": 29700
+          }
+        ],
+        "theory_of_mind": {
+          "known_people": {
+            "resident_003": {
+              "observations": [
+                {
+                  "at": 29702,
+                  "observation": "Sofia Rivera agreed to spend time talking with me.",
+                  "evidence_id": "beat_00000006",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 29822,
+                  "observation": "social:set_boundary:positive",
+                  "evidence_id": "beat_00000085",
+                  "modality": "participation"
+                },
+                {
+                  "at": 29822,
+                  "observation": "We completed set boundary with Sofia Rivera.",
+                  "evidence_id": "beat_00000086",
+                  "modality": "participation"
+                },
+                {
+                  "at": 31256,
+                  "observation": "social:small_talk:declined",
+                  "evidence_id": "beat_00000380",
+                  "modality": "participation"
+                },
+                {
+                  "at": 54849,
+                  "observation": "Sofia Rivera agreed to spend time talking with me.",
+                  "evidence_id": "beat_00004056",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 55029,
+                  "observation": "social:check_in:positive",
+                  "evidence_id": "beat_00004119",
+                  "modality": "participation"
+                },
+                {
+                  "at": 55029,
+                  "observation": "We completed check in with Sofia Rivera.",
+                  "evidence_id": "beat_00004119",
+                  "modality": "participation"
+                },
+                {
+                  "at": 55762,
+                  "observation": "social:celebrate:declined",
+                  "evidence_id": "beat_00004313",
+                  "modality": "participation"
+                },
+                {
+                  "at": 56814,
+                  "observation": "Sofia Rivera agreed to spend time talking with me.",
+                  "evidence_id": "beat_00004555",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 56889,
+                  "observation": "social:compliment:positive",
+                  "evidence_id": "beat_00004572",
+                  "modality": "participation"
+                },
+                {
+                  "at": 56889,
+                  "observation": "We completed compliment with Sofia Rivera.",
+                  "evidence_id": "beat_00004572",
+                  "modality": "participation"
+                }
+              ],
+              "inferences": {
+                "rapport": {
+                  "value": "interaction was receptive",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00004555"
+                  ],
+                  "updated_at": 56814
+                },
+                "availability": {
+                  "value": "may prefer space",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00004313"
+                  ],
+                  "updated_at": 55762
+                }
+              }
+            }
+          },
+          "max_observations_per_person": 12,
+          "policy": "direct_observations_only"
+        },
+        "action_model": {
+          "policy": "seeded_if_then_weighted",
+          "last_choice": null
+        },
+        "social_appraisal": {
+          "type": "Connected",
+          "category": "compliment",
+          "outcome": "positive",
+          "evidence_id": "beat_00004572",
+          "expires_at": 57789
+        },
+        "active_fear": {
+          "kind": "dogs",
+          "source": "dog_clover",
+          "event": "dog_encounter",
+          "evidence_id": "beat_00009626",
+          "since": 98100,
+          "expires_at": 99300
+        }
+      },
+      "routine": {
+        "id": "plan_resident_004_53",
+        "kind": "meal",
+        "steps": [
+          {
+            "kind": "buy_groceries",
+            "target_id": "object_0304"
+          },
+          {
+            "kind": "stock_fridge",
+            "target_id": "object_0017"
+          },
+          {
+            "kind": "fetch_ingredients",
+            "target_id": "object_0017"
+          },
+          {
+            "kind": "prepare_meal",
+            "target_id": "object_0019"
+          },
+          {
+            "kind": "serve_meal",
+            "target_id": "object_0021"
+          },
+          {
+            "kind": "eat_meal",
+            "target_id": "object_0021"
+          },
+          {
+            "kind": "clear_dishes",
+            "target_id": "object_0021"
+          },
+          {
+            "kind": "wash_dishes",
+            "target_id": "object_0018"
+          },
+          {
+            "kind": "bin_trash",
+            "target_id": "object_0331"
+          },
+          {
+            "kind": "empty_trash",
+            "target_id": "object_0331"
+          },
+          {
+            "kind": "wipe_counter",
+            "target_id": "object_0019"
+          }
+        ],
+        "index": 11,
+        "started_at": 97527,
+        "status": "completed"
+      },
+      "workplace": {
+        "target_id": "object_0324",
+        "building_id": "school",
+        "workplace_id": "school",
+        "station_kind": "teacher_station",
+        "work_from_home": false
+      },
+      "workplace_id": "school",
+      "locations": [
+        {
+          "id": "mosswood",
+          "name": "Mosswood",
+          "bounds": [
+            0,
+            0,
+            128,
+            154
+          ],
+          "parent": null
+        },
+        {
+          "id": "home_02",
+          "name": "Rivera house",
+          "bounds": [
+            30,
+            6,
+            15,
+            11
+          ],
+          "parent": "mosswood"
+        },
+        {
+          "id": "home_02_bedroom",
+          "name": "Bedroom",
+          "bounds": [
+            39,
+            7,
+            5,
+            4
+          ],
+          "parent": "home_02"
+        }
+      ],
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "rule appraisal",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks"
+      },
+      "clock": 116100,
+      "intentions": [
+        {
+          "text": "Sleeping until about 12:05",
+          "status": "committed",
+          "target_id": "object_0025",
+          "deadline": 129940,
+          "prerequisites": [
+            "Reach interaction anchor",
+            "Hold reservation"
+          ]
+        },
+        {
+          "text": "Having a drink",
+          "status": "possible next action, not a promise",
+          "score": 0.6973
+        },
+        {
+          "text": "Getting ingredients",
+          "status": "possible next action, not a promise",
+          "score": 0.57496
+        },
+        {
+          "text": "Using the bathroom",
+          "status": "possible next action, not a promise",
+          "score": 0.50646
+        }
+      ],
+      "planned_steps": [
+        {
+          "kind": "buy_groceries",
+          "target_id": "object_0304",
+          "label": "Buying groceries",
+          "status": "completed",
+          "target_name": "Market workbench"
+        },
+        {
+          "kind": "stock_fridge",
+          "target_id": "object_0017",
+          "label": "Putting groceries away",
+          "status": "completed",
+          "target_name": "Kitchen pantry"
+        },
+        {
+          "kind": "fetch_ingredients",
+          "target_id": "object_0017",
+          "label": "Getting ingredients",
+          "status": "completed",
+          "target_name": "Kitchen pantry"
+        },
+        {
+          "kind": "prepare_meal",
+          "target_id": "object_0019",
+          "label": "Preparing a meal",
+          "status": "completed",
+          "target_name": "Kitchen counter"
+        },
+        {
+          "kind": "serve_meal",
+          "target_id": "object_0021",
+          "label": "Carrying dinner to the table",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "eat_meal",
+          "target_id": "object_0021",
+          "label": "Eating a meal",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "clear_dishes",
+          "target_id": "object_0021",
+          "label": "Clearing dirty dishes",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "wash_dishes",
+          "target_id": "object_0018",
+          "label": "Washing dishes",
+          "status": "completed",
+          "target_name": "Kitchen sink"
+        },
+        {
+          "kind": "bin_trash",
+          "target_id": "object_0331",
+          "label": "Putting scraps in the bin",
+          "status": "completed",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "empty_trash",
+          "target_id": "object_0331",
+          "label": "Taking out the trash",
+          "status": "completed",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "wipe_counter",
+          "target_id": "object_0019",
+          "label": "Wiping the kitchen counter",
+          "status": "completed",
+          "target_name": "Kitchen counter"
+        }
+      ],
+      "household_objects": [
+        {
+          "id": "object_0017",
+          "name": "Kitchen pantry",
+          "kind": "fridge",
+          "daily": {
+            "pantry_stock": 6
+          }
+        },
+        {
+          "id": "object_0018",
+          "name": "Kitchen sink",
+          "kind": "sink",
+          "daily": {
+            "washed_total": 10
+          }
+        },
+        {
+          "id": "object_0019",
+          "name": "Kitchen counter",
+          "kind": "counter",
+          "daily": {
+            "mess": 0,
+            "cleaned_total": 10
+          }
+        },
+        {
+          "id": "object_0021",
+          "name": "Coffee table",
+          "kind": "table",
+          "daily": {
+            "served_meals": 0,
+            "dirty_dishes": 0
+          }
+        },
+        {
+          "id": "object_0331",
+          "name": "Kitchen bin",
+          "kind": "bin",
+          "daily": {
+            "trash": 0,
+            "disposed_total": 10
+          }
+        }
+      ],
+      "social_categories": {
+        "greet": {
+          "label": "Greet",
+          "duration_seconds": 45,
+          "tone": "warm",
+          "base": 0.35
+        },
+        "small_talk": {
+          "label": "Small talk",
+          "duration_seconds": 180,
+          "tone": "warm",
+          "base": 0.42
+        },
+        "share_interest": {
+          "label": "Share interest",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.46
+        },
+        "offer_help": {
+          "label": "Offer help",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "ask_advice": {
+          "label": "Ask advice",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.36
+        },
+        "tell_joke": {
+          "label": "Tell joke",
+          "duration_seconds": 90,
+          "tone": "play",
+          "base": 0.4
+        },
+        "compliment": {
+          "label": "Compliment",
+          "duration_seconds": 75,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "apologize": {
+          "label": "Apologize",
+          "duration_seconds": 150,
+          "tone": "repair",
+          "base": 0.32
+        },
+        "check_in": {
+          "label": "Check in",
+          "duration_seconds": 180,
+          "tone": "care",
+          "base": 0.41
+        },
+        "confide": {
+          "label": "Confide",
+          "duration_seconds": 360,
+          "tone": "care",
+          "base": 0.26
+        },
+        "invite_activity": {
+          "label": "Invite to activity",
+          "duration_seconds": 90,
+          "tone": "warm",
+          "base": 0.37
+        },
+        "celebrate": {
+          "label": "Celebrate",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.43
+        },
+        "play_together": {
+          "label": "Play together",
+          "duration_seconds": 300,
+          "tone": "play",
+          "base": 0.42
+        },
+        "coordinate_work": {
+          "label": "Coordinate work",
+          "duration_seconds": 240,
+          "tone": "task",
+          "base": 0.38
+        },
+        "set_boundary": {
+          "label": "Set boundary",
+          "duration_seconds": 120,
+          "tone": "boundary",
+          "base": 0.28
+        },
+        "gossip": {
+          "label": "Gossip",
+          "duration_seconds": 180,
+          "tone": "tension",
+          "base": 0.24
+        },
+        "reconcile": {
+          "label": "Reconcile",
+          "duration_seconds": 300,
+          "tone": "repair",
+          "base": 0.27
+        },
+        "flirt": {
+          "label": "Flirt",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.24,
+          "romantic": true
+        },
+        "ask_date": {
+          "label": "Ask for date",
+          "duration_seconds": 90,
+          "tone": "romance",
+          "base": 0.2,
+          "romantic": true
+        },
+        "express_affection": {
+          "label": "Express affection",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.25,
+          "romantic": true
+        }
+      }
+    },
+    {
+      "id": "resident_005",
+      "kind": "human",
+      "name": "Jun Chen",
+      "age": 27,
+      "household_id": "household_03",
+      "home_id": "home_03",
+      "position": [
+        66,
+        14
+      ],
+      "appearance": {
+        "shirt": "#9684af",
+        "skin": "#734a37",
+        "hair": "#847d75",
+        "style": 0
+      },
+      "profile": {
+        "job": "Designer",
+        "interests": [
+          "reading",
+          "cooking"
+        ],
+        "traits": [
+          "Curious",
+          "Reserved",
+          "Creative"
+        ]
+      },
+      "preferences": {
+        "cooking": 0.97,
+        "relaxing": 0.4,
+        "reading": 0.99,
+        "gardening": 0.46,
+        "craft": 0.84,
+        "socializing": 0.31,
+        "walking": 0.76
+      },
+      "needs": {
+        "hunger": 0.016622222222222222,
+        "thirst": 0.20551111111111123,
+        "bladder": 0.009733333333333333,
+        "fatigue": 0.03872833333333333,
+        "hygiene": 0.17629111111111095,
+        "social": 1.0,
+        "fun": 0.3492083333333335,
+        "comfort": 0.0
+      },
+      "needs_at": 115811,
+      "need_rates": {
+        "hunger": 3.0555555555555554e-05,
+        "thirst": 4.722222222222223e-05,
+        "bladder": 3.3333333333333335e-05,
+        "fatigue": 1.5833333333333333e-05,
+        "hygiene": -0.001402222222222222,
+        "social": 1.5277777777777777e-05,
+        "fun": 2.0833333333333333e-05,
+        "comfort": -0.0002819444444444444
+      },
+      "money": 392,
+      "inventory": {
+        "phone": 1,
+        "house_key": 1,
+        "food_scraps": 1
+      },
+      "skills": {
+        "cooking": 0.5860000000000001,
+        "craft": 0.135,
+        "gardening": 0.285
+      },
+      "schedule": {
+        "start": 32400,
+        "end": 61200,
+        "work_target_seconds": 14400,
+        "work_seconds": 0,
+        "day": 1
+      },
+      "goals": [
+        {
+          "id": "wellbeing",
+          "title": "Take care of myself",
+          "kind": "ongoing",
+          "progress": 0.73
+        },
+        {
+          "id": "work",
+          "title": "Finish today's work",
+          "kind": "daily",
+          "progress": 0.0
+        },
+        {
+          "id": "hobby",
+          "title": "Make time for reading",
+          "kind": "daily",
+          "progress": 1
+        }
+      ],
+      "relations": {
+        "resident_006": {
+          "closeness": 0.685,
+          "trust": 0.771,
+          "last_interaction": 62394,
+          "kind": "Housemate",
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.65,
+              "status": "established"
+            },
+            "friendship": {
+              "score": 0.018,
+              "status": "developing"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.5,
+              "status": "co_resident"
+            }
+          },
+          "last_evidence_id": "beat_00005525"
+        },
+        "resident_007": {
+          "closeness": 0.72,
+          "trust": 0.792,
+          "last_interaction": 80497,
+          "kind": "Housemate",
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "sibling"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.036,
+              "status": "developing"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.5,
+              "status": "co_resident"
+            }
+          },
+          "last_evidence_id": "beat_00008417"
+        },
+        "resident_001": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "grandparent"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_002": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "grandparent"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_003": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "parent"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_004": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "parent"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_008": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "aunt_uncle"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_010": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.7,
+              "status": "cousin"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_013": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_017": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_021": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_025": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_029": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_033": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_037": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        },
+        "resident_041": {
+          "closeness": 0.0,
+          "trust": 0.35,
+          "respect": 0.35,
+          "attraction": 0.0,
+          "tension": 0.0,
+          "last_interaction": null,
+          "kind": "Acquaintance",
+          "layers": {
+            "family": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "romance": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "friendship": {
+              "score": 0.0,
+              "status": "none"
+            },
+            "coworker": {
+              "score": 0.5,
+              "status": "shared_workplace"
+            },
+            "household": {
+              "score": 0.0,
+              "status": "none"
+            }
+          },
+          "introduced_at": 29700
+        }
+      },
+      "perceptions": [
+        {
+          "id": "perception_resident_005_9292_16",
+          "observer": "resident_005",
+          "at": 95973,
+          "modality": "participation",
+          "content": "I finished getting ingredients.",
+          "source_entity": "object_0032",
+          "source_beat": "beat_00009292",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9361_16",
+          "observer": "resident_005",
+          "at": 96576,
+          "modality": "participation",
+          "content": "I finished preparing a meal.",
+          "source_entity": "object_0034",
+          "source_beat": "beat_00009361",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9379_16",
+          "observer": "resident_005",
+          "at": 96675,
+          "modality": "participation",
+          "content": "I finished carrying dinner to the table.",
+          "source_entity": "object_0036",
+          "source_beat": "beat_00009379",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9472_16",
+          "observer": "resident_005",
+          "at": 97276,
+          "modality": "participation",
+          "content": "I finished eating a meal.",
+          "source_entity": "object_0036",
+          "source_beat": "beat_00009472",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9521_16",
+          "observer": "resident_005",
+          "at": 97528,
+          "modality": "participation",
+          "content": "I finished using the bathroom.",
+          "source_entity": "object_0042",
+          "source_beat": "beat_00009521",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9839_16",
+          "observer": "resident_005",
+          "at": 99338,
+          "modality": "participation",
+          "content": "I finished reading a book.",
+          "source_entity": "object_0037",
+          "source_beat": "beat_00009839",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9861_16",
+          "observer": "resident_005",
+          "at": 99437,
+          "modality": "participation",
+          "content": "I finished clearing dirty dishes.",
+          "source_entity": "object_0036",
+          "source_beat": "beat_00009861",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_9908_16",
+          "observer": "resident_005",
+          "at": 99687,
+          "modality": "participation",
+          "content": "I finished washing dishes.",
+          "source_entity": "object_0033",
+          "source_beat": "beat_00009908",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11087_16",
+          "observer": "resident_005",
+          "at": 113853,
+          "modality": "participation",
+          "content": "I finished having a drink.",
+          "source_entity": "object_0033",
+          "source_beat": "beat_00011087",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11099_16",
+          "observer": "resident_005",
+          "at": 113947,
+          "modality": "participation",
+          "content": "I finished putting scraps in the bin.",
+          "source_entity": "object_0332",
+          "source_beat": "beat_00011099",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11114_16",
+          "observer": "resident_005",
+          "at": 114128,
+          "modality": "participation",
+          "content": "I finished taking out the trash.",
+          "source_entity": "object_0332",
+          "source_beat": "beat_00011114",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11133_16",
+          "observer": "resident_005",
+          "at": 114253,
+          "modality": "participation",
+          "content": "I finished getting ingredients.",
+          "source_entity": "object_0032",
+          "source_beat": "beat_00011133",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11201_16",
+          "observer": "resident_005",
+          "at": 114856,
+          "modality": "participation",
+          "content": "I finished preparing a meal.",
+          "source_entity": "object_0034",
+          "source_beat": "beat_00011201",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11216_16",
+          "observer": "resident_005",
+          "at": 114955,
+          "modality": "participation",
+          "content": "I finished carrying dinner to the table.",
+          "source_entity": "object_0036",
+          "source_beat": "beat_00011216",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11282_16",
+          "observer": "resident_005",
+          "at": 115556,
+          "modality": "participation",
+          "content": "I finished eating a meal.",
+          "source_entity": "object_0036",
+          "source_beat": "beat_00011282",
+          "reliability": "direct"
+        },
+        {
+          "id": "perception_resident_005_11325_16",
+          "observer": "resident_005",
+          "at": 115808,
+          "modality": "participation",
+          "content": "I finished using the bathroom.",
+          "source_entity": "object_0042",
+          "source_beat": "beat_00011325",
+          "reliability": "direct"
+        }
+      ],
+      "memories": [
+        {
+          "id": "memory_perception_resident_005_9292_16",
+          "at": 95973,
+          "content": "I finished getting ingredients.",
+          "source_percepts": [
+            "perception_resident_005_9292_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9361_16",
+          "at": 96576,
+          "content": "I finished preparing a meal.",
+          "source_percepts": [
+            "perception_resident_005_9361_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9379_16",
+          "at": 96675,
+          "content": "I finished carrying dinner to the table.",
+          "source_percepts": [
+            "perception_resident_005_9379_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9472_16",
+          "at": 97276,
+          "content": "I finished eating a meal.",
+          "source_percepts": [
+            "perception_resident_005_9472_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9521_16",
+          "at": 97528,
+          "content": "I finished using the bathroom.",
+          "source_percepts": [
+            "perception_resident_005_9521_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9839_16",
+          "at": 99338,
+          "content": "I finished reading a book.",
+          "source_percepts": [
+            "perception_resident_005_9839_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9861_16",
+          "at": 99437,
+          "content": "I finished clearing dirty dishes.",
+          "source_percepts": [
+            "perception_resident_005_9861_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_9908_16",
+          "at": 99687,
+          "content": "I finished washing dishes.",
+          "source_percepts": [
+            "perception_resident_005_9908_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11087_16",
+          "at": 113853,
+          "content": "I finished having a drink.",
+          "source_percepts": [
+            "perception_resident_005_11087_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11099_16",
+          "at": 113947,
+          "content": "I finished putting scraps in the bin.",
+          "source_percepts": [
+            "perception_resident_005_11099_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11114_16",
+          "at": 114128,
+          "content": "I finished taking out the trash.",
+          "source_percepts": [
+            "perception_resident_005_11114_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11133_16",
+          "at": 114253,
+          "content": "I finished getting ingredients.",
+          "source_percepts": [
+            "perception_resident_005_11133_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11201_16",
+          "at": 114856,
+          "content": "I finished preparing a meal.",
+          "source_percepts": [
+            "perception_resident_005_11201_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11216_16",
+          "at": 114955,
+          "content": "I finished carrying dinner to the table.",
+          "source_percepts": [
+            "perception_resident_005_11216_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11282_16",
+          "at": 115556,
+          "content": "I finished eating a meal.",
+          "source_percepts": [
+            "perception_resident_005_11282_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        },
+        {
+          "id": "memory_perception_resident_005_11325_16",
+          "at": 115808,
+          "content": "I finished using the bathroom.",
+          "source_percepts": [
+            "perception_resident_005_11325_16"
+          ],
+          "salience": 0.6,
+          "retention": "retained"
+        }
+      ],
+      "beliefs": [
+        {
+          "id": "belief_perception_resident_005_9292_16",
+          "proposition": "I finished getting ingredients.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9292_16"
+          ],
+          "valid_from": 95973
+        },
+        {
+          "id": "belief_perception_resident_005_9361_16",
+          "proposition": "I finished preparing a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9361_16"
+          ],
+          "valid_from": 96576
+        },
+        {
+          "id": "belief_perception_resident_005_9379_16",
+          "proposition": "I finished carrying dinner to the table.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9379_16"
+          ],
+          "valid_from": 96675
+        },
+        {
+          "id": "belief_perception_resident_005_9472_16",
+          "proposition": "I finished eating a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9472_16"
+          ],
+          "valid_from": 97276
+        },
+        {
+          "id": "belief_perception_resident_005_9521_16",
+          "proposition": "I finished using the bathroom.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9521_16"
+          ],
+          "valid_from": 97528
+        },
+        {
+          "id": "belief_perception_resident_005_9839_16",
+          "proposition": "I finished reading a book.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9839_16"
+          ],
+          "valid_from": 99338
+        },
+        {
+          "id": "belief_perception_resident_005_9861_16",
+          "proposition": "I finished clearing dirty dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9861_16"
+          ],
+          "valid_from": 99437
+        },
+        {
+          "id": "belief_perception_resident_005_9908_16",
+          "proposition": "I finished washing dishes.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_9908_16"
+          ],
+          "valid_from": 99687
+        },
+        {
+          "id": "belief_perception_resident_005_11087_16",
+          "proposition": "I finished having a drink.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11087_16"
+          ],
+          "valid_from": 113853
+        },
+        {
+          "id": "belief_perception_resident_005_11099_16",
+          "proposition": "I finished putting scraps in the bin.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11099_16"
+          ],
+          "valid_from": 113947
+        },
+        {
+          "id": "belief_perception_resident_005_11114_16",
+          "proposition": "I finished taking out the trash.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11114_16"
+          ],
+          "valid_from": 114128
+        },
+        {
+          "id": "belief_perception_resident_005_11133_16",
+          "proposition": "I finished getting ingredients.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11133_16"
+          ],
+          "valid_from": 114253
+        },
+        {
+          "id": "belief_perception_resident_005_11201_16",
+          "proposition": "I finished preparing a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11201_16"
+          ],
+          "valid_from": 114856
+        },
+        {
+          "id": "belief_perception_resident_005_11216_16",
+          "proposition": "I finished carrying dinner to the table.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11216_16"
+          ],
+          "valid_from": 114955
+        },
+        {
+          "id": "belief_perception_resident_005_11282_16",
+          "proposition": "I finished eating a meal.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11282_16"
+          ],
+          "valid_from": 115556
+        },
+        {
+          "id": "belief_perception_resident_005_11325_16",
+          "proposition": "I finished using the bathroom.",
+          "confidence": "high",
+          "evidence": [
+            "perception_resident_005_11325_16"
+          ],
+          "valid_from": 115808
+        }
+      ],
+      "emotion": {
+        "type": "Uncomfortable",
+        "valence": 0.567,
+        "arousal": 0.6,
+        "intensity": 0.23,
+        "cause": "Completed toilet; appraised my own needs",
+        "since": 115808,
+        "expires_at": null
+      },
+      "thought": {
+        "text": "A warm shower sounds lovely.",
+        "trigger": "decision_91",
+        "since": 115809
+      },
+      "action": {
+        "id": "action_resident_005_91",
+        "kind": "shower",
+        "label": "Taking a shower",
+        "target_id": "object_0043",
+        "phase": "using",
+        "started_at": 115809,
+        "arrives_at": 115811,
+        "ends_at": 116411,
+        "duration": 600,
+        "path": [
+          [
+            66,
+            12
+          ],
+          [
+            66,
+            13
+          ],
+          [
+            66,
+            14
+          ]
+        ],
+        "reason": "Hygiene pressure is 58%",
+        "definition_version": "2.0.0",
+        "reservation_id": "action_resident_005_91",
+        "partner_id": null
+      },
+      "decision_id": 91,
+      "last_decision": {
+        "at": 115809,
+        "id": 91,
+        "chosen": "shower",
+        "candidates": [
+          {
+            "kind": "shower",
+            "target_id": "object_0043",
+            "anchor": [
+              66,
+              14
+            ],
+            "distance": 2,
+            "score": 0.55301,
+            "terms": {
+              "need_relief": 0.5174,
+              "preference": 0.036,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0068,
+              "travel_and_time_cost": 0.0072
+            }
+          },
+          {
+            "kind": "read",
+            "target_id": "object_0037",
+            "anchor": [
+              60,
+              9
+            ],
+            "distance": 9,
+            "score": 0.33341,
+            "terms": {
+              "need_relief": 0.1314,
+              "preference": 0.1188,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.1092,
+              "travel_and_time_cost": 0.026
+            }
+          },
+          {
+            "kind": "clear_dishes",
+            "target_id": "object_0036",
+            "anchor": [
+              56,
+              13
+            ],
+            "distance": 11,
+            "score": 0.33041,
+            "routine_kind": "meal",
+            "routine_steps": [
+              {
+                "kind": "fetch_ingredients",
+                "target_id": "object_0032"
+              },
+              {
+                "kind": "prepare_meal",
+                "target_id": "object_0034"
+              },
+              {
+                "kind": "serve_meal",
+                "target_id": "object_0036"
+              },
+              {
+                "kind": "eat_meal",
+                "target_id": "object_0036"
+              },
+              {
+                "kind": "clear_dishes",
+                "target_id": "object_0036"
+              },
+              {
+                "kind": "wash_dishes",
+                "target_id": "object_0033"
+              },
+              {
+                "kind": "bin_trash",
+                "target_id": "object_0332"
+              },
+              {
+                "kind": "empty_trash",
+                "target_id": "object_0332"
+              },
+              {
+                "kind": "wipe_counter",
+                "target_id": "object_0034"
+              }
+            ],
+            "routine_index": 4,
+            "new_routine": false,
+            "terms": {
+              "plan_goal": 0.1201,
+              "continuity": 0.22,
+              "personality": 0.0068,
+              "travel_cost": 0.0165
+            }
+          },
+          {
+            "kind": "drink",
+            "target_id": "object_0033",
+            "anchor": [
+              56,
+              8
+            ],
+            "distance": 14,
+            "score": 0.15722,
+            "terms": {
+              "need_relief": 0.0563,
+              "preference": 0.1164,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0068,
+              "travel_and_time_cost": 0.0223
+            }
+          },
+          {
+            "kind": "garden",
+            "target_id": "object_0045",
+            "anchor": [
+              70,
+              12
+            ],
+            "distance": 4,
+            "score": 0.15436,
+            "terms": {
+              "need_relief": 0.1166,
+              "preference": 0.0552,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.001,
+              "travel_and_time_cost": 0.0164
+            }
+          },
+          {
+            "kind": "stroll",
+            "target_id": "object_0318",
+            "anchor": [
+              58,
+              57
+            ],
+            "distance": 53,
+            "score": 0.10648,
+            "terms": {
+              "need_relief": 0.0678,
+              "preference": 0.0912,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0332,
+              "travel_and_time_cost": 0.0858
+            }
+          },
+          {
+            "kind": "relax",
+            "target_id": "object_0035",
+            "anchor": [
+              57,
+              11
+            ],
+            "distance": 10,
+            "score": 0.04666,
+            "terms": {
+              "need_relief": 0.049,
+              "preference": 0.048,
+              "commitment": 0,
+              "critical": 0,
+              "personality": -0.0249,
+              "travel_and_time_cost": 0.0254
+            }
+          },
+          {
+            "kind": "eat",
+            "target_id": "object_0303",
+            "anchor": [
+              10,
+              56
+            ],
+            "distance": 100,
+            "score": -0.03421,
+            "terms": {
+              "need_relief": 0.0001,
+              "preference": 0.1164,
+              "commitment": 0,
+              "critical": 0,
+              "personality": 0.0068,
+              "travel_and_time_cost": 0.1575
+            }
+          },
+          {
+            "kind": "wait",
+            "target_id": null,
+            "anchor": [
+              66,
+              12
+            ],
+            "distance": 0,
+            "score": -0.15,
+            "terms": {
+              "fallback": true
+            }
+          },
+          {
+            "kind": "sleep",
+            "target_id": "object_0039",
+            "anchor": [
+              63,
+              9
+            ],
+            "distance": 6,
+            "score": -0.41907,
+            "terms": {
+              "need_relief": 0.0021,
+              "preference": 0.036,
+              "commitment": -0.28,
+              "critical": 0,
+              "personality": 0.0068,
+              "travel_and_time_cost": 0.184
+            }
+          },
+          {
+            "kind": "work",
+            "target_id": "object_0326",
+            "anchor": [
+              64,
+              132
+            ],
+            "distance": 122,
+            "score": -1.06439,
+            "terms": {
+              "need_relief": 0.017,
+              "preference": 0.1008,
+              "commitment": -1,
+              "critical": 0,
+              "personality": 0.0196,
+              "travel_and_time_cost": 0.2017
+            }
+          }
+        ],
+        "rejected": [],
+        "random_draw": 0.6091838779064782,
+        "policy": "stable named softmax draw"
+      },
+      "cooldowns": {
+        "chat": 81097,
+        "relax": 77286,
+        "drink": 113883,
+        "fetch_ingredients": 114283,
+        "prepare_meal": 114886,
+        "serve_meal": 114985,
+        "eat_meal": 115586,
+        "toilet": 115838,
+        "work": 54345,
+        "shower": 75581,
+        "bin_trash": 113977,
+        "wipe_counter": 61378,
+        "clear_dishes": 99467,
+        "wash_dishes": 99717,
+        "empty_trash": 114158,
+        "read": 99368,
+        "stroll": 59610,
+        "buy_groceries": 62115,
+        "stock_fridge": 62423,
+        "wait": 66574,
+        "garden": 71513,
+        "eat": 74438,
+        "sleep": 113774
+      },
+      "effects": [],
+      "owner": "procedural",
+      "owner_epoch": 1,
+      "version": 260,
+      "last_beat": "beat_00011327",
+      "family": {
+        "parent_ids": [
+          "resident_003",
+          "resident_004"
+        ],
+        "partner_id": "resident_006",
+        "relationship_status": "partnered",
+        "known_kin_ids": [
+          "resident_001",
+          "resident_002",
+          "resident_003",
+          "resident_004",
+          "resident_007",
+          "resident_008",
+          "resident_010"
+        ]
+      },
+      "psychology": {
+        "schema_version": 1,
+        "big_five": {
+          "openness": 0.548,
+          "conscientiousness": 0.48,
+          "extraversion": 0.392,
+          "agreeableness": 0.441,
+          "neuroticism": 0.42
+        },
+        "traits": [
+          "Practical"
+        ],
+        "ambitions": [
+          {
+            "id": "ambition_primary",
+            "kind": "create",
+            "title": "Develop a creative practice",
+            "progress": 0.45,
+            "completed": false,
+            "updated_at": 54315,
+            "evidence_id": "beat_00003905"
+          }
+        ],
+        "hobbies": [
+          {
+            "id": "hobby_reading",
+            "kind": "reading",
+            "enjoyment": 0.99,
+            "practice_seconds": 9000,
+            "last_practiced": 99338,
+            "last_evidence_id": "beat_00009839"
+          },
+          {
+            "id": "hobby_cooking",
+            "kind": "cooking",
+            "enjoyment": 0.97,
+            "practice_seconds": 10320,
+            "last_practiced": 115556,
+            "last_evidence_id": "beat_00011282"
+          },
+          {
+            "id": "hobby_craft",
+            "kind": "craft",
+            "enjoyment": 0.84,
+            "practice_seconds": 16200,
+            "last_practiced": 54315,
+            "last_evidence_id": "beat_00003905"
+          }
+        ],
+        "fears": [
+          {
+            "id": "fear_rejection",
+            "kind": "social_rejection",
+            "intensity": 0.385,
+            "last_updated": 77257,
+            "evidence_id": "beat_00007798",
+            "expires_at": 91657
+          },
+          {
+            "id": "fear_stagnation",
+            "kind": "stagnation",
+            "intensity": 0.2096,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_conflict",
+            "kind": "conflict",
+            "intensity": 0.1682,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_dogs",
+            "kind": "dogs",
+            "intensity": 0.1345,
+            "last_updated": 29700
+          },
+          {
+            "id": "fear_job_loss",
+            "kind": "job_loss",
+            "intensity": 0.3682,
+            "last_updated": 29700
+          }
+        ],
+        "theory_of_mind": {
+          "known_people": {
+            "resident_006": {
+              "observations": [
+                {
+                  "at": 29704,
+                  "observation": "Nora Chen agreed to spend time talking with me.",
+                  "evidence_id": "beat_00000009",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 30004,
+                  "observation": "social:share_interest:positive",
+                  "evidence_id": "beat_00000161",
+                  "modality": "participation"
+                },
+                {
+                  "at": 30004,
+                  "observation": "We completed share interest with Nora Chen.",
+                  "evidence_id": "beat_00000161",
+                  "modality": "participation"
+                },
+                {
+                  "at": 62394,
+                  "observation": "social:small_talk:declined",
+                  "evidence_id": "beat_00005525",
+                  "modality": "participation"
+                },
+                {
+                  "at": 62394,
+                  "observation": "Nora Chen declined a conversation.",
+                  "evidence_id": "beat_00005525",
+                  "modality": "hearing"
+                }
+              ],
+              "inferences": {
+                "rapport": {
+                  "value": "interaction was receptive",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00000009"
+                  ],
+                  "updated_at": 29704
+                },
+                "availability": {
+                  "value": "may prefer space",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00005525"
+                  ],
+                  "updated_at": 62394
+                }
+              }
+            },
+            "resident_007": {
+              "observations": [
+                {
+                  "at": 67852,
+                  "observation": "Theo Chen agreed to spend time talking with me.",
+                  "evidence_id": "beat_00006298",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 68152,
+                  "observation": "social:share_interest:positive",
+                  "evidence_id": "beat_00006330",
+                  "modality": "participation"
+                },
+                {
+                  "at": 68152,
+                  "observation": "We completed share interest with Theo Chen.",
+                  "evidence_id": "beat_00006331",
+                  "modality": "participation"
+                },
+                {
+                  "at": 77257,
+                  "observation": "social:celebrate:declined",
+                  "evidence_id": "beat_00007798",
+                  "modality": "participation"
+                },
+                {
+                  "at": 77257,
+                  "observation": "Theo Chen declined a conversation.",
+                  "evidence_id": "beat_00007798",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 79148,
+                  "observation": "social:greet:declined",
+                  "evidence_id": "beat_00008200",
+                  "modality": "participation"
+                },
+                {
+                  "at": 80452,
+                  "observation": "Theo Chen agreed to spend time talking with me.",
+                  "evidence_id": "beat_00008407",
+                  "modality": "hearing"
+                },
+                {
+                  "at": 80497,
+                  "observation": "social:greet:positive",
+                  "evidence_id": "beat_00008417",
+                  "modality": "participation"
+                },
+                {
+                  "at": 80497,
+                  "observation": "We completed greet with Theo Chen.",
+                  "evidence_id": "beat_00008418",
+                  "modality": "participation"
+                }
+              ],
+              "inferences": {
+                "rapport": {
+                  "value": "interaction was receptive",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00008407"
+                  ],
+                  "updated_at": 80452
+                },
+                "availability": {
+                  "value": "may prefer space",
+                  "confidence": "low",
+                  "evidence_ids": [
+                    "beat_00008200"
+                  ],
+                  "updated_at": 79148
+                }
+              }
+            }
+          },
+          "max_observations_per_person": 12,
+          "policy": "direct_observations_only"
+        },
+        "action_model": {
+          "policy": "seeded_if_then_weighted",
+          "last_choice": null
+        },
+        "social_appraisal": {
+          "type": "Connected",
+          "category": "greet",
+          "outcome": "positive",
+          "evidence_id": "beat_00008417",
+          "expires_at": 81397
+        }
+      },
+      "routine": {
+        "id": "plan_resident_005_86",
+        "kind": "meal",
+        "steps": [
+          {
+            "kind": "fetch_ingredients",
+            "target_id": "object_0032"
+          },
+          {
+            "kind": "prepare_meal",
+            "target_id": "object_0034"
+          },
+          {
+            "kind": "serve_meal",
+            "target_id": "object_0036"
+          },
+          {
+            "kind": "eat_meal",
+            "target_id": "object_0036"
+          },
+          {
+            "kind": "clear_dishes",
+            "target_id": "object_0036"
+          },
+          {
+            "kind": "wash_dishes",
+            "target_id": "object_0033"
+          },
+          {
+            "kind": "bin_trash",
+            "target_id": "object_0332"
+          },
+          {
+            "kind": "empty_trash",
+            "target_id": "object_0332"
+          },
+          {
+            "kind": "wipe_counter",
+            "target_id": "object_0034"
+          }
+        ],
+        "index": 4,
+        "started_at": 114129,
+        "status": "active"
+      },
+      "workplace": {
+        "target_id": "object_0326",
+        "building_id": "studio",
+        "workplace_id": "studio",
+        "station_kind": "designer_station",
+        "work_from_home": false
+      },
+      "workplace_id": "studio",
+      "locations": [
+        {
+          "id": "mosswood",
+          "name": "Mosswood",
+          "bounds": [
+            0,
+            0,
+            128,
+            154
+          ],
+          "parent": null
+        },
+        {
+          "id": "home_03",
+          "name": "Chen house",
+          "bounds": [
+            54,
+            6,
+            15,
+            11
+          ],
+          "parent": "mosswood"
+        },
+        {
+          "id": "home_03_bathroom",
+          "name": "Bathroom",
+          "bounds": [
+            63,
+            12,
+            5,
+            4
+          ],
+          "parent": "home_03"
+        }
+      ],
+      "coverage": {
+        "needs": "modeled",
+        "actions": "modeled",
+        "emotions": "rule appraisal",
+        "thoughts": "template from accepted decision",
+        "beliefs": "bounded observations and initialized knowledge",
+        "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+        "speech": "unmodeled",
+        "physiology": "game abstraction",
+        "personality": "five bounded gameplay traits; not a psychological diagnosis",
+        "relationships": "explicit kinship/status plus directional quality dimensions",
+        "ambitions": "event-driven progress and utility preferences",
+        "fears": "observed triggers, cooldowns and temporary appraisal",
+        "household_routines": "reserved multi-step meal and cleanup plans",
+        "work": "assigned physical workplace and commute; simplified paid tasks"
+      },
+      "clock": 116100,
+      "intentions": [
+        {
+          "text": "Taking a shower until about 08:20",
+          "status": "committed",
+          "target_id": "object_0043",
+          "deadline": 116411,
+          "prerequisites": [
+            "Reach interaction anchor",
+            "Hold reservation"
+          ]
+        },
+        {
+          "text": "Reading a book",
+          "status": "possible next action, not a promise",
+          "score": 0.33509
+        },
+        {
+          "text": "Clearing dirty dishes",
+          "status": "possible next action, not a promise",
+          "score": 0.3308
+        },
+        {
+          "text": "Having a drink",
+          "status": "possible next action, not a promise",
+          "score": 0.16257
+        }
+      ],
+      "planned_steps": [
+        {
+          "kind": "fetch_ingredients",
+          "target_id": "object_0032",
+          "label": "Getting ingredients",
+          "status": "completed",
+          "target_name": "Kitchen pantry"
+        },
+        {
+          "kind": "prepare_meal",
+          "target_id": "object_0034",
+          "label": "Preparing a meal",
+          "status": "completed",
+          "target_name": "Kitchen counter"
+        },
+        {
+          "kind": "serve_meal",
+          "target_id": "object_0036",
+          "label": "Carrying dinner to the table",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "eat_meal",
+          "target_id": "object_0036",
+          "label": "Eating a meal",
+          "status": "completed",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "clear_dishes",
+          "target_id": "object_0036",
+          "label": "Clearing dirty dishes",
+          "status": "next",
+          "target_name": "Coffee table"
+        },
+        {
+          "kind": "wash_dishes",
+          "target_id": "object_0033",
+          "label": "Washing dishes",
+          "status": "planned",
+          "target_name": "Kitchen sink"
+        },
+        {
+          "kind": "bin_trash",
+          "target_id": "object_0332",
+          "label": "Putting scraps in the bin",
+          "status": "planned",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "empty_trash",
+          "target_id": "object_0332",
+          "label": "Taking out the trash",
+          "status": "planned",
+          "target_name": "Kitchen bin"
+        },
+        {
+          "kind": "wipe_counter",
+          "target_id": "object_0034",
+          "label": "Wiping the kitchen counter",
+          "status": "planned",
+          "target_name": "Kitchen counter"
+        }
+      ],
+      "household_objects": [
+        {
+          "id": "object_0032",
+          "name": "Kitchen pantry",
+          "kind": "fridge",
+          "daily": {
+            "pantry_stock": 1
+          }
+        },
+        {
+          "id": "object_0033",
+          "name": "Kitchen sink",
+          "kind": "sink",
+          "daily": {
+            "washed_total": 14
+          }
+        },
+        {
+          "id": "object_0034",
+          "name": "Kitchen counter",
+          "kind": "counter",
+          "daily": {
+            "mess": 1,
+            "cleaned_total": 14
+          }
+        },
+        {
+          "id": "object_0036",
+          "name": "Coffee table",
+          "kind": "table",
+          "daily": {
+            "served_meals": 0,
+            "dirty_dishes": 1
+          }
+        },
+        {
+          "id": "object_0332",
+          "name": "Kitchen bin",
+          "kind": "bin",
+          "daily": {
+            "trash": 0,
+            "disposed_total": 14
+          }
+        }
+      ],
+      "social_categories": {
+        "greet": {
+          "label": "Greet",
+          "duration_seconds": 45,
+          "tone": "warm",
+          "base": 0.35
+        },
+        "small_talk": {
+          "label": "Small talk",
+          "duration_seconds": 180,
+          "tone": "warm",
+          "base": 0.42
+        },
+        "share_interest": {
+          "label": "Share interest",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.46
+        },
+        "offer_help": {
+          "label": "Offer help",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "ask_advice": {
+          "label": "Ask advice",
+          "duration_seconds": 300,
+          "tone": "warm",
+          "base": 0.36
+        },
+        "tell_joke": {
+          "label": "Tell joke",
+          "duration_seconds": 90,
+          "tone": "play",
+          "base": 0.4
+        },
+        "compliment": {
+          "label": "Compliment",
+          "duration_seconds": 75,
+          "tone": "warm",
+          "base": 0.4
+        },
+        "apologize": {
+          "label": "Apologize",
+          "duration_seconds": 150,
+          "tone": "repair",
+          "base": 0.32
+        },
+        "check_in": {
+          "label": "Check in",
+          "duration_seconds": 180,
+          "tone": "care",
+          "base": 0.41
+        },
+        "confide": {
+          "label": "Confide",
+          "duration_seconds": 360,
+          "tone": "care",
+          "base": 0.26
+        },
+        "invite_activity": {
+          "label": "Invite to activity",
+          "duration_seconds": 90,
+          "tone": "warm",
+          "base": 0.37
+        },
+        "celebrate": {
+          "label": "Celebrate",
+          "duration_seconds": 240,
+          "tone": "warm",
+          "base": 0.43
+        },
+        "play_together": {
+          "label": "Play together",
+          "duration_seconds": 300,
+          "tone": "play",
+          "base": 0.42
+        },
+        "coordinate_work": {
+          "label": "Coordinate work",
+          "duration_seconds": 240,
+          "tone": "task",
+          "base": 0.38
+        },
+        "set_boundary": {
+          "label": "Set boundary",
+          "duration_seconds": 120,
+          "tone": "boundary",
+          "base": 0.28
+        },
+        "gossip": {
+          "label": "Gossip",
+          "duration_seconds": 180,
+          "tone": "tension",
+          "base": 0.24
+        },
+        "reconcile": {
+          "label": "Reconcile",
+          "duration_seconds": 300,
+          "tone": "repair",
+          "base": 0.27
+        },
+        "flirt": {
+          "label": "Flirt",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.24,
+          "romantic": true
+        },
+        "ask_date": {
+          "label": "Ask for date",
+          "duration_seconds": 90,
+          "tone": "romance",
+          "base": 0.2,
+          "romantic": true
+        },
+        "express_affection": {
+          "label": "Express affection",
+          "duration_seconds": 120,
+          "tone": "romance",
+          "base": 0.25,
+          "romantic": true
+        }
+      }
+    }
+  ],
+  "scope": "Seeded new world; 44 adults, not a city benchmark. Counts measure executed completions; chat counts per participant, accepted categories per encounter."
+}

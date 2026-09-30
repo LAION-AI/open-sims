@@ -1,0 +1,23 @@
+{
+  "id": "mosswood.everyday",
+  "version": "1.0.0",
+  "schema_version": 1,
+  "units": {"time": "integer world seconds", "distance": "meters", "needs": "urgency, 0 satisfied to 1 critical", "money": "fictional coins"},
+  "selection": {"candidate_limit": 24, "temperature": 0.07, "critical_threshold": 0.88, "critical_bonus": 2.0},
+  "need_rates_per_hour": {"hunger": 0.11, "thirst": 0.17, "bladder": 0.12, "fatigue": 0.057, "hygiene": 0.052, "social": 0.055, "fun": 0.075, "comfort": 0.065},
+  "actions": {
+    "eat": {"label": "Making a meal", "object_kinds": ["fridge", "cafe_counter"], "duration": 1080, "relief": {"hunger": 0.80, "comfort": 0.1}, "cost": 5, "preference": "cooking", "thought": "A proper meal would help me feel more like myself."},
+    "drink": {"label": "Having a drink", "object_kinds": ["sink", "fountain", "cafe_counter"], "duration": 180, "relief": {"thirst": 0.85}, "cost": 0, "preference": "cooking", "thought": "Time for a glass of water."},
+    "toilet": {"label": "Using the bathroom", "object_kinds": ["toilet"], "duration": 240, "relief": {"bladder": 0.95}, "cost": 0, "preference": null, "thought": "I should take care of this before doing anything else."},
+    "shower": {"label": "Taking a shower", "object_kinds": ["shower"], "duration": 600, "relief": {"hygiene": 0.85, "comfort": 0.18}, "cost": 0, "preference": null, "thought": "A warm shower sounds lovely."},
+    "sleep": {"label": "Sleeping", "object_kinds": ["bed"], "duration": 25200, "relief": {"fatigue": 1.4, "comfort": 0.8}, "cost": 0, "preference": null, "thought": "I need some rest. Tomorrow can wait."},
+    "relax": {"label": "Taking a quiet break", "object_kinds": ["sofa", "bench"], "duration": 1500, "relief": {"comfort": 0.6, "fun": 0.23, "fatigue": 0.10}, "cost": 0, "preference": "relaxing", "thought": "A little quiet time would be good."},
+    "read": {"label": "Reading a book", "object_kinds": ["bookshelf"], "duration": 1800, "relief": {"fun": 0.62, "comfort": 0.18}, "cost": 0, "preference": "reading", "thought": "There is still a chapter I want to finish."},
+    "garden": {"label": "Tending the garden", "object_kinds": ["planter"], "duration": 1500, "relief": {"fun": 0.55, "comfort": 0.12}, "cost": 0, "preference": "gardening", "thought": "I could spend a little time with the plants."},
+    "work": {"label": "Working on a project", "object_kinds": ["desk", "shop_counter"], "duration": 2700, "relief": {"fun": 0.08}, "cost": 0, "income": 18, "preference": "craft", "thought": "I want to make some progress on my work."},
+    "chat": {"label": "Catching up", "object_kinds": [], "duration": 480, "relief": {"social": 0.56, "fun": 0.16}, "cost": 0, "preference": "socializing", "thought": "It would be nice to hear how someone is doing."},
+    "stroll": {"label": "Enjoying the park", "object_kinds": ["park_marker"], "duration": 900, "relief": {"fun": 0.32, "comfort": 0.16}, "cost": 0, "preference": "walking", "thought": "A walk through the green might clear my head."},
+    "wait": {"label": "Taking a moment", "object_kinds": [], "duration": 120, "relief": {}, "cost": 0, "preference": null, "thought": "I will take a moment and then reconsider."}
+  },
+  "coverage": {"needs": "modeled", "actions": "modeled", "emotions": "rule appraisal", "thoughts": "template from accepted decision", "beliefs": "bounded observations and initialized knowledge", "theory_of_mind": "unmodeled", "speech": "unmodeled", "physiology": "game abstraction"}
+}

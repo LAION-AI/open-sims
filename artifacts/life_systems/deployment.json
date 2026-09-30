@@ -1,0 +1,48 @@
+{
+  "url": "http://127.0.0.1:8765",
+  "backup": "C:\\Users\\chris\\Documents\\OpenSims2\\data\\backups\\mosswood-pre-life-v2-20260928T183737Z-f877746a.sqlite3",
+  "backup_clock": 241550,
+  "current_clock": 241661,
+  "checks": {
+    "clock_not_reset": true,
+    "population_preserved": true,
+    "ages_preserved": true,
+    "households_preserved": true,
+    "unknown_kinship_not_invented": true,
+    "old_object_geometry_preserved": true,
+    "new_objects_added": true,
+    "new_schema": true,
+    "exact_replay": true,
+    "health": true,
+    "model_disabled": true
+  },
+  "passed": true,
+  "rule_manifest": {
+    "id": "mosswood.everyday",
+    "version": "2.0.0",
+    "sha256": "d833aaed1a19bc03e5609dd51625c6badbdcdc77dbb58970f5db589137f9dde0",
+    "schema_version": 1,
+    "units": {
+      "time": "integer world seconds",
+      "distance": "meters",
+      "needs": "urgency, 0 satisfied to 1 critical",
+      "money": "fictional coins"
+    },
+    "coverage": {
+      "needs": "modeled",
+      "actions": "modeled",
+      "emotions": "rule appraisal",
+      "thoughts": "template from accepted decision",
+      "beliefs": "bounded observations and initialized knowledge",
+      "theory_of_mind": "bounded first-order estimates from witnessed interactions",
+      "speech": "unmodeled",
+      "physiology": "game abstraction",
+      "personality": "five bounded gameplay traits; not a psychological diagnosis",
+      "relationships": "explicit kinship/status plus directional quality dimensions",
+      "ambitions": "event-driven progress and utility preferences",
+      "fears": "observed triggers, cooldowns and temporary appraisal",
+      "household_routines": "reserved multi-step meal and cleanup plans",
+      "work": "assigned physical workplace and commute; simplified paid tasks"
+    }
+  }
+}
