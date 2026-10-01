@@ -26,7 +26,14 @@ class RuleRegistry:
             "household_routines": "reserved multi-step meal and cleanup plans",
             "work": "assigned physical workplace and commute; simplified paid tasks",
         })
-        self.v2_hash = hashlib.sha256(json.dumps(self.data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        # The v2 hash predates the five new career assignments.  Keep its
+        # original work-station set for save recognition, while the active
+        # package may use the expanded list.
+        old_v2 = deepcopy(self.data)
+        added_jobs = {'Physician', 'Chef', 'Mechanic', 'Programmer', 'Civic planner'}
+        old_v2['actions']['work']['object_kinds'] = sorted(
+            {kind for job, (kind, _) in JOB_STATIONS.items() if job not in added_jobs})
+        self.v2_hash = hashlib.sha256(json.dumps(old_v2, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         from .possessions import POSSESSION_ACTIONS
         from .urban_life import SERVICE_ACTIONS, SERVICE_JOBS
         self.data['actions'].update(POSSESSION_ACTIONS)
@@ -38,6 +45,14 @@ class RuleRegistry:
         self.data['coverage'].update(emotions='simultaneous evidenced appraisals; separate self narrative; EmoNet-Face vocabulary',
             possessions='unique owned portable food and wearable items with location/state',
             city='hierarchical laboratory plus appended live service destinations; no traffic or geodata reconstruction')
+        # Preserve the exact 3.0 contract hash so occupied saves can opt into
+        # the 3.1 action target without a geometry rewrite or invented history.
+        from copy import deepcopy as _copy
+        old_v3 = _copy(self.data)
+        old_v3['actions']['change_outfit']['object_kinds'] = ['bed']
+        self.v3_hash = hashlib.sha256(json.dumps(old_v3, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        self.data['version'] = '3.1.0'
+        self.data['coverage']['clothes_storage'] = 'reachable wardrobes in new homes; old saves retain bed fallback'
         self.hash = hashlib.sha256(json.dumps(self.data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         self.version = self.data["version"]
         self.actions = self.data["actions"]

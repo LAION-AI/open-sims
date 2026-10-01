@@ -62,7 +62,7 @@ Accepted history and the current scheduler checkpoint are saved together to `dat
 
 Neu: **Objekte** öffnet eine durchsuchbare Objektliste; sichtbare Möbel sind direkt auf der Karte anklickbar. Der Explorer zeigt echte Zustände, Reservierungen, Nutzer, Anker und Aktionsarten. `GET /api/objects/{oid}` liefert zusätzlich konkrete Containerinhalte. Ein älterer laufender Server nutzt bis zum Neustart eine ausdrücklich markierte Leseprojektion über `/api/world`.
 
-Das Tempo-Menü bietet **1× / 10× / 60× / 120× / 300× / 600×**. Tempoauswahl bewahrt die Pause; Play startet. Höhere Werte sind angeforderte Faktoren, keine garantierte Rechenleistung. Der [HTML-Ausbauplan](web/plausibility-plan.html) beschreibt Schulbetrieb, gemeinsame Generatorverträge, beobachtungsbasierte Agentenschleife und ein umfassendes Interventionsmenü. Diese geplanten Systeme wurden noch nicht implementiert.
+Das Tempo-Menü bietet **1× / 10× / 60× / 120× / 300× / 600×**. Tempoauswahl bewahrt die Pause; Play startet. Höhere Werte sind angeforderte Faktoren, keine garantierte Rechenleistung. Neue Welten haben mehr Möbel, Schränke, Berufs- und Ambitionspfade, sichtbar gerichtete Beziehungen und unverbindliche Handlungsempfehlungen. Der [aktuelle HTML-Zwischenstand](docs/expanded_life.html) trennt diese Umsetzung vom weiterhin offenen [Ausbauplan](web/plausibility-plan.html): Schülerbetrieb, gemeinsame Generatorverträge und automatische Agentenverbesserung sind noch nicht implementiert.
 
 | Control | What it does |
 | --- | --- |

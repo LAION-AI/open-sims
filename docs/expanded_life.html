@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mosswood · Alltags- und Beziehungsausbau</title>
+<style>
+:root{--paper:#f7f5ee;--ink:#2a4035;--green:#376a50;--line:#dbe3d4}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:36px 22px 80px}h1,h2{font-family:Georgia,serif;line-height:1.2}h1{font-size:clamp(34px,5vw,56px)}h2{font-size:29px;margin-top:48px}a{color:var(--green)}.lead{font-size:19px;max-width:760px;color:#5c705f}.eyebrow{font-size:11px;letter-spacing:.15em;color:var(--green)}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px}.card{background:#fffef9;border:1px solid var(--line);border-radius:12px;padding:18px}.card h3{margin:0 0 7px;font-size:17px}.card p{margin:0;color:#637766}.note{border-left:4px solid var(--green);background:#eaf1e5;padding:14px 18px;margin:23px 0}.warn{border-color:#b48b65;background:#f4ece1}code,pre{background:#e9eee4;border-radius:4px;padding:2px 5px}pre{padding:18px;overflow:auto;font-size:13px}table{border-collapse:collapse;width:100%}td,th{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#eaf0e5}small{color:#6a7e6b}
+</style></head><body><main>
+<nav><a href="/">Welt öffnen</a> · <a href="/plausibility-plan">ursprünglicher Ausbauplan</a> · <a href="/docs">API</a></nav>
+<p class="eyebrow">PROCEDURAL LIVING WORLD · ERGÄNZUNG 05 · 1. OKTOBER 2026</p>
+<h1>Mehr Alltag, sichtbare Beziehungen.</h1>
+<p class="lead">Dieser Zwischenstand schließt einige konkrete Lücken des Plausibilitätsplans. Das gesamte autonome Verbesserungs- und Schulbetriebssystem ist damit ausdrücklich nicht fertig.</p>
+<div class="cards">
+<article class="card"><h3>Bewohnte Häuser</h3><p>20 neue Haushalte erhalten je einen erreichbaren Kleiderschrank und drei Esszimmerstühle. Zusätzliche Beistelltische, Sessel, Garderoben, Lampen und Pflanzen variieren je nach Seed und verfügbarem Platz. Die Platzierung verwirft Varianten, die bestehende Interaktionsanker oder durchgehende Gehflächen abtrennen.</p></article>
+<article class="card"><h3>Konkrete Kleidung</h3><p>Nicht getragene Kleidungsstücke neuer Bewohner liegen im zugehörigen Schrank; der Outfitplan führt sie dorthin. Ältere Save-Geometrie wird nicht geändert und behält den bisherigen Bett-Fallback.</p></article>
+<article class="card"><h3>Berufswege</h3><p>20 Berufe haben eigene Aufgaben, Fachfertigkeit, Startzeit, Lohnfaktor, Arbeitsqualität und vier Fortschrittsstufen. Erfahrung und Karriereambition wachsen nach tatsächlich abgeschlossener Arbeit am zugewiesenen Arbeitsplatz, nicht allein durch einen Wunsch zu arbeiten.</p></article>
+<article class="card"><h3>Ambitionen</h3><p>Jede neue Person hat ein persönliches Hauptziel, einen Berufspfad und ein Hobbyziel. Hobby-Praxis und Karriereereignisse schreiben getrennte, belegte Fortschritte. Für alte Spielstände beginnt neu hinzugefügter Fortschritt bei null.</p></article>
+<article class="card"><h3>Sozialleben</h3><p>Der Entscheidungsraum betrachtet mehrere sichtbare Partner statt nur des nächsten. Gespräche berücksichtigen gemeinsame Interessen, Beziehung, Familie, Arbeitsplatz und zeitlichen Abstand seit dem letzten Kontakt. Neue Spielstände besitzen einige ausdrücklich angelegte Freundschaften zwischen Haushalten.</p></article>
+<article class="card"><h3>Spielerhinweis</h3><p>Im Sim-Inspector lassen sich aktuell mögliche nächste Handlungen als unverbindliche Empfehlung vormerken und zurücknehmen. Sie gibt einen begrenzten Nutzenbonus; Wege, Ressourcen, Beziehungsschranken und die Zustimmung zum Gespräch werden weiterhin geprüft. Der Status ist im Event-Ledger nachvollziehbar.</p></article>
+</div>
+<h2>Beziehungsfenster</h2>
+<p>Bei jeder bekannten Person werden nun die konkreten Rollen angezeigt, etwa Ehepartner:in, Elternteil, Kind, Geschwister, Freund:in, Kolleg:in oder Mitbewohner:in. Die Liste zeigt direkt eine kurze Haltung <em>in beide Richtungen</em>; aufklappbar sind Nähe, Vertrauen, Respekt, Anziehung und Spannung mit beiden Werten. Fehlende Gegenrichtungen heißen „nicht dokumentiert“.</p>
+<div class="note">„Wie sie sich zueinander fühlen“ meint hier längerfristige, gerichtete <strong>Beziehungswerte</strong>. Die momentane Emotion einer anderen Person ist etwas anderes und wird weder erraten noch aus ihrem Kopf in die Beziehungsliste kopiert. Verwandtschaft wird nur aus expliziten Eltern- und Partner-IDs abgeleitet.</div>
+<h2>Messung und Grenzen</h2>
+<table><thead><tr><th>Prüfung</th><th>Erwartung / Grenze</th></tr></thead><tbody>
+<tr><td><code>GET /api/plausibility</code></td><td>Lesender Bericht über Objektarten, Schrank-/Bett-/Tischzugang, Arbeitsorte und mögliche Arbeitsausfälle. Er verändert keine Karte und repariert nichts selbst.</td></tr>
+<tr><td>Neuer Seed 73</td><td>20 Haushalte, 44 Erwachsene, 522 registrierte Objekte, darunter 20 Kleiderschränke und 60 Esszimmerstühle. Die 24 Schülerplätze bleiben ohne modellierte Schüler.</td></tr>
+<tr><td>Kompatibilität</td><td>Die gespeicherten Regel-Hashes 2.0 und 3.0 werden erkannt. 3.0-Saves erhalten eine protokollierte 3.1-Migration; ihre alte Raumgeometrie wird nicht heimlich neu eingerichtet.</td></tr>
+<tr><td>Noch offen</td><td>Kind-/Jugend-Lebensphasen, Schülerwege und Unterricht, gemeinsame Generatorverträge, mehrstöckige bewohnte Laufzeitkarte, vollständige Spieler-Interventionen und der selbstverbessernde Agenten-Zyklus.</td></tr>
+</tbody></table>
+<p class="warn note">Die Ergebniszahlen gelten für den genannten Seed und diese Codeversion. Alte Screenshots und laufende ältere Server zeigen ihre gespeicherte Geometrie; für neue Möbel einen separaten neuen Spielstand anlegen.</p>
+<h2>Entwickler-Schnittstellen</h2>
+<pre>GET  /api/plausibility
+GET  /api/actors/{id}                 # recommendation_options + social_graph
+GET  /api/actors/{id}/relationships   # Rollen, Qualitäten, Gegenrichtung
+POST /api/recommendations            # actor_id, expected_version, action, target_id,
+                                     # social_category?, ttl_seconds?
+POST /api/recommendations/{id}/cancel # expected_version</pre>
+<p>Empfehlungen sind nur für prozedural gesteuerte Sims zulässig, laufen nach 1–60 Weltminuten ab und werden an der nächsten Entscheidung einmalig aufgelöst. Bei veraltetem Actor-Stand oder nicht mehr zulässiger Option gibt die API 409 zurück. Für einen LLM-Agenten bleibt die getrennte, begrenzte <code>/api/bridge/{id}/context</code>-Perspektive maßgeblich.</p>
+<p><small>Abnahme: 164 Regressionstests bestanden; nach der letzten Sitzplatz-Verteilung zusätzlich 13 gezielte Tests. Zwölf Browser-/API-Prüfungen bestanden einschließlich Mobilbreite 390 px; Screenshots und Bericht liegen in <code>artifacts/expanded_life/</code>. Reproduktion: <code>python -m unittest tests.test_expanded_life -v</code>, <code>python -m unittest discover -s tests -q</code> und <code>python scripts/check_expanded_life.py</code>. Die raumplanerische Laborbibliothek und der Inhalt-Agenten-Workshop bleiben separate Prototypen.</small></p>
+</main></body></html>

@@ -57,6 +57,11 @@ JOB_STATIONS = {
     "Baker": ("cafe_counter", "cafe"),
     "Bookseller": ("shop_counter", "shop"),
     "Independent artist": ("desk", None),
+    "Physician": ("hospital_desk", "hospital"),
+    "Chef": ("cafe_counter", "cafe"),
+    "Mechanic": ("carpenter_station", "workshop"),
+    "Programmer": ("office_station", "office_hub"),
+    "Civic planner": ("townhall_desk", "town_hall"),
 }
 
 

@@ -20,6 +20,17 @@ export function psychologyMarkup(p,state){
   <section class="detail-block" data-life="tom"><h3>Was diese Person über andere vermutet</h3><p>Beobachtung und Deutung sind getrennt. Vermutungen können falsch sein.</p>${known.slice(-6).map(([id,k])=>`<div class="belief"><b>${esc(personName(id,state))}</b>${Object.values(k.inferences||{}).map(i=>`<p>${esc(i.value)} · ${esc(i.confidence)} confidence</p><small>${esc((i.evidence_ids||[]).join(', '))}</small>`).join('')}<details><summary>${k.observations.length} beobachtete Hinweise</summary>${k.observations.slice(-4).map(o=>`<p>${esc(o.observation)}<br><small>${esc(o.evidence_id)}</small></p>`).join('')}</details></div>`).join('')||'<p>Noch keine beobachteten sozialen Hinweise.</p>'}</section>`;
 }
 
+export function careerMarkup(p){
+  const career=p.career;if(!career)return '';
+  return `<section class="detail-block" data-life="career"><h3>Berufsweg · ${esc(career.job)}</h3>${rows([
+    ['Aktuelle Aufgabe',career.task],['Stufe',career.level],
+    ['Erfahrung',`${Number(career.experience_hours||0).toFixed(1)} Stunden · ${career.completed_shifts||0} abgeschlossene Einsätze`],
+    ['Arbeitsqualität',`${pct(career.performance)}% · spielerischer Leistungswert`],
+    ['Fachfertigkeit',`${name(career.skill)} · ${pct(p.skills?.[career.skill])}%`],
+    ['Letzter Einsatz',career.last_shift==null?'Noch keiner':`Weltsekunde ${career.last_shift}`]
+  ])}<p class="coverage-note">Fortschritt entsteht erst nach tatsächlich erreichter und abgeschlossener Arbeit am zugewiesenen Arbeitsplatz. Keine Berufsqualifikation in der realen Welt.</p></section>`;
+}
+
 export function relationshipsMarkup(p,state){
   const entries=Object.entries(p.relations||{});
   return `<section class="detail-block" data-life="relationships"><h3>Familie, Beziehungen & Bekanntschaften</h3>${rows([['Beziehungsstatus',name(p.family?.relationship_status||'unspecified')],['Partner',p.family?.partner_id?personName(p.family.partner_id,state):'Nicht hinterlegt'],['Eltern',(p.family?.parent_ids||[]).map(id=>personName(id,state)).join(', ')||'Nicht hinterlegt']])}<p class="coverage-note">Ein gemeinsamer Haushalt bedeutet nicht automatisch Verwandtschaft. Alte Spielstände behalten ihre Biografien; unbekannte Familienbeziehungen werden nicht erfunden.</p>${entries.map(([id,r])=>`<details class="relationship-detail"><summary>${esc(personName(id,state))} · ${esc(Object.entries(r.layers||{}).filter(([_,v])=>v.status!=='none').map(([k,v])=>`${name(k)}: ${name(v.status)}`).join(' · ')||r.kind)}</summary>${rows(['closeness','trust','respect','attraction','tension'].map(k=>[name(k),pct(r[k])+'%']))}<button class="small-button" data-related-person="${esc(id)}">Person ansehen</button></details>`).join('')}</section>`;

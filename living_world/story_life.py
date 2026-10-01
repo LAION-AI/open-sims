@@ -3,14 +3,17 @@
 Only the coordinator calls mutating methods. Observation methods return copies.
 """
 from copy import deepcopy
-from . import affect, possessions, psychology
+from . import affect, careers, possessions, psychology
 from .daily_life import DAILY_ACTIONS, apply_step, StepUnavailable
 from .urban_life import SERVICE_ACTIONS, assigned_service_job
 
 
 class StoryLife:
     def _story_actor(self,actor):
-        if 'belongings' not in actor:actor.update(possessions.initialize(actor,self.now))
+        if 'belongings' not in actor:
+            wardrobe=next((o for o in self.objects.values() if o['kind']=='wardrobe'
+                           and o.get('household_id')==actor['household_id']),None)
+            actor.update(possessions.initialize(actor,self.now,wardrobe['id'] if wardrobe else None))
         if 'affect' not in actor:
             actor['affect']=affect.appraise(actor,self.needs_at(actor),self.now,{'kind':'initialization','text':'Authored initial needs'},'initialization')
         actor['workplace']=assigned_service_job(actor,self.objects)
@@ -19,6 +22,8 @@ class StoryLife:
     def _initialize_story(self):
         for actor in self.actors.values():self._story_actor(actor)
         for aid,patch in psychology.initialize_social_graph(self.actors,self.now).items():self.actors[aid].update(patch)
+        for aid,patch in psychology.authored_friendships(self.actors,self.now).items():
+            self.actors[aid]['relations'].update(patch['relations'])
         self.meta['story_systems']={'version':0,'schema':'mosswood.story/3','taxonomy':'EmoNet-Face 40',
             'truth_policy':'canonical simulation causes are not the actor self-story; no real-person inference'}
 
@@ -38,6 +43,8 @@ class StoryLife:
             for aid in self.actors:
                 actor=self.edit('actors',aid)
                 self._story_actor(actor)
+                actor.setdefault('career', careers.initial(actor,self.now))
+                actor.update(psychology.add_missing_ambitions(actor,self.now))
                 actor['affect']=affect.appraise(actor,self.needs_at(actor),self.now,'Migration: current state, not invented history',f'beat_{self.store.sequence+1:08}')
         self.save()
 

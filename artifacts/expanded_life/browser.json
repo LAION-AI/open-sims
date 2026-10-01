@@ -1,0 +1,25 @@
+{
+  "database": ":memory:",
+  "live_save_touched": false,
+  "checks": {
+    "career_visible": true,
+    "recommendation_options": true,
+    "recommendation_pending": true,
+    "recommendation_cancelled": true,
+    "spouse_role": true,
+    "bidirectional_feeling": true,
+    "private_mind_not_shown": true,
+    "search_filters": true,
+    "mobile_fits": true,
+    "friend_role": true,
+    "supplement_available": true,
+    "audit_has_storage": true
+  },
+  "errors": [],
+  "mobile_widths": {
+    "page": 390,
+    "viewport": 390,
+    "dialog": 390
+  },
+  "passed": true
+}

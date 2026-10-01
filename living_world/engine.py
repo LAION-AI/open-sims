@@ -20,10 +20,11 @@ from .story_life import StoryLife
 from . import affect, possessions
 from .urban_life import SERVICE_ACTIONS, SERVICE_JOBS, service_available
 from . import psychology
+from . import careers
 from .daily_life import DAILY_ACTIONS, StepUnavailable, apply_step
 
 FIRST_NAMES=["Maya","Elliot","Sofia","Leo","Jun","Nora","Theo","Amara","Daniel","Camille","Louis","Hana","Felix","Petra","Arjun","Meera","Luca","Isla","Oliver","Ruby","Rafael","Clara","Asha","Nikhil","Willow","Finn","Min","Jae","Emilia","Oscar","Ines","Mateo","Avery","Robin","Yuki","Ren","Layla","Omar","Chloe","Hugo","Ada","Miles","Zoe","Jules"]
-JOBS=["Illustrator","Carpenter","Baker","Teacher","Designer","Gardener","Bookseller","Tailor"]+list(SERVICE_JOBS)
+JOBS=["Illustrator","Carpenter","Baker","Teacher","Designer","Gardener","Bookseller","Tailor"]+list(SERVICE_JOBS)+["Physician","Chef","Mechanic","Programmer","Civic planner"]
 SHIRTS=["#cb775c","#6b9ca4","#d7b861","#83996b","#9684af","#b87390","#6686b0","#bba480"]
 SKIN=["#e9ba94","#c78e67","#996342","#f0cfad","#734a37"]
 HAIR=["#574338","#352f32","#a56b3f","#d4b372","#847d75"]
@@ -73,7 +74,7 @@ class World(StoryLife,LifeSystems):
         self.metrics={"events_processed":0,"decisions":0,"completed_actions":0,"interrupted_actions":0,"declined_chats":0,"last_advance_ms":0.0}
         self._transaction=None
         if saved:
-            if saved["rule_hash"] not in (self.rules.hash, self.rules.legacy_hash,self.rules.v2_hash):
+            if saved["rule_hash"] not in (self.rules.hash, self.rules.legacy_hash,self.rules.v2_hash,self.rules.v3_hash):
                 raise ValueError("Saved world uses another rule package; use a different --database or migrate explicitly.")
             self.actors=saved["actors"]
             self.objects.update(saved["objects"])
@@ -94,6 +95,16 @@ class World(StoryLife,LifeSystems):
             elif saved['rule_hash']==self.rules.v2_hash:
                 self.migration_backup=self.store.migration_backup('story-v3')
                 self._migrate_story(saved)
+            elif saved['rule_hash']==self.rules.v3_hash:
+                with self.transaction('migration.rules.v3_1', list(self.actors),
+                        'Wardrobe actions and future career goals are available; this saved floor plan stays unchanged.',
+                        ['existing object IDs, positions, and personal histories preserved']):
+                    self.edit('world','story_systems')['rule_contract_version']='3.1.0'
+                    for aid in self.actors:
+                        actor = self.edit('actors', aid)
+                        actor.setdefault('career', careers.initial(actor, self.now))
+                        actor.update(psychology.add_missing_ambitions(actor, self.now))
+                self.save()
         else:
             self._initialize()
             self.save()
@@ -300,15 +311,20 @@ class World(StoryLife,LifeSystems):
                     continue
                 opos=self.position_at(other)
                 if self.spatial.visible(pos,opos,radius=4):
-                    others.append((abs(opos[0]-pos[0])+abs(opos[1]-pos[1]),other["id"]))
+                    distance=abs(opos[0]-pos[0])+abs(opos[1]-pos[1])
+                    others.append((psychology.partner_priority(actor,other,distance,self.now),other["id"]))
             if others:
-                _,other=min(others)
                 projected = {**actor, "needs": needs}
-                for social in psychology.social_candidates(projected, self.actors[other], self.now):
-                    if not social["allowed"]:
-                        continue
-                    score=needs["social"]**2*1.9+actor["preferences"]["socializing"]*.16 + (social["score"]-.5)*.4 + self._life_bias(actor,"chat")
-                    candidates.append({"kind":"chat","social_category":social["category"],"target_id":other,"anchor":list(pos),"distance":0,"score":round(score,5),"terms":{"need_relief":round(needs["social"]**2*1.9,4),"category_affinity":social["score"],"personality":self._life_bias(actor,"chat")}})
+                for partner_priority,other in sorted(others,key=lambda row:(-row[0],row[1]))[:3]:
+                    allowed=[row for row in psychology.social_candidates(projected,self.actors[other],self.now) if row['allowed']]
+                    for social in allowed[:3]:
+                        score=(needs["social"]**2*1.9+actor["preferences"]["socializing"]*.16
+                               +(social["score"]-.5)*.4+self._life_bias(actor,"chat")+partner_priority*.18)
+                        candidates.append({"kind":"chat","social_category":social["category"],"topic":social.get('topic'),
+                                           "target_id":other,"anchor":list(pos),"distance":0,"score":round(score,5),
+                                           "terms":{"need_relief":round(needs["social"]**2*1.9,4),
+                                                    "category_affinity":social["score"],"partner_priority":partner_priority,
+                                                    "personality":self._life_bias(actor,"chat")}})
         candidates.extend(self._routine_candidates(actor, needs, pos))
         candidates.append({"kind":"wait","target_id":None,"anchor":list(pos),"distance":0,"score":-.15,"terms":{"fallback":True}})
         return sorted(candidates,key=lambda c:(-c["score"],c["kind"],c.get("social_category","")))[:self.rules.data['selection']['candidate_limit']],rejected
@@ -330,6 +346,93 @@ class World(StoryLife,LifeSystems):
                 return candidate,draw
         return candidates[-1],draw
 
+    @staticmethod
+    def _matches_recommendation(candidate, recommendation):
+        return (candidate['kind'] == recommendation['action']
+                and candidate.get('target_id') == recommendation.get('target_id')
+                and candidate.get('social_category') == recommendation.get('social_category'))
+
+    def recommend(self, aid, payload):
+        actor = self.actors[aid]
+        if actor['owner'] != 'procedural':
+            raise RejectedProposal('Only procedural residents can receive player recommendations')
+        if actor['version'] != payload['expected_version']:
+            raise RejectedProposal('Stale actor component version')
+        candidates, _ = self.candidates(actor)
+        if not any(self._matches_recommendation(candidate, payload) for candidate in candidates):
+            raise RejectedProposal('That action is not currently feasible and known to this resident')
+        ttl = int(payload.get('ttl_seconds', 1800))
+        if not 60 <= ttl <= 3600:
+            raise RejectedProposal('Recommendation must expire within 1–60 world minutes')
+        with self.transaction('player.recommend.v1', [aid],
+                              f"A player suggests a possible next step to {actor['name']}.",
+                              ['Advisory utility bias only; action preconditions and consent remain authoritative']):
+            actor = self.edit('actors', aid)
+            actor['player_recommendation'] = {
+                'id': f'recommendation_{aid}_{self.store.sequence + 1}',
+                'action': payload['action'], 'target_id': payload.get('target_id'),
+                'social_category': payload.get('social_category'),
+                'created_at': self.now, 'expires_at': self.now + ttl, 'status': 'pending'}
+        return deepcopy(actor['player_recommendation'])
+
+    def cancel_recommendation(self, aid, expected_version):
+        actor = self.actors[aid]
+        if actor['version'] != expected_version:
+            raise RejectedProposal('Stale actor component version')
+        if actor.get('player_recommendation', {}).get('status') != 'pending':
+            raise RejectedProposal('No pending recommendation')
+        with self.transaction('player.recommend.cancel.v1', [aid],
+                              f"The suggestion to {actor['name']} is withdrawn."):
+            actor = self.edit('actors', aid)
+            actor['player_recommendation']['status'] = 'cancelled'
+            actor['player_recommendation']['resolved_at'] = self.now
+        return deepcopy(actor['player_recommendation'])
+
+    def _resolve_recommendation(self, actor, chosen, candidates):
+        recommendation = actor.get('player_recommendation')
+        if not recommendation or recommendation['status'] != 'pending':
+            return
+        if self.now >= recommendation['expires_at']:
+            status = 'expired'
+        elif not any(self._matches_recommendation(c, recommendation) for c in candidates):
+            status = 'unavailable'
+        elif self._matches_recommendation(chosen, recommendation):
+            status = 'followed'
+        else:
+            status = 'considered'
+        recommendation['status'] = status
+        recommendation['resolved_at'] = self.now
+
+    def _explicit_social_candidate(self, actor, request):
+        """Validate a named partner without treating utility shortlist as authority."""
+        if request.get('action') != 'chat' or actor['cooldowns'].get('chat', 0) > self.now:
+            return None
+        other = self.actors.get(request.get('target_id'))
+        if not other or other['id'] == actor['id'] or other['owner'] != 'procedural':
+            return None
+        action = other['action']
+        if action and (action['phase'] != 'using' or action['kind'] not in ('wait', 'relax', 'stroll')):
+            return None
+        pos = self.position_at(actor)
+        opposite = self.position_at(other)
+        if not self.spatial.visible(pos, opposite, radius=4):
+            return None
+        category = request.get('social_category') or 'small_talk'
+        projected = {**actor, 'needs': self.needs_at(actor)}
+        social = next((row for row in psychology.social_candidates(projected, other, self.now)
+                       if row['category'] == category and row['allowed']), None)
+        if not social:
+            return None
+        distance = abs(opposite[0] - pos[0]) + abs(opposite[1] - pos[1])
+        priority = psychology.partner_priority(actor, other, distance, self.now)
+        score = (projected['needs']['social']**2 * 1.9
+                 + actor['preferences']['socializing'] * .16
+                 + (social['score'] - .5) * .4
+                 + self._life_bias(actor, 'chat') + priority * .18)
+        return {'kind': 'chat', 'social_category': category, 'topic': social.get('topic'),
+                'target_id': other['id'], 'anchor': list(pos), 'distance': 0,
+                'score': round(score, 5), 'terms': {'explicit_feasibility_check': True}}
+
     def decide(self, aid, requested=None):
         actor=self.actors[aid]
         if actor["action"] or actor["owner"]!="procedural" and requested is None:
@@ -337,6 +440,20 @@ class World(StoryLife,LifeSystems):
         self._repair_routine(aid)
         self._check_fears(aid)
         candidates,rejected=self.candidates(actor)
+        if requested and requested.get('action') == 'chat' and not any(
+                c['kind'] == 'chat' and c['target_id'] == requested.get('target_id')
+                and (not requested.get('social_category') or c.get('social_category') == requested['social_category'])
+                for c in candidates):
+            explicit = self._explicit_social_candidate(actor, requested)
+            if explicit:
+                candidates.append(explicit)
+        recommendation=actor.get('player_recommendation')
+        if (requested is None and recommendation and recommendation['status']=='pending'
+                and self.now < recommendation['expires_at']):
+            for candidate in candidates:
+                if self._matches_recommendation(candidate,recommendation):
+                    candidate['score']=round(candidate['score']+.65,5)
+                    candidate['terms']['player_recommendation']=.65
         chosen,draw=self.choose(actor,candidates)
         if requested:
             possible=[c for c in candidates if c["kind"]==requested["action"] and (not requested.get("target_id") or c["target_id"]==requested["target_id"]) and (not requested.get("social_category") or c.get("social_category")==requested["social_category"])]
@@ -364,6 +481,7 @@ class World(StoryLife,LifeSystems):
             actor=self.edit("actors",aid)
             self.materialize(actor)
             actor["decision_id"]+=1
+            self._resolve_recommendation(actor,chosen,candidates)
             actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":kind,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"stable named softmax draw" if draw is not None else "validated external intent"}
             actor["thought"]={"text":definition["thought"],"trigger":f"decision_{actor['decision_id']}","since":self.now}
             duration=definition["duration"]
@@ -459,6 +577,8 @@ class World(StoryLife,LifeSystems):
         if not social["allowed"]:
             raise RejectedProposal(social["reason"])
         label=psychology.SOCIAL_CATEGORIES[category].get("label",category.replace("_"," "))
+        topic=chosen.get('topic') or social.get('topic')
+        topic_phrase=f" about {topic}" if topic else ''
         # Recipient decides from its own needs and willingness, with one named draw.
         willingness=min(.97,social["willingness"]+self.needs_at(other)["social"]*.25)
         accepted=max(self.needs_at(other).values())<.91 and self.rng(other["id"],f"{aid}:{actor['decision_id']+1}","chat_consent").random()<willingness
@@ -466,6 +586,7 @@ class World(StoryLife,LifeSystems):
             with self.transaction("social.decline.v1",[aid,other["id"]],f"{other['name']} is not ready to chat. {actor['name']} respects that and reconsiders.",["Recipient willingness check declined"]):
                 actor=self.edit("actors",aid)
                 actor["decision_id"]+=1
+                self._resolve_recommendation(actor,chosen,candidates)
                 actor["cooldowns"]["chat"]=self.now+900
                 other=self.edit("actors",other["id"])
                 self._social_complete(actor,other,category,"declined")
@@ -477,9 +598,10 @@ class World(StoryLife,LifeSystems):
                 self.schedule(self.now+1,"decision",aid,actor["decision_id"])
             self.metrics["declined_chats"]+=1
             return
-        with self.transaction("social.accept.v2",[aid,other["id"]],f"{actor['name']} and {other['name']} agree: {label}.",[reason,"Recipient accepted the request",category]):
+        with self.transaction("social.accept.v2",[aid,other["id"]],f"{actor['name']} and {other['name']} agree: {label}{topic_phrase}.",[reason,"Recipient accepted the request",category]):
             actor=self.edit("actors",aid)
             other=self.edit("actors",other["id"])
+            self._resolve_recommendation(actor,chosen,candidates)
             if other["action"]:
                 self._release(other)
             for person,partner in ((actor,other),(other,actor)):
@@ -487,8 +609,9 @@ class World(StoryLife,LifeSystems):
                 person["decision_id"]+=1
                 event_id=f"action_{aid}_{actor['decision_id']}" if person is actor else actor["action"]["id"]
                 duration=social["duration_seconds"]
-                person["action"]={"id":event_id,"kind":"chat","social_category":category,"label":f"{label} · {partner['name'].split()[0]}","target_id":partner["id"],"phase":"using","started_at":self.now,"arrives_at":self.now,"ends_at":self.now+duration,"duration":duration,"path":[list(person["position"])],"reason":"Both participants accepted this interaction","definition_version":self.rules.version,"reservation_id":None,"partner_id":partner["id"]}
-                person["thought"]={"text":f"I would like to spend a moment with {partner['name'].split()[0]}.","trigger":"accepted conversation","since":self.now}
+                person["action"]={"id":event_id,"kind":"chat","social_category":category,"topic":topic,
+                                  "label":f"{label}{topic_phrase} · {partner['name'].split()[0]}","target_id":partner["id"],"phase":"using","started_at":self.now,"arrives_at":self.now,"ends_at":self.now+duration,"duration":duration,"path":[list(person["position"])],"reason":"Both participants accepted this interaction","definition_version":self.rules.version,"reservation_id":None,"partner_id":partner["id"]}
+                person["thought"]={"text":f"I would like to spend a moment with {partner['name'].split()[0]}{topic_phrase}.","trigger":"accepted conversation","since":self.now}
                 self._begin_use(person)
                 self._perceive(person,f"{partner['name']} agreed to spend time talking with me.",partner["id"],"hearing")
                 self._schedule_urgent(person)
@@ -575,8 +698,11 @@ class World(StoryLife,LifeSystems):
             if action['kind']=='eat_recipe':
                 for key,amount in definition['relief'].items():person['needs'][key]=clamp(person['needs'][key]-amount)
             if action["kind"]=="work":
-                person["money"]+=definition["income"]
-                self.edit("world","economy")["earned"]+=definition["income"]
+                shift=careers.complete_shift(person,action['duration'],self.now,
+                    f"beat_{self.store.sequence+1:08}",definition['income'])
+                person['career'],person['skills']=shift['career'],shift['skills']
+                person["money"]+=shift['income']
+                self.edit("world","economy")["earned"]+=shift['income']
                 person["schedule"]["work_seconds"]+=action["duration"]
             pref=definition["preference"]
             if pref in person["skills"]:
@@ -595,7 +721,8 @@ class World(StoryLife,LifeSystems):
                     self._social_complete(person,other,category,outcome)
                     if other["action"] and other["action"]["id"]==action["id"]:
                         other["action"]["social_effects_applied"]=True
-                self._perceive(person,f"We completed {category.replace('_',' ')} with {self.actors[partner]['name']}.",partner,"participation")
+                topic=f" about {action['topic']}" if action.get('topic') else ''
+                self._perceive(person,f"We completed {category.replace('_',' ')}{topic} with {self.actors[partner]['name']}.",partner,"participation")
             else:
                 self._perceive(person,f"I finished {definition['label'].lower()}.",action["target_id"] or aid,"participation")
             self._release(person)
@@ -719,6 +846,11 @@ class World(StoryLife,LifeSystems):
         candidates,_=self.candidates(self.actors[aid])
         for c in candidates[:3]:
             actor["intentions"].append({"text":self.rules.actions[c["kind"]]["label"],"status":"possible next action, not a promise","score":c["score"]})
+        actor['recommendation_options'] = [
+            {'action': c['kind'], 'target_id': c.get('target_id'),
+             'social_category': c.get('social_category'), 'topic': c.get('topic'),
+             'label': self.rules.actions[c['kind']]['label'], 'score': c['score']}
+            for c in candidates[:12] if c['kind'] != 'wait']
         return self._life_inspection(actor)
 
     def snapshot(self):

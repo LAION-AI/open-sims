@@ -63,6 +63,75 @@ class LivingNeighborhood(SpatialService):
         return self.add_object(kind, name, x, y, w, h, anchors, household,
                                building, blocking, len(anchors) if capacity is None else capacity)
 
+    def _furnish_room(self, kind, name, bounds, size, door, hid, bid, rng,
+                      *, near=None, required=False):
+        """Place a wall-side fixture only if every existing home anchor stays reachable.
+
+        The search uses the live meter grid and is reusable across room programs;
+        seed variation only chooses among valid solutions. No occupied tile,
+        doorway, or corridor is silently converted into a decorative override.
+        """
+        rx, ry, rw, rh = bounds
+        bw, bh = size
+        building = next(b for b in self.buildings if b['id'] == bid)
+        bx, by, width, height = (building[k] for k in ('x', 'y', 'w', 'h'))
+        existing_anchors = [tuple(anchor) for obj in self.objects.values()
+                            if obj.get('building_id') == bid for anchor in obj['anchors']
+                            if bx <= anchor[0] < bx + width and by <= anchor[1] < by + height]
+        candidates = []
+        for y in range(ry, ry + rh - bh + 1):
+            for x in range(rx, rx + rw - bw + 1):
+                footprint = {(xx, yy) for yy in range(y, y + bh) for xx in range(x, x + bw)}
+                if any(p in self.blocked or self.cells[p[1] * self.width + p[0]] != FLOOR for p in footprint):
+                    continue
+                # Wall-side placement preserves the central circulation area.
+                if not (x == rx or y == ry or x + bw == rx + rw or y + bh == ry + rh):
+                    continue
+                anchors = [(xx, yy) for xx, yy in
+                           ((x + bw // 2, y + bh), (x + bw // 2, y - 1),
+                            (x - 1, y + bh // 2), (x + bw, y + bh // 2))
+                           if rx <= xx < rx + rw and ry <= yy < ry + rh
+                           and (xx, yy) not in footprint and (xx, yy) not in self.blocked
+                           and self.cells[yy * self.width + xx] == FLOOR]
+                if not anchors:
+                    continue
+                blocked = self.blocked | footprint
+                start = tuple(door)
+                if start in blocked:
+                    continue
+                seen, queue = {start}, deque([start])
+                while queue:
+                    cx, cy = queue.popleft()
+                    for point in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                        px, py = point
+                        if (bx <= px < bx + width and by <= py < by + height
+                                and point not in seen and point not in blocked
+                                and self.cells[py * self.width + px] not in (WALL, WATER)):
+                            seen.add(point)
+                            queue.append(point)
+                usable = [anchor for anchor in anchors if anchor in seen]
+                if not usable or any(anchor not in seen for anchor in existing_anchors):
+                    continue
+                # An isolated free floor tile is as bad as a lost interaction anchor.
+                if any((xx, yy) not in seen for yy in range(by, by + height)
+                       for xx in range(bx, bx + width)
+                       if (xx, yy) not in blocked
+                       and self.cells[yy * self.width + xx] not in (WALL, WATER)):
+                    continue
+                distance = abs(x - near[0]) + abs(y - near[1]) if near else 0
+                candidates.append((distance + rng.random() * 2.5, x, y, usable[0]))
+        if not candidates:
+            if required:
+                raise ValueError(f'No valid {kind} in {bid}')
+            return None
+        _, x, y, anchor = min(candidates)
+        oid = self._object(kind, name, x, y, bw, bh, [list(anchor)], hid, bid)
+        self.objects[oid]['room_program'] = kind
+        if kind == 'wardrobe':
+            self.objects[oid]['storage_capacity'] = 24
+            self.objects[oid]['storage_kinds'] = ['top', 'trousers', 'shoes', 'outerwear']
+        return oid
+
     def _home(self, index, row, col, rng):
         variant = (index + rng.randrange(3)) % 3
         width = (16, 17, 18)[variant]
@@ -135,9 +204,45 @@ class LivingNeighborhood(SpatialService):
                                      capacity, blocking)
             if kind == "bed":
                 self.objects[object_id]["bed_variant"] = "double" if capacity == 2 else "single"
+        room_by_kind = {key: bounds for key, _, bounds in rooms}
+        wardrobe = None
+        for room_key in ('bedroom', 'hall', 'living'):
+            wardrobe = self._furnish_room('wardrobe', 'Household wardrobe',
+                                          room_by_kind[room_key], (2, 1), door,
+                                          hid, bid, rng, near=(x + split + 2, y + 3))
+            if wardrobe:
+                break
+        if wardrobe is None:
+            raise ValueError(f'Home has no reachable clothes storage: {bid}')
+        building = self.buildings[-1]
+        building['wardrobe_id'] = wardrobe
+        program = [('side_table', 'Bedside table', 'bedroom', (1, 1), (x + split + 2, y + 3)),
+                   ('armchair', 'Reading chair', 'living', (1, 1), (x + 5, y + 6)),
+                   ('coat_rack', 'Hall coat rack', 'hall', (1, 1), tuple(door))]
+        if index % 3 != 0:
+            program.append(('floor_lamp', 'Living room floor lamp', 'living', (1, 1), (x + 5, y + 6)))
+        if index % 4 == 0:
+            program.append(('plant', 'Window plant', 'living', (1, 1), (x + split - 2, y + 5)))
+        for kind, label, room_key, size, near in program:
+            self._furnish_room(kind, label, room_by_kind[room_key], size, door,
+                               hid, bid, rng, near=near)
+        table = next(o for o in self.objects.values()
+                     if o['household_id'] == hid and o['kind'] == 'table')
+        seat_positions = [(table['x'] - 1, table['y']),
+                          (table['x'] + table['w'], table['y']),
+                          (table['x'], table['y'] + table['h'])]
+        for seat_index, anchor in enumerate(seat_positions):
+            if self.walkable(anchor) and all(
+                    not (obj['x'] <= anchor[0] < obj['x'] + obj['w']
+                         and obj['y'] <= anchor[1] < obj['y'] + obj['h'])
+                    for obj in self.objects.values() if obj.get('building_id') == bid
+                    and obj.get('blocking', True)):
+                chair = self._object('dining_chair', f'Dining chair {seat_index + 1}',
+                                     *anchor, anchors=[list(anchor)], household=hid,
+                                     building=bid, blocking=False)
+                self.objects[chair]['paired_with'] = table['id']
         self._object("planter", "Vegetable patch", x + width + 2, y + 5, 2, 2,
                      [[x + width + 1, y + 6]], hid, bid)
-        building = self.buildings[-1]
         building["plan_variant"] = ("offset-bedroom", "living-alcove", "wide-bedroom")[variant]
         building["rooms"] = [bid + "_" + key for key, _, _ in rooms]
         self.households.append({"id": hid, "name": SURNAMES[index],

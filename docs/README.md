@@ -10,7 +10,7 @@ Open Sims separates the **inhabited world** from three authoring laboratories. A
 | HTTP/WebSocket and future agent boundary | [API](api.md) and live `/docs` OpenAPI | Local trusted API |
 | Inhabited district and urban services | [Neighborhood](neighborhood_design.md), [City](city_design.md), [Story systems](story_systems.html) | One-level live map; district laboratory separate |
 | Room and multi-floor generation | [Housing supplement](procedural_housing_supplement.html), [spatial plausibility](spatial_plausibility_notes.md), [bed variants](bed_variants_notes.md), [buildings](buildings_notes.md), [civic catalog](civic_catalog_notes.md) | Separate generator laboratory |
-| Everyday behavior and psychology | [Life systems](life_systems.html), [daily life](daily_life_design.md), [psychology](psychology_design.md), [affect](affect_design.md), [possessions](possessions_design.md) | Rules-based adult model |
+| Everyday behavior and psychology | [Expanded-life HTML supplement](expanded_life.html), [life systems](life_systems.html), [daily life](daily_life_design.md), [psychology](psychology_design.md), [affect](affect_design.md), [possessions](possessions_design.md) | Rules-based adult model; new careers and relationship view |
 | Extensible content-agent workshop | [Workshop supplement](agent_workshop.html) | Review-gated prototype; no unattended publication |
 | Evaluation and next interventions | [Verification](verification.md), [plausibility and intervention plan](../web/plausibility-plan.html), [evidence](../artifacts/) | Reported tests plus explicitly planned work |
 

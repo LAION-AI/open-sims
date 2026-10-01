@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from . import psychology
 from . import possessions
+from . import careers
 from .daily_life import (DAILY_ACTIONS, StepUnavailable, apply_step, assigned_workplace,
                          daily_state, plan_meal, plan_cleaning, plan_hobby)
 
@@ -20,6 +21,10 @@ class LifeSystems:
             actor.update(psychology.migrate_existing_actor(actor, self.rng(aid, 0, "psychology"), self.now))
             actor.setdefault("routine", None)
             actor.setdefault("family", {"parent_ids": [], "partner_id": None, "relationship_status": "unspecified"})
+            actor.setdefault('career', careers.initial(actor, self.now))
+            if new_world:
+                actor['schedule']['start'] = actor['career']['schedule_start']
+                actor['schedule']['end'] = actor['schedule']['start'] + 8 * 3600
             actor["workplace"] = assigned_workplace(actor, self.objects)
             actor["workplace_id"] = actor["workplace"]["workplace_id"] if actor["workplace"] else None
         for aid, patch in psychology.initialize_social_graph(self.actors, self.now).items():
@@ -62,7 +67,7 @@ class LifeSystems:
                 ["recognized v1 package", "no inferred marriages or family history"]):
             for aid, patch in patches.items():
                 actor = self.edit("actors", aid)
-                for key in ("psychology", "family", "routine", "workplace", "workplace_id", "relations"):
+                for key in ("psychology", "family", "routine", "workplace", "workplace_id", "relations", "career"):
                     actor[key] = patch[key]
         self.schedule(self.now + 60, "animal_tick", None, 0)
         # World finishes the story upgrade before writing the new rule checkpoint.
@@ -92,8 +97,7 @@ class LifeSystems:
             plans.append(("cleaning", plan_cleaning(actor, self.objects), 0, True))
             plans.append(("hobby", plan_hobby(actor, self.objects), 0, True))
             if actor.get('outfit_last_day') != self.now//86400:
-                bed=next((o for o in self.objects.values() if o['kind']=='bed' and o['household_id']==actor['household_id']),None)
-                if bed:plans.append(('outfit',[{'kind':'change_outfit','target_id':bed['id']}],0,True))
+                plans.append(('outfit',possessions.plan_outfit(actor,self.objects,self.now),0,True))
         results = []
         for plan_kind, steps, index, is_new in plans:
             if not steps or index >= len(steps):
@@ -173,7 +177,7 @@ class LifeSystems:
         if routine and action.get("routine_id") == routine["id"]:
             routine["index"] += 1
             routine["status"] = "completed" if routine["index"] >= len(routine["steps"]) else "active"
-        activity = self.rules.actions[action["kind"]].get("preference") or action["kind"]
+        activity = "work" if action["kind"] == "work" else self.rules.actions[action["kind"]].get("preference") or action["kind"]
         self._apply_actor_patch(actor, psychology.complete_activity(actor, activity, self.now,
             f"beat_{self.store.sequence+1:08}", duration_seconds=action["duration"]))
 

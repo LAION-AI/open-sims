@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .engine import World, RejectedProposal
 from . import affect, possessions
 from .object_inspection import inspect_object
+from .plausibility import audit as audit_plausibility
 from .generation.api import create_generation_router
 from .generation.city_api import create_city_router
 from .workshop.api import create_workshop_router
@@ -35,6 +36,21 @@ class Intent(BaseModel):
     action: str
     target_id: str | None = None
     social_category: str | None = Field(default=None, max_length=40)
+
+
+class Recommendation(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    actor_id: str
+    expected_version: int
+    action: str
+    target_id: str | None = None
+    social_category: str | None = Field(default=None, max_length=40)
+    ttl_seconds: int = Field(default=1800, ge=60, le=3600)
+
+
+class RecommendationCancel(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    expected_version: int
 
 
 class Transfer(BaseModel):
@@ -121,6 +137,11 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
         async with app.state.lock:
             w=app.state.world
             return {"status":"fault" if w.fault else "ok","fault":w.fault,"invariants":w.invariants(),"population":len(w.actors),"households":20,"llm_enabled":False,"simulation_fields":False}
+
+    @app.get('/api/plausibility')
+    async def plausibility():
+        async with app.state.lock:
+            return audit_plausibility(app.state.world)
 
     @app.get("/api/world")
     async def geometry():
@@ -227,6 +248,24 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
             except RejectedProposal as exc:
                 raise HTTPException(409,str(exc)) from exc
 
+    @app.post('/api/recommendations')
+    async def recommend(body:Recommendation):
+        async with app.state.lock:
+            actor_or_404(body.actor_id)
+            try:
+                return app.state.world.recommend(body.actor_id, body.model_dump())
+            except RejectedProposal as exc:
+                raise HTTPException(409,str(exc)) from exc
+
+    @app.post('/api/recommendations/{aid}/cancel')
+    async def cancel_recommendation(aid:str,body:RecommendationCancel):
+        async with app.state.lock:
+            actor_or_404(aid)
+            try:
+                return app.state.world.cancel_recommendation(aid,body.expected_version)
+            except RejectedProposal as exc:
+                raise HTTPException(409,str(exc)) from exc
+
     @app.post("/api/bridge/{aid}/ownership")
     async def transfer(aid:str,body:Transfer):
         actor_or_404(aid)
@@ -285,6 +324,10 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
     @app.get('/story-supplement')
     async def story_supplement():
         return FileResponse(ROOT/'docs'/'story_systems.html')
+
+    @app.get('/expanded-life')
+    async def expanded_life():
+        return FileResponse(ROOT/'docs'/'expanded_life.html')
 
     @app.get('/plausibility-plan', include_in_schema=False)
     async def plausibility_plan():

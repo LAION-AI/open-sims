@@ -54,6 +54,16 @@ await window.mosswood.configure({
 const mapPngDataUrl = window.mosswood.capture();
 ```
 
+## Plausibility and player recommendations (rule package 3.1)
+
+`GET /api/plausibility` returns a read-only snapshot audit: counts of object kinds and occupations, missing/unreachable home storage, insufficient bed/table capacity, missing workplaces, missed work targets, and the explicitly unmodelled school population. It does not alter a save or call an LLM.
+
+`GET /api/actors/{actor_id}` includes `recommendation_options` for feasible next steps and the current `player_recommendation` when present. `POST /api/recommendations` accepts `actor_id`, `expected_version`, `action`, `target_id`, optional `social_category`, and `ttl_seconds` (60–3600, default 1800). The actor must still be procedurally controlled. The suggestion is journaled and adds a bounded utility bias at the next free decision; it is neither a command nor consent from a social partner. It resolves as `followed`, `considered`, `unavailable`, or `expired`. `POST /api/recommendations/{actor_id}/cancel` with `expected_version` changes a pending suggestion to `cancelled`.
+
+`GET /api/actors/{actor_id}/relationships` and the inspector's `social_graph` now expose explicit viewer-relative roles and both participants' directed relation *scores* where both records exist. They exclude the target's current affect, thoughts and needs. An absent reverse record stays absent.
+
+These omniscient player/QA endpoints are **not** agent perspective packets. An external decision agent must use the bounded bridge below.
+
 ## LWM bridge 0.1
 
 The runtime creates **no Simulation Fields and makes no model calls**. These three endpoints implement a bounded future decision-provider boundary:

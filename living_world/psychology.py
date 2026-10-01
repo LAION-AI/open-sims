@@ -115,6 +115,12 @@ def _hobby_kind(kind: str) -> str:
     return _HOBBY_FOR_ACTION.get(kind, kind)
 
 
+def _career_title(actor: dict) -> str:
+    job = actor.get('profile', {}).get('job', 'worker')
+    article = 'an' if job[:1].lower() in 'aeiou' else 'a'
+    return f'Grow as {article} {job}'
+
+
 def initialize_psychology(actor: dict, rng, now: int = 0) -> dict:
     """Return a new psychology component for a fictional actor.
 
@@ -143,6 +149,12 @@ def initialize_psychology(actor: dict, rng, now: int = 0) -> dict:
     return {"schema_version": SCHEMA_VERSION, "big_five": big_five,
             "traits": _trait_labels(big_five),
             "ambitions": [{"id": "ambition_primary", "kind": ambition_kind, "title": ambition_title,
+                           "progress": 0.0, "completed": False, "updated_at": now},
+                          {"id": "ambition_career", "kind": "career",
+                           "title": _career_title(actor),
+                           "progress": 0.0, "completed": False, "updated_at": now},
+                          {"id": "ambition_hobby", "kind": "hobby",
+                           "activity": hobbies[0], "title": "Practice " + hobbies[0],
                            "progress": 0.0, "completed": False, "updated_at": now}],
             "hobbies": [{"id": "hobby_" + name, "kind": name, "enjoyment": _clamp(actor.get("preferences", {}).get(name, .5)),
                          "practice_seconds": 0, "last_practiced": None} for name in hobbies],
@@ -163,6 +175,23 @@ def migrate_existing_actor(actor: dict, rng, now: int = 0) -> dict:
         psychology.setdefault("theory_of_mind", {"known_people": {}, "max_observations_per_person": MAX_OBSERVATIONS, "policy": "direct_observations_only"})
         patch["psychology"] = psychology
     return patch
+
+
+def add_missing_ambitions(actor: dict, now: int) -> dict:
+    """Add future goals to a v3 save without inventing earlier progress."""
+    psychology = deepcopy(actor.get('psychology', {}))
+    ambitions = psychology.setdefault('ambitions', [])
+    known = {item.get('id') for item in ambitions}
+    if 'ambition_career' not in known:
+        ambitions.append({'id': 'ambition_career', 'kind': 'career',
+                          'title': _career_title(actor),
+                          'progress': 0.0, 'completed': False, 'updated_at': now})
+    if 'ambition_hobby' not in known:
+        hobby = next(iter(psychology.get('hobbies', [])), {}).get('kind', 'relaxing')
+        ambitions.append({'id': 'ambition_hobby', 'kind': 'hobby', 'activity': hobby,
+                          'title': 'Practice ' + hobby, 'progress': 0.0,
+                          'completed': False, 'updated_at': now})
+    return {'psychology': psychology}
 
 
 def _layers(relation: dict | None, household_id: str | None, other_household_id: str | None,
@@ -292,12 +321,60 @@ def initialize_social_graph(actors, now: int = 0) -> dict:
             if prior is None and not (same_home or family_status != "none" or partnered or shared_workplace):
                 continue
             relation = _relation(actor, other, family_status, partnered)
+            if prior is None and family_status != 'none':
+                # New-world authored kin should not all appear emotionally
+                # indifferent merely because no interaction beat has fired yet.
+                closeness = .62 if family_status in {'parent', 'child'} else .54 if family_status in {'sibling', 'grandparent', 'grandchild'} else .43
+                relation['closeness'] = closeness
+                relation['trust'] = .66 if family_status in {'parent', 'child'} else .57
+                relation['respect'] = .58
             if shared_workplace and relation["layers"]["coworker"].get("status") in (None, "none"):
                 relation["layers"]["coworker"] = {"score": .5, "status": "shared_workplace"}
+                if prior is None:
+                    relation['respect'] = max(relation['respect'], .52)
             if prior is None:
                 relation["introduced_at"] = now
             relations[other["id"]] = relation
         patches[actor["id"]] = {"relations": relations}
+    return patches
+
+
+def authored_friendships(actors, now: int = 0) -> dict:
+    """Seed a few reciprocal cross-home friendships for *new* worlds only.
+
+    Candidates share an interest when possible and live within a few homes;
+    no relationship is inferred for an old save from mere proximity.
+    """
+    people = list(actors.values()) if isinstance(actors, dict) else list(actors)
+    by_id = {person['id']: person for person in people}
+    patches = {}
+    for index in range(11, len(people), 5):
+        actor = people[index]
+        options = []
+        for distance in range(2, 9):
+            for neighbor_index in (index + distance, index - distance):
+                if not 11 <= neighbor_index < len(people):
+                    continue
+                other = people[neighbor_index]
+                if (other['household_id'] == actor['household_id']
+                        or _kinship(actor, other, by_id) != 'none'):
+                    continue
+                shared = set(actor.get('profile', {}).get('interests', [])) & set(other.get('profile', {}).get('interests', []))
+                options.append((-len(shared), distance, other['id']))
+        if not options:
+            continue
+        _, _, other_id = min(options)
+        other = by_id[other_id]
+        for viewer, target, offset in ((actor, other, .0), (other, actor, .045)):
+            relation = _relation(viewer, target)
+            relation['kind'] = 'Friend'
+            relation['closeness'] = max(float(relation['closeness']), .57 + offset)
+            relation['trust'] = max(float(relation['trust']), .53 + offset)
+            relation['respect'] = max(float(relation['respect']), .54)
+            relation['layers']['friendship'] = {'score': .62, 'status': 'established'}
+            relation['introduced_at'] = now
+            relation['origin'] = 'authored_new_world_friendship'
+            patches.setdefault(viewer['id'], {'relations': {}})['relations'][target['id']] = relation
     return patches
 
 
@@ -387,7 +464,36 @@ def _social_context(actor: dict, other: dict, relation: dict, category: str) -> 
             return False, "coordinate work requires a shared workplace or coworker link"
     if category in ("apologize", "reconcile") and float(relation.get("tension", 0)) < .035:
         return False, f"{category} requires an existing tension"
+    if category == 'confide' and float(relation.get('trust', 0)) < .30:
+        return False, 'confiding requires a minimum of trust'
+    if category == 'express_affection' and float(relation['layers']['romance'].get('score', 0)) < .08:
+        return False, 'affection requires an existing romantic connection'
+    if category == 'ask_date' and (float(relation.get('attraction', 0)) < .04
+                                    and float(relation.get('closeness', 0)) < .15):
+        return False, 'a date invitation requires some rapport'
     return True, "available if both people are present and free"
+
+
+def shared_topics(actor: dict, other: dict) -> list[str]:
+    """Use only explicit interests, never inferred private thoughts."""
+    own = set(actor.get('profile', {}).get('interests', []))
+    theirs = set(other.get('profile', {}).get('interests', []))
+    return sorted(own & theirs)
+
+
+def partner_priority(actor: dict, other: dict, distance: int, now: int) -> float:
+    """Prefer meaningful or novel encounters, with a short reunion cooldown."""
+    relation = actor.get('relations', {}).get(other.get('id'))
+    closeness = float((relation or {}).get('closeness', 0))
+    last = (relation or {}).get('last_interaction')
+    recently_met = last is not None and now - last < 2 * 3600
+    household = actor.get('household_id') == other.get('household_id')
+    score = .23 * closeness + .06 * bool(shared_topics(actor, other))
+    score += .035 if relation is None else 0
+    score += .045 if household else 0
+    score -= .18 if recently_met else 0
+    score -= min(.12, max(0, distance) * .025)
+    return round(score, 4)
 
 
 def _tom_social_modifier(actor: dict, subject_id: str, category: str, now: int) -> float:
@@ -411,6 +517,7 @@ def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
     other_five = _big_five(other)
     social_need = float(actor.get("needs", {}).get("social", .5))
     connection = (float(relation["closeness"]) + float(relation["trust"])) / 2
+    topics = shared_topics(actor, other)
     results = []
     for category, definition in SOCIAL_CATEGORIES.items():
         allowed, reason = _social_context(actor, other, relation, category)
@@ -429,6 +536,13 @@ def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
             willingness += connection * .12
         score = definition["base"] + affinity * .28 + social_need * .24 + connection * .30
         score += _tom_social_modifier(actor, other.get("id"), category, now)
+        if category in {'share_interest', 'invite_activity', 'play_together'}:
+            score += .13 if topics else -.11
+            willingness += .08 if topics else -.04
+        if category == 'coordinate_work' and _workplace_id(actor) == _workplace_id(other):
+            score += .09
+        if category == 'check_in' and relation['layers']['family'].get('status') not in (None, 'none'):
+            score += .08
         if tone == "conflict": score -= five.get("agreeableness", .5) * .22
         if tone == "romance": score += relation["layers"]["romance"].get("score", 0) * .26
         if not allowed: score = -1.0
@@ -436,7 +550,8 @@ def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
                         "probability": round(max(0., min(1., score if allowed else 0.)), 4),
                         "willingness": round(max(0., min(1., willingness)), 4),
                         "duration_seconds": definition["duration_seconds"], "allowed": allowed, "reason": reason,
-                        "requires_consent": bool(definition.get("romantic"))})
+                        "requires_consent": bool(definition.get("romantic")),
+                        "topic": topics[0] if topics and category in {'share_interest', 'invite_activity', 'play_together'} else None})
     return sorted(results, key=lambda row: (-row["score"], row["category"]))
 
 
@@ -531,9 +646,13 @@ def complete_activity(actor: dict, activity: str, now: int, evidence_id: str, du
         if hobby.get("kind") == activity:
             hobby["practice_seconds"] = int(hobby.get("practice_seconds", 0)) + duration
             hobby["last_practiced"] = now; hobby["last_evidence_id"] = evidence_id
-    kind_map = {"reading": "mastery", "craft": "create", "gardening": "care", "socializing": "community", "relaxing": "stability", "cooking": "mastery"}
+    kind_map = {"reading": "mastery", "craft": "create", "gardening": "care", "socializing": "community", "relaxing": "stability", "cooking": "mastery", "work": "career"}
     for ambition in patch.get("ambitions", []):
         if ambition.get("kind") == kind_map.get(activity):
             ambition["progress"] = _unit(float(ambition.get("progress", 0)) + max(.02, duration / 36000))
             ambition["completed"] = ambition["progress"] >= 1.0; ambition["updated_at"] = now; ambition["evidence_id"] = evidence_id
+        elif ambition.get('kind') == 'hobby' and ambition.get('activity') == activity:
+            ambition['progress'] = _unit(float(ambition.get('progress', 0)) + duration / 72000)
+            ambition['completed'] = ambition['progress'] >= 1.0
+            ambition['updated_at'] = now; ambition['evidence_id'] = evidence_id
     return {"psychology": patch}

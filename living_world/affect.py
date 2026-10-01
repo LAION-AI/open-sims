@@ -391,9 +391,50 @@ def _known_relation(relation: dict) -> bool:
     return any(layer.get("status") not in (None, "none") for layer in layers.values() if isinstance(layer, dict))
 
 
+def _relationship_roles(actor: dict, target: dict, relation: dict) -> list[str]:
+    """Viewer-relative, structural roles; never infer kinship from age or home."""
+    layers = relation.get('layers', {})
+    family = actor.get('family', {})
+    other_family = target.get('family', {})
+    roles = []
+    if family.get('partner_id') == target.get('id') and other_family.get('partner_id') == actor.get('id'):
+        roles.append('spouse' if family.get('relationship_status') == other_family.get('relationship_status') == 'married' else 'partner')
+    kin = layers.get('family', {}).get('status', 'none')
+    if kin not in (None, 'none'):
+        roles.append(kin)
+    friendship = layers.get('friendship', {})
+    if (friendship.get('status') == 'established'
+            or float(friendship.get('score', 0)) >= .15):
+        roles.append('friend')
+    romance = layers.get('romance', {})
+    if 'spouse' not in roles and 'partner' not in roles and float(romance.get('score', 0)) >= .15:
+        roles.append('romantic_interest')
+    if layers.get('coworker', {}).get('status') not in (None, 'none'):
+        roles.append('coworker')
+    if layers.get('household', {}).get('status') not in (None, 'none'):
+        roles.append('housemate')
+    return roles or ['acquaintance']
+
+
+def _relationship_feeling(qualities: dict) -> str:
+    """A readable appraisal of relation *scores*, not the target's current emotion."""
+    if qualities['tension'] >= .55:
+        return 'tense'
+    if qualities['attraction'] >= .55 and qualities['closeness'] >= .35:
+        return 'attracted'
+    if qualities['closeness'] >= .65 and qualities['trust'] >= .6:
+        return 'close_and_trusting'
+    if qualities['respect'] >= .65:
+        return 'respectful'
+    if qualities['closeness'] >= .4:
+        return 'warm'
+    return 'reserved'
+
+
 def social_graph_projection(actor: dict, actors, now: int) -> dict:
-    """Project only the viewer's directed known relationships, never target minds."""
-    actor_ids = set(actors) if isinstance(actors, dict) else {row.get("id") for row in actors}
+    """Project explicit pairwise relations; never expose needs, thoughts or affect."""
+    by_id = actors if isinstance(actors, dict) else {row.get('id'): row for row in actors}
+    actor_ids = set(by_id)
     nodes, edges = [], []
     for target_id, relation in actor.get("relations", {}).items():
         if target_id not in actor_ids or not _known_relation(relation):
@@ -402,9 +443,19 @@ def social_graph_projection(actor: dict, actors, now: int) -> dict:
         types = sorted(key for key, value in layers.items() if isinstance(value, dict) and value.get("status") not in (None, "none"))
         qualities = {key: _clamp(relation.get(key, 0)) for key in ("closeness", "trust", "respect", "attraction", "tension")}
         importance = _clamp(.38 * qualities["closeness"] + .27 * qualities["trust"] + .20 * qualities["respect"] + .10 * qualities["attraction"] + (.05 if types else 0))
+        target = by_id[target_id]
+        reverse = target.get('relations', {}).get(actor.get('id'))
+        reciprocal = None
+        if reverse is not None and _known_relation(reverse):
+            reverse_qualities = {key: _clamp(reverse.get(key, 0)) for key in qualities}
+            reciprocal = {'qualities': reverse_qualities,
+                          'feeling': _relationship_feeling(reverse_qualities),
+                          'roles': _relationship_roles(target, actor, reverse)}
         nodes.append({"id": target_id, "known": True, "importance": importance})
         edges.append({"source": actor.get("id"), "target": target_id, "directed": True,
-                      "relationship_types": types, "qualities": qualities, "importance": importance})
+                      "relationship_types": types, "qualities": qualities, "importance": importance,
+                      "roles": _relationship_roles(actor, target, relation),
+                      "feeling": _relationship_feeling(qualities), 'reciprocal': reciprocal})
     known_ids = {node["id"] for node in nodes}
     observed = actor.get("psychology", {}).get("theory_of_mind", {}).get("known_people", {})
     observed_not_known = sorted(target_id for target_id in observed if target_id in actor_ids and target_id not in known_ids)
@@ -412,4 +463,4 @@ def social_graph_projection(actor: dict, actors, now: int) -> dict:
             "nodes": sorted(nodes, key=lambda row: (-row["importance"], row["id"])),
             "edges": sorted(edges, key=lambda row: (-row["importance"], row["target"])),
             "observed_not_known": observed_not_known,
-            "privacy": "viewer relation data only; target affect, needs, thoughts, and hidden state are excluded"}
+            "privacy": "explicit directional relation scores from both participants; current affect, needs, thoughts and beliefs are excluded"}

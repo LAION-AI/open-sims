@@ -36,7 +36,7 @@ POSSESSION_ACTIONS = {
     "serve_recipe": _action("Carrying food to the table", ["table"], 90),
     "eat_recipe": _action("Eating a home-cooked meal", ["table"], 600,
                           relief={"hunger": .8, "comfort": .1}, preference="cooking"),
-    "change_outfit": _action("Changing clothes", ["bed"], 180,
+    "change_outfit": _action("Changing clothes", ["wardrobe", "bed"], 180,
                              thought="A fresh outfit for today."),
 }
 
@@ -114,14 +114,14 @@ def _patch(items, serial, state, inventory, outfit_last_day):
             "outfit_last_day": outfit_last_day}
 
 
-def initialize(actor, now):
+def initialize(actor, now, wardrobe_id=None):
     """Create stable starting clothes; safe to call on an already migrated actor."""
     if "belongings" in actor:
         return {"belongings": deepcopy(actor["belongings"]),
                 "possession_serial": _serial(actor),
                 "outfit_last_day": actor.get("outfit_last_day")}
     items, serial = [], 0
-    home = actor["home_id"]
+    home = wardrobe_id or actor["home_id"]
     palette = (actor.get("appearance") or {}).get("shirt", "#849c83")
     suffix = actor["id"].rsplit("_", 1)[-1]
     palette_index = int(suffix) if suffix.isdigit() else sum((i + 1) * ord(ch) for i, ch in enumerate(actor["id"]))
@@ -168,11 +168,11 @@ def worn_outfit(actor):
 
 
 def plan_outfit(actor, objects, now):
-    """One local wardrobe visit a day; the existing bed is the changing anchor."""
+    """Use real clothes storage where available; old saves may still use a bed."""
     if actor.get("outfit_last_day") == int(now // 86400):
         return []
-    bed = _home_object(actor, objects, "bed")
-    return [{"kind": "change_outfit", "target_id": bed["id"]}] if bed else []
+    target = _home_object(actor, objects, "wardrobe") or _home_object(actor, objects, "bed")
+    return [{"kind": "change_outfit", "target_id": target["id"]}] if target else []
 
 
 def _home_object(actor, objects, kind):
@@ -340,19 +340,21 @@ def apply_step(actor, obj, kind, now):
         day = int(now // 86400)
         if last_day == day:
             raise PossessionUnavailable("Already changed today")
+        storage_id = oid if obj["kind"] == "wardrobe" and any(
+            item["location"] == _location("container", oid) for item in items) else actor["home_id"]
         for slot in ("top", "trousers", "shoes", "outerwear"):
             stored = [i for i in items if i["kind"] == slot
-                      and i["location"] == _location("container", actor["home_id"])]
+                      and i["location"] == _location("container", storage_id)]
             worn = [i for i in items if i["kind"] == slot
                     and i["location"] == _location("worn", aid, slot)]
             if slot == "outerwear":
                 if day % 2 == 0 and not worn and stored:
                     stored[0]["location"] = _location("worn", aid, slot)
                 elif day % 2 == 1 and worn:
-                    worn[0]["location"] = _location("container", actor["home_id"])
+                    worn[0]["location"] = _location("container", storage_id)
             elif stored:
                 if worn:
-                    worn[0]["location"] = _location("container", actor["home_id"])
+                    worn[0]["location"] = _location("container", storage_id)
                 stored[0]["location"] = _location("worn", aid, slot)
         last_day = day
     return _patch(items, serial, state, inventory, last_day)
