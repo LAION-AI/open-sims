@@ -16,9 +16,9 @@ class LivingNeighborhood(SpatialService):
     """A new-save layout preserving SpatialService's runtime object contract."""
 
     LAYOUT_ID = "neighborhood-v1"
-    MAP_HEIGHT = 180
+    MAP_HEIGHT = 210
     HOME_ROWS = (4, 30, 132, 158)
-    ROAD_ROWS = (21, 48, 74, 99, 125, 151, 175)
+    ROAD_ROWS = (21, 48, 74, 99, 125, 151, 175, 201)
     LOT_X = (4, 29, 54, 79, 104)
 
     def rect(self, x, y, w, h, terrain):
@@ -273,14 +273,18 @@ class LivingNeighborhood(SpatialService):
             "office_hub": ("Office Hub", 19, "office_station", "Office desks", 6),
             "supermarket": ("South Market", 19, "supermarket_checkout", "Checkouts", 5),
             "shopping_center": ("Mosswood Arcade", 19, "mall_counter", "Arcade counters", 5),
+            "kindergarten": ("Clover Kindergarten", 19, "kindergarten_desk", "Educators' desk", 4),
+            "pool": ("Mosswood Pool", 20, "pool_water", "Swimming lanes", 8),
+            "bar": ("The Green Lantern Bar", 19, "bar_counter", "Bar counter", 6),
+            "community_center": ("Commons Community Center", 19, "community_table", "Community activity table", 6),
         }
         name, w, station_kind, station_name, slots = definitions[kind]
         bid = "office_hub" if kind == "office_hub" else kind
         x = self.LOT_X[col] + (1 if col % 2 and kind != "school" else 0)
-        y = (56, 81, 106)[row]
+        y = (56, 81, 106, 182)[row]
         h = 14
         door = self.building(bid, name, x, y, w, h, (col + row + 2) % 6)
-        self._frontage(bid, door, (74, 99, 125)[row])
+        self._frontage(bid, door, (74, 99, 125, 201)[row])
         self.buildings[-1]["service_kind"] = kind
         if kind == "school":
             self.rect(x + 12, y + 1, 1, 11, WALL)
@@ -301,7 +305,7 @@ class LivingNeighborhood(SpatialService):
                     self._object("school_student_chair", "Classroom seat", cx, cy + 1,
                                  anchors=[[cx, cy + 1]], building=bid, blocking=False)
         else:
-            if kind not in {"gym", "nightclub"}:
+            if kind not in {"gym", "nightclub", "pool"}:
                 self.rect(x + 1, y + 7, w - 2, 1, WALL)
                 self.rect(x + w // 2, y + 7, 1, 1, FLOOR)
                 self.regions.extend([
@@ -319,6 +323,12 @@ class LivingNeighborhood(SpatialService):
                 anchors = [[x + 3 + j % 3, y + 3 + j // 3] for j in range(slots)]
                 self._object(station_kind, station_name, x + 3, y + 3, 3, 2,
                              anchors, building=bid, capacity=slots, blocking=False)
+            elif kind == "pool":
+                anchors = [[x + 3 + j % 4, y + 4 + j // 4] for j in range(slots)]
+                self._object(station_kind, station_name, x + 3, y + 3, 10, 6,
+                             anchors, building=bid, capacity=slots, blocking=False)
+                self._object('lifeguard_station','Pool safety station',x + 14,y + 3,2,1,
+                             [[x + 14,y + 4]],building=bid)
             else:
                 self._object(station_kind, station_name, x + 2, y + 2, slots, 1,
                              [[x + 2 + j, y + 3] for j in range(slots)],
@@ -335,6 +345,36 @@ class LivingNeighborhood(SpatialService):
                 for j in range(3):
                     self._object("hospital_bed", "Treatment bed", x + 2 + 3*j, y + 9,
                                  1, 2, [[x + 2 + 3*j, y + 11]], building=bid)
+                self._object('bench','Clinic waiting bench',x + 12,y + 9,4,1,
+                             [[x + 13,y + 10]],building=bid)
+            if kind == 'kindergarten':
+                for j in range(5):
+                    self._object('kindergarten_mat',f'Play and learning mat {j+1}',x + 2 + 3*j,y + 9,
+                                 2,1,[[x + 2 + 3*j,y + 10]],building=bid,blocking=False)
+                self._object('toy_shelf','Toys and picture books',x + 2,y + 11,3,1,
+                             [[x + 3,y + 10]],building=bid)
+            if kind == 'pool':
+                self._object('pool_lockers','Changing lockers',x + 2,y + 10,4,1,
+                             [[x + 3,y + 11]],building=bid)
+                self._object('pool_shower','Pool shower',x + 15,y + 9,1,1,
+                             [[x + 15,y + 10]],building=bid)
+            if kind == 'gym':
+                self._object('weights_rack','Strength equipment',x + 10,y + 3,3,1,
+                             [[x + 11,y + 4]],building=bid)
+                self._object('gym_mat','Stretching area',x + 10,y + 9,4,2,
+                             [[x + 11,y + 10]],building=bid,blocking=False)
+            if kind == 'nightclub':
+                self._object('dj_booth','Music booth',x + 12,y + 2,3,1,
+                             [[x + 13,y + 3]],building=bid)
+                self._object('sofa','Club lounge seating',x + 11,y + 9,4,1,
+                             [[x + 12,y + 10]],building=bid)
+            if kind == 'bar':
+                for j in range(3):
+                    self._object('table',f'Bar guest table {j+1}',x + 2 + 5*j,y + 9,
+                                 1,1,[[x + 2 + 5*j,y + 10]],building=bid)
+                for j in range(3):
+                    self._object('bar_stool',f'Bar stool {j+1}',x + 2 + 2*j,y + 4,
+                                 1,1,[[x + 2 + 2*j,y + 4]],building=bid,blocking=False)
             if kind in {"cafe", "shop"}:
                 for j in range(2):
                     self._object("table" if kind == "cafe" else "shelf",
@@ -343,7 +383,7 @@ class LivingNeighborhood(SpatialService):
                                  [[x + 3 + 4*j, y + 10]], building=bid)
 
     def _park(self, col, row, name):
-        x, y, w, h = self.LOT_X[col], (56, 81, 106)[row], 19, 15
+        x, y, w, h = self.LOT_X[col], (56, 81, 106, 182)[row], 19, 15
         park_id = f"park_{row}_{col}"
         self.planning_metadata["parks"].append({"id": park_id, "name": name,
                                                  "bounds": [x, y, w, h]})
@@ -398,6 +438,7 @@ class LivingNeighborhood(SpatialService):
             ("school", "studio", None, "hospital", "fire_station"),
             ("cafe", "shop", None, "gym", "nightclub"),
             ("town_hall", "office_hub", "supermarket", "shopping_center", "workshop"),
+            ("kindergarten", "pool", "bar", "community_center", None),
         )
         for row, entries in enumerate(services):
             for col, kind in enumerate(entries):
@@ -415,6 +456,8 @@ class LivingNeighborhood(SpatialService):
         for item in self.decorations:
             if item["kind"] == "tree":
                 self.blocked.add((item["x"], item["y"]))
+        from .campus import extend_campus
+        extend_campus(self,seed)
         self._validate_anchors()
         self._validate_connections()
         self.park_patrol = [[62, 87], [63, 87], [64, 87], [65, 87],
@@ -433,7 +476,11 @@ class LivingNeighborhood(SpatialService):
         seen, queue = {start}, deque([start])
         while queue:
             x, y = queue.popleft()
-            for point in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            portals=[]
+            for portal in self.planning_metadata.get('portals',[]):
+                if [x,y]==portal['from']:portals.append(tuple(portal['to']))
+                if [x,y]==portal['to']:portals.append(tuple(portal['from']))
+            for point in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1),*portals):
                 if point not in seen and self.walkable(point):
                     seen.add(point)
                     queue.append(point)
@@ -451,6 +498,10 @@ class LivingNeighborhood(SpatialService):
 
     def spawn_for(self, household_id, member_index):
         household = next((h for h in self.households if h["id"] == household_id), None)
+        if household_id=='student_residence' and isinstance(member_index,int) and 0<=member_index<10:
+            beds=[o for o in self.objects.values() if o['kind']=='bed'
+                  and o.get('household_id')==household_id]
+            return list(beds[member_index]['anchors'][0])
         if household is None or not isinstance(member_index, int) or not 0 <= member_index < 3:
             raise ValueError("Unknown household or member slot")
         building = next(b for b in self.buildings if b["id"] == household["building_id"])

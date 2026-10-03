@@ -11,8 +11,13 @@ from .urban_life import SERVICE_ACTIONS, assigned_service_job
 class StoryLife:
     def _story_actor(self,actor):
         if 'belongings' not in actor:
-            wardrobe=next((o for o in self.objects.values() if o['kind']=='wardrobe'
-                           and o.get('household_id')==actor['household_id']),None)
+            wardrobes=[o for o in self.objects.values() if o['kind']=='wardrobe'
+                       and o.get('household_id')==actor['household_id']]
+            if actor['household_id']=='student_residence' and wardrobes:
+                slot=max(0,int(actor['id'].rsplit('_',1)[-1])-45)
+                wardrobe=wardrobes[min(slot,len(wardrobes)-1)]
+            else:
+                wardrobe=wardrobes[0] if wardrobes else None
             actor.update(possessions.initialize(actor,self.now,wardrobe['id'] if wardrobe else None))
         if 'affect' not in actor:
             actor['affect']=affect.appraise(actor,self.needs_at(actor),self.now,{'kind':'initialization','text':'Authored initial needs'},'initialization')
@@ -63,10 +68,16 @@ class StoryLife:
     def _apply_possession(self,actor,action):
         kind=action['kind']
         if kind in possessions.POSSESSION_ACTIONS:
+            eaten=next((item for item in actor.get('belongings',[]) if
+                kind=='eat_recipe' and item['kind'] in possessions.RECIPES and
+                item['location']=={'type':'container','id':action['target_id']} and
+                item.get('state',{}).get('stage')=='served'),None)
             obj=self.edit('objects',action['target_id'])
             patch=possessions.apply_step(actor,obj,kind,self.now)
             obj['daily']=patch.pop('object_daily')
             actor.update(patch)
+            if eaten:
+                actor['last_meal']={'label':eaten['label'],'item_id':eaten['id'],'at':self.now}
         elif kind in {'clear_dishes','wash_dishes'}:
             if kind=='clear_dishes':
                 target=action['target_id']

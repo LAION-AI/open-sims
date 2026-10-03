@@ -3,6 +3,8 @@ from copy import deepcopy
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+import random
 
 from living_world import affect
 from living_world.engine import World
@@ -73,10 +75,14 @@ class StoryIntegrationTests(unittest.TestCase):
             other["relations"][actor["id"]].update(closeness=.8, trust=.8)
             other["needs"]["social"] = .90
             other["psychology"]["big_five"]["agreeableness"] = 1.0
-        w.decide(actor["id"], {"action": "chat", "target_id": other["id"], "social_category": "express_affection"})
+        original_rng=w.rng
+        with patch.object(w,'rng',side_effect=lambda aid,decision,purpose:
+                random.Random(1) if purpose=='chat_consent' else original_rng(aid,decision,purpose)):
+            w.decide(actor["id"], {"action": "chat", "target_id": other["id"], "social_category": "express_affection"})
         action = w.actors[actor["id"]]["action"]
         self.assertIsNotNone(action)
-        w.advance(action["duration"])
+        with patch('living_world.engine.leisure_drama.resolve_social_event',return_value={'kind':'quiet'}):
+            w.advance(action["duration"])
         actor, other = w.actors[actor["id"]], w.actors[other["id"]]
         for person in (actor, other):
             states = {state["id"]: state for state in person["affect"]["states"]}

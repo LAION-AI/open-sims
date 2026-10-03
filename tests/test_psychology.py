@@ -39,7 +39,7 @@ class PsychologyTests(unittest.TestCase):
         self.assertNotIn("p10", graph["p0"]["relations"])
 
     def test_social_categories_include_twenty_and_block_known_kin_romance(self):
-        self.assertEqual(len(SOCIAL_CATEGORIES), 20)
+        self.assertGreaterEqual(len(SOCIAL_CATEGORIES), 24)
         parent, child = actor("parent", 50), actor("child", 25, "home_b")
         child["family"] = {"parent_ids": ["parent"], "partner_id": None, "relationship_status": "single"}
         graph = initialize_social_graph({"parent": parent, "child": child})

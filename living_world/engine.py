@@ -21,10 +21,15 @@ from . import affect, possessions
 from .urban_life import SERVICE_ACTIONS, SERVICE_JOBS, service_available
 from . import psychology
 from . import careers
-from .daily_life import DAILY_ACTIONS, StepUnavailable, apply_step
+from .daily_life import DAILY_ACTIONS, StepUnavailable, apply_step, assigned_workplace, coworkers_at_work
+from .urban_life import assigned_service_job
+from .campus_life import CAMPUS_ACTIONS, campus_available
+from . import work_life, leisure_drama, storyteller, percentile
+from .speech import SpeechLibrary
 
-FIRST_NAMES=["Maya","Elliot","Sofia","Leo","Jun","Nora","Theo","Amara","Daniel","Camille","Louis","Hana","Felix","Petra","Arjun","Meera","Luca","Isla","Oliver","Ruby","Rafael","Clara","Asha","Nikhil","Willow","Finn","Min","Jae","Emilia","Oscar","Ines","Mateo","Avery","Robin","Yuki","Ren","Layla","Omar","Chloe","Hugo","Ada","Miles","Zoe","Jules"]
-JOBS=["Illustrator","Carpenter","Baker","Teacher","Designer","Gardener","Bookseller","Tailor"]+list(SERVICE_JOBS)+["Physician","Chef","Mechanic","Programmer","Civic planner"]
+FIRST_NAMES=["Maya","Elliot","Sofia","Leo","Jun","Nora","Theo","Amara","Daniel","Camille","Louis","Hana","Felix","Petra","Arjun","Meera","Luca","Isla","Oliver","Ruby","Rafael","Clara","Asha","Nikhil","Willow","Finn","Min","Jae","Emilia","Oscar","Ines","Mateo","Avery","Robin","Yuki","Ren","Layla","Omar","Chloe","Hugo","Ada","Miles","Zoe","Jules","Samira","Noah","Elif","Tariq","Mira","Jonas","Lina","Pavel","Nia","Kiran"]
+SERVICE_ACTIONS={**SERVICE_ACTIONS,**CAMPUS_ACTIONS}
+JOBS=["Illustrator","Carpenter","Baker","Teacher","Designer","Gardener","Bookseller","Tailor"]+list(SERVICE_JOBS)+["Physician","Chef","Mechanic","Programmer","Civic planner","Kindergarten educator","Lifeguard","Bartender","Club DJ","Professor","Researcher","University administrator"]
 SHIRTS=["#cb775c","#6b9ca4","#d7b861","#83996b","#9684af","#b87390","#6686b0","#bba480"]
 SKIN=["#e9ba94","#c78e67","#996342","#f0cfad","#734a37"]
 HAIR=["#574338","#352f32","#a56b3f","#d4b372","#847d75"]
@@ -46,6 +51,8 @@ class World(StoryLife,LifeSystems):
     def __init__(self, seed=42, database=":memory:", layout='legacy'):
         self.rules=RuleRegistry()
         self.store=BeatStore(database)
+        speech_database = ':memory:' if database == ':memory:' else str(__import__('pathlib').Path(database).with_name(__import__('pathlib').Path(database).stem+'-speech.sqlite3'))
+        self.speech=SpeechLibrary(speech_database)
         saved=self.store.checkpoint()
         self.seed=saved["seed"] if saved else seed
         self.layout=saved.get('layout','legacy') if saved else layout
@@ -74,7 +81,7 @@ class World(StoryLife,LifeSystems):
         self.metrics={"events_processed":0,"decisions":0,"completed_actions":0,"interrupted_actions":0,"declined_chats":0,"last_advance_ms":0.0}
         self._transaction=None
         if saved:
-            if saved["rule_hash"] not in (self.rules.hash, self.rules.legacy_hash,self.rules.v2_hash,self.rules.v3_hash):
+            if saved["rule_hash"] not in (self.rules.hash, self.rules.legacy_hash,self.rules.v2_hash,self.rules.v3_hash,self.rules.v31_hash,self.rules.v32_hash):
                 raise ValueError("Saved world uses another rule package; use a different --database or migrate explicitly.")
             self.actors=saved["actors"]
             self.objects.update(saved["objects"])
@@ -88,6 +95,73 @@ class World(StoryLife,LifeSystems):
             self.paused=saved.get('paused',False)
             self.speed=saved.get('speed',10)
             self._restore_households()
+            if self.layout=='neighborhood-v1' and not self.spatial.planning_metadata.get('campus_version'):
+                from .campus import extend_campus
+                from .neighborhood import LivingNeighborhood
+                self.migration_backup=self.store.migration_backup('campus-v1')
+                prior_objects=set(self.objects)
+                extend_campus(self.spatial,self.seed)
+                LivingNeighborhood._validate_connections(self.spatial)
+                # Populate the newly opened residence with six freshly
+                # initialized students. Existing biographies remain untouched.
+                template=World(seed=self.seed,layout='neighborhood-v1')
+                try:
+                    wardrobe_ids=[o['id'] for o in self.objects.values()
+                                  if o['kind']=='wardrobe' and o.get('household_id')=='student_residence']
+                    newcomers=[]
+                    for slot in range(6):
+                        aid=f'resident_{45+slot:03}'
+                        if aid in self.actors:
+                            raise ValueError('Campus student ID already exists in old save')
+                        actor=deepcopy(template.actors[aid])
+                        actor['needs_at']=self.now
+                        actor['emotion']['since']=self.now
+                        actor['thought']={'text':'I have just moved into Willow Hall.',
+                                          'trigger':'campus_migration','since':self.now}
+                        actor['beliefs']=[{'id':aid+'_campus_knowledge',
+                            'proposition':'I know my residence and the university.',
+                            'confidence':'high','evidence':['campus-v1 migration'],
+                            'valid_from':self.now}]
+                        actor['memories']=[]
+                        actor['perceptions']=[]
+                        actor.pop('belongings',None)
+                        actor.update(possessions.initialize(actor,self.now,wardrobe_ids[slot]))
+                        actor['affect']=affect.appraise(actor,actor['needs'],self.now,
+                            {'kind':'initialization','text':'Moved into Willow Hall'},
+                            f'beat_{self.store.sequence+1:08}')
+                        for ambition in actor.get('psychology',{}).get('ambitions',[]):
+                            ambition['updated_at']=self.now
+                        actor['schedule']['day']=self.now//86400
+                        actor['last_beat']=f'beat_{self.store.sequence+1:08}'
+                        self.actors[aid]=actor
+                        newcomers.append(aid)
+                        self.schedule(self.now+slot,'decision',aid,0)
+                    for aid in newcomers:
+                        self.actors[aid]['social_status']=storyteller.social_status(self.actors[aid],self.actors)
+                    next(h for h in self.spatial.households if h['id']=='student_residence')['members']=newcomers
+                finally:
+                    template.close()
+                map_state=self.meta['map']
+                map_state['planning']=deepcopy(self.spatial.planning_metadata)
+                map_state['version']=map_state.get('version',0)+1
+                changes=[{'collection':'objects','subject_id':oid,'component_path':'$',
+                          'new_value':deepcopy(self.objects[oid]),'expected_prior_version':None,
+                          'operation':'set','scope':'canonical','effective_time':self.now,
+                          'microstep':i,'evidence_ids':['campus-v1 migration']}
+                         for i,oid in enumerate(self.objects) if oid not in prior_objects]
+                changes.append({'collection':'world','subject_id':'map','component_path':'$',
+                                'new_value':deepcopy(map_state),'expected_prior_version':map_state['version']-1,
+                                'operation':'set','scope':'canonical','effective_time':self.now,
+                                'microstep':len(changes),'evidence_ids':['campus-v1 migration']})
+                changes.extend({'collection':'actors','subject_id':aid,'component_path':'$',
+                                'new_value':deepcopy(self.actors[aid]),'expected_prior_version':None,
+                                'operation':'set','scope':'canonical','effective_time':self.now,
+                                'microstep':len(changes)+index,'evidence_ids':['campus-v1 migration']}
+                               for index,aid in enumerate(newcomers))
+                self.store.append(self._beat('migration.campus.v1',newcomers,
+                    'Mosswood Campus opened and six students moved into the stair-linked residence.',changes,
+                    ['Existing coordinates, residents and object identities preserved']))
+                self.save()
             if saved["rule_hash"] == self.rules.legacy_hash:
                 self.migration_backup = self.store.migration_backup()
                 self._migrate_life(saved)
@@ -105,6 +179,56 @@ class World(StoryLife,LifeSystems):
                         actor.setdefault('career', careers.initial(actor, self.now))
                         actor.update(psychology.add_missing_ambitions(actor, self.now))
                 self.save()
+            elif saved['rule_hash']==self.rules.v31_hash:
+                self.migration_backup=self.store.migration_backup('rules-v3_2')
+                with self.transaction('migration.rules.v3_2',list(self.actors),
+                        'New leisure, work and optional decision tools are available; existing homes and histories remain intact.'):
+                    self.edit('world','story_systems')['rule_contract_version']='3.2.0'
+                    for aid in self.actors:
+                        self.edit('actors',aid)['appearance']['age']=self.actors[aid]['age']
+                self.save()
+            elif saved['rule_hash']==self.rules.v32_hash:
+                with self.transaction('migration.rules.v3_3',list(self.actors),
+                        'Campus opportunities and W100 task grading became available; no earlier action was rerolled.'):
+                    self.edit('world','story_systems')['rule_contract_version']='3.3.0'
+                    for aid in self.actors:
+                        actor=self.edit('actors',aid)
+                        actor.setdefault('education',{'university_student':18<=actor['age']<=25,
+                                                      'progress_hours':0.0})
+                self.save()
+            missing=[aid for aid, actor in self.actors.items()
+                     if 'drive' not in actor.get('psychology', {}).get('social_style', {}) or 'social_status' not in actor]
+            if missing:
+                self.migration_backup=self.store.migration_backup('storyteller-social-v1')
+                with self.transaction('migration.social_style.v1',missing,
+                        'Added individual social tendencies and current standing; no past encounters were inferred.',
+                        ['Current state only; existing relationships and histories preserved']):
+                    for aid in missing:
+                        actor=self.edit('actors',aid)
+                        actor.update(psychology.migrate_existing_actor(actor,self.rng(aid,0,'psychology'),self.now))
+                        actor['social_status']=storyteller.social_status(actor,self.actors)
+                self.save()
+            missing_aptitudes=[aid for aid, actor in self.actors.items()
+                               if actor.get('aptitudes', {}).get('version') != 1]
+            if missing_aptitudes:
+                if not hasattr(self,'migration_backup'):
+                    self.migration_backup=self.store.migration_backup('percentile-v1')
+                with self.transaction('migration.percentile.v1',missing_aptitudes,
+                        'Added seeded W100 abilities; earlier events were not rerolled.'):
+                    for aid in missing_aptitudes:
+                        actor=self.edit('actors',aid)
+                        actor['aptitudes']=percentile.initial(actor,self.rng(aid,0,'percentile_initial'))
+                self.save()
+            missing_education=[aid for aid, actor in self.actors.items() if 'education' not in actor]
+            if missing_education:
+                with self.transaction('migration.campus_education.v1',missing_education,
+                        'Campus study eligibility became available to young adults; prior studies were not inferred.'):
+                    self.edit('world','story_systems')['rule_contract_version']='3.3.0'
+                    for aid in missing_education:
+                        actor=self.edit('actors',aid)
+                        actor['education']={'university_student':18<=actor['age']<=25,
+                                            'progress_hours':0.0}
+                self.save()
         else:
             self._initialize()
             self.save()
@@ -121,7 +245,7 @@ class World(StoryLife,LifeSystems):
         i=0
         for hi,household in enumerate(self.spatial.households):
             building=next(b for b in self.spatial.buildings if b["id"]==household["building_id"])
-            for member in range(3 if hi%5==2 else 2):
+            for member in range(10 if household['id']=='student_residence' else 3 if hi%5==2 else 2):
                 aid=f"resident_{i+1:03}"
                 rng=self.rng(aid,0,"initialization")
                 prefs={p:round(rng.uniform(.2,1),2) for p in ("cooking","relaxing","reading","gardening","craft","socializing","walking")}
@@ -161,11 +285,18 @@ class World(StoryLife,LifeSystems):
                 self.actors[aid]["relations"]={other:{"closeness":.65,"trust":.75,"last_interaction":None,"kind":"Housemate"} for other in household["members"] if other!=aid}
         self._life_components(new_world=True)
         self._initialize_story()
+        for actor in self.actors.values():
+            actor['social_status']=storyteller.social_status(actor,self.actors)
+            actor['aptitudes']=percentile.initial(actor,self.rng(actor['id'],0,'percentile_initial'))
+            actor['education']={'university_student':18<=actor['age']<=25,
+                                'progress_hours':0.0}
         changes=[]
         for collection,records in (("actors",self.actors),("objects",self.objects),("world",self.meta)):
             for rid,record in records.items():
                 changes.append({"collection":collection,"subject_id":rid,"component_path":"$","new_value":deepcopy(record),"expected_prior_version":None,"operation":"set","scope":"canonical","effective_time":self.now,"microstep":len(changes),"evidence_ids":["initialization"]})
-        self.store.append(self._beat("initialization",[],"Morning arrives in Mosswood. Forty-four residents begin their day across twenty homes.",changes))
+        self.store.append(self._beat("initialization",[],
+            "Morning arrives in Mosswood. Residents begin their day across twenty homes and a ten-room student residence." if self.layout!='legacy' else
+            "Morning arrives in Mosswood. Forty-four residents begin their day across twenty homes.",changes))
         for i,aid in enumerate(self.actors):
             self.schedule(self.now+i%29,"decision",aid,0)
         self.schedule((self.now//86400+1)*86400,"midnight",None,0)
@@ -257,6 +388,9 @@ class World(StoryLife,LifeSystems):
             if kind in ("chat","wait") or kind in DAILY_ACTIONS or kind in possessions.POSSESSION_ACTIONS:
                 continue
             if kind in SERVICE_ACTIONS and not service_available({**actor,'needs':needs},kind,self.now):continue
+            if kind in CAMPUS_ACTIONS and not campus_available(actor,kind,self.now):continue
+            if actor.get('age',30)<18 and kind in {'work','dance_club','visit_bar','job_search'}:
+                continue
             if actor["cooldowns"].get(kind,0)>self.now:
                 continue
             options=[o for o in objects if o["kind"] in definition["object_kinds"] and o["condition"]>.1]
@@ -266,6 +400,28 @@ class World(StoryLife,LifeSystems):
             if kind=="work":
                 workplace = actor.get("workplace") or {}
                 options = [o for o in options if o["id"] == workplace.get("target_id")]
+            if actor['household_id']=='student_residence' and kind in {'sleep','change_outfit'}:
+                own=[o for o in options if o.get('household_id')=='student_residence'
+                     and o['kind']==('bed' if kind=='sleep' else 'wardrobe')]
+                slot=max(0,int(actor['id'].rsplit('_',1)[-1])-45)
+                options=own[slot:slot+1] if own else []
+            if kind=='job_search' and actor['profile']['job']!='Unemployed':
+                continue
+            if kind=='visit_patient' and not any(other['id']!=actor['id'] and other.get('action')
+                    and other['action']['kind']=='visit_clinic' for other in self.actors.values()):
+                continue
+            if kind.startswith('leisure_'):
+                activity=definition['leisure_activity']
+                tags=leisure_drama.LEISURE_ACTIVITIES[activity]['tags']
+                if activity in {'host_party','watch_movie','relax_at_home'}:
+                    options=[o for o in options if o.get('household_id')==actor['household_id']]
+                if activity=='visit_museum':
+                    continue  # No museum affordance has been built yet.
+                if actor.get('age',30)<18 and activity in {'ask_on_date','go_on_date','attend_party','karaoke','see_live_music'}:
+                    continue
+                if actor.get('age',30)<7 and activity=='swim':continue
+                if 'party' in tags and not (self.now%86400>=17*3600 or self.now%86400<2*3600):
+                    continue
             free=[]
             for obj in options:
                 if definition["cost"]>actor["money"]:
@@ -292,12 +448,28 @@ class World(StoryLife,LifeSystems):
                     commitment=.65
                 else:
                     commitment=-1
+            if kind=='job_search':
+                commitment=.45 if actor['profile']['job']=='Unemployed' else -1
+            if kind in {'school_day','kindergarten_day'}:
+                commitment=(.9 if actor['schedule']['work_seconds']<actor['schedule']['work_target_seconds']
+                            else -.7)
+            if kind in {'attend_lecture','attend_seminar','run_lab'}:
+                if actor['profile']['job']=='Student':
+                    commitment=.95 if actor['schedule']['work_seconds']<actor['schedule']['work_target_seconds'] and 9*3600<=minute<15*3600 else -.5
+                else:
+                    commitment=.38 if actor.get('education',{}).get('university_student') and 9*3600<=minute<16*3600 else -.2
             if kind=="sleep":
                 commitment=.35 if minute>=22*3600 or minute<6*3600 else -.28
             critical=max([needs[n] for n in definition["relief"] if n in ("hunger","thirst","bladder","fatigue","hygiene")] or [0])
             urgency=2 if critical>=self.rules.data["selection"]["critical_threshold"] else 0
             personality = self._life_bias(actor, kind)
-            score=relief+preference+commitment+urgency-time_cost+personality
+            if kind.startswith('leisure_'):
+                activity=definition['leisure_activity']
+                activity_weight=next(row['weight'] for row in leisure_drama.leisure_actions(actor) if row['activity']==activity)
+                personality+=min(.38,(activity_weight-1)*.3)
+                score_bonus=.25 if needs['fun']>.4 else .02
+            else:score_bonus=0
+            score=relief+preference+commitment+urgency-time_cost+personality+score_bonus
             candidates.append({"kind":kind,"target_id":oid,"anchor":anchor,"distance":distance,"score":round(score,5),
                                "terms":{"need_relief":round(relief,4),"preference":round(preference,4),"commitment":commitment,"critical":urgency,"personality":personality,"travel_and_time_cost":round(time_cost,4)}})
         # Only visible, socially available people are possible partners.
@@ -312,19 +484,64 @@ class World(StoryLife,LifeSystems):
                 opos=self.position_at(other)
                 if self.spatial.visible(pos,opos,radius=4):
                     distance=abs(opos[0]-pos[0])+abs(opos[1]-pos[1])
-                    others.append((psychology.partner_priority(actor,other,distance,self.now),other["id"]))
+                    other_view={**other,'social_status':storyteller.social_status(other,self.actors),
+                                'needs':self.needs_at(other)}
+                    others.append((psychology.partner_priority(actor,other_view,distance,self.now),other["id"]))
             if others:
                 projected = {**actor, "needs": needs}
                 for partner_priority,other in sorted(others,key=lambda row:(-row[0],row[1]))[:3]:
-                    allowed=[row for row in psychology.social_candidates(projected,self.actors[other],self.now) if row['allowed']]
-                    for social in allowed[:3]:
-                        score=(needs["social"]**2*1.9+actor["preferences"]["socializing"]*.16
+                    workplace=actor.get('workplace_id')
+                    at_work=bool(workplace) and workplace in {r['id'] for r in self.spatial.regions_at(pos)}
+                    projected_other={**self.actors[other], 'needs':self.needs_at(self.actors[other]),
+                        'social_status':storyteller.social_status(self.actors[other],self.actors)}
+                    allowed=[row for row in psychology.social_candidates(projected,projected_other,self.now)
+                             if row['allowed'] and (row['category']!='undermine' or at_work)]
+                    exploratory=allowed[2:]
+                    picked=self.rng(actor['id'],actor['decision_id'],
+                        'social_explore:'+other).choices(exploratory,
+                        weights=[max(.01,row['score']) for row in exploratory],k=1)[0] if exploratory else None
+                    shortlist=allowed[:2]+([picked] if picked else [])
+                    for social in shortlist:
+                        score=(needs["social"]**2*2.15+actor["preferences"]["socializing"]*.20+.12
                                +(social["score"]-.5)*.4+self._life_bias(actor,"chat")+partner_priority*.18)
                         candidates.append({"kind":"chat","social_category":social["category"],"topic":social.get('topic'),
                                            "target_id":other,"anchor":list(pos),"distance":0,"score":round(score,5),
                                            "terms":{"need_relief":round(needs["social"]**2*1.9,4),
                                                     "category_affinity":social["score"],"partner_priority":partner_priority,
                                                     "personality":self._life_bias(actor,"chat")}})
+            if actor.get('age', 30) >= 10 and needs['social'] >= .28 and 8*3600 <= minute < 23*3600:
+                contacts=[]
+                for other_id,relation in actor.get('relations',{}).items():
+                    other=self.actors.get(other_id)
+                    if not other or other['owner']!='procedural' or other_id==actor['id']:
+                        continue
+                    opposite=self.position_at(other)
+                    if self.spatial.visible(pos,opposite,radius=4):
+                        continue
+                    ongoing=other.get('action')
+                    if ongoing and (ongoing['phase']!='using' or ongoing['kind'] not in ('wait','relax','stroll')):
+                        continue
+                    score=float(relation.get('closeness',0))*.5+float(relation.get('trust',0))*.2
+                    if relation.get('last_interaction') is not None and self.now-relation['last_interaction']<4*3600:
+                        score-=.35
+                    contacts.append((score,other_id))
+                if contacts:
+                    contacts.sort(key=lambda row:(-row[0],row[1]))
+                    best=contacts[:5]
+                    chosen_contact=self.rng(actor['id'],actor['decision_id'],'outreach').choices(
+                        best,weights=[max(.05,.3+row[0]) for row in best],k=1)[0]
+                    other=self.actors[chosen_contact[1]]
+                    social=next((row for row in psychology.social_candidates(
+                        {**actor,'needs':needs},
+                        {**other,'needs':self.needs_at(other)},self.now)
+                        if row['category']=='phone_call' and row['allowed']),None)
+                    if social:
+                        score=needs['social']**2*1.8+actor['preferences']['socializing']*.18
+                        score+=.08+(social['score']-.5)*.3+self._life_bias(actor,'chat')
+                        candidates.append({'kind':'chat','social_category':'phone_call','topic':None,
+                            'target_id':other['id'],'anchor':list(pos),'distance':0,'score':round(score,5),
+                            'terms':{'outreach':True,'social_need':round(needs['social'],4),
+                                     'relationship':round(chosen_contact[0],4)}})
         candidates.extend(self._routine_candidates(actor, needs, pos))
         candidates.append({"kind":"wait","target_id":None,"anchor":list(pos),"distance":0,"score":-.15,"terms":{"fallback":True}})
         return sorted(candidates,key=lambda c:(-c["score"],c["kind"],c.get("social_category","")))[:self.rules.data['selection']['candidate_limit']],rejected
@@ -336,8 +553,9 @@ class World(StoryLife,LifeSystems):
         top=max(c["score"] for c in candidates)
         # Twenty conversation options must not make socializing twenty times
         # likelier merely because that action family has a richer vocabulary.
-        counts = {kind: sum(c["kind"] == kind for c in candidates) for kind in {c["kind"] for c in candidates}}
-        weights=[math.exp((c["score"]-top)/temperature)/counts[c["kind"]] for c in candidates]
+        family=lambda c: 'leisure' if c['kind'].startswith('leisure_') else c['kind']
+        counts = {kind: sum(family(c) == kind for c in candidates) for kind in {family(c) for c in candidates}}
+        weights=[math.exp((c["score"]-top)/temperature)/counts[family(c)] for c in candidates]
         draw=rng.random()
         running=0
         for candidate,weight in zip(candidates,weights):
@@ -360,7 +578,9 @@ class World(StoryLife,LifeSystems):
             raise RejectedProposal('Stale actor component version')
         candidates, _ = self.candidates(actor)
         if not any(self._matches_recommendation(candidate, payload) for candidate in candidates):
-            raise RejectedProposal('That action is not currently feasible and known to this resident')
+            explicit = self._explicit_social_candidate(actor, payload) or self._explicit_place_candidate(actor, payload)
+            if not explicit:
+                raise RejectedProposal('That action is not currently feasible and known to this resident')
         ttl = int(payload.get('ttl_seconds', 1800))
         if not 60 <= ttl <= 3600:
             raise RejectedProposal('Recommendation must expire within 1–60 world minutes')
@@ -415,16 +635,22 @@ class World(StoryLife,LifeSystems):
             return None
         pos = self.position_at(actor)
         opposite = self.position_at(other)
-        if not self.spatial.visible(pos, opposite, radius=4):
-            return None
         category = request.get('social_category') or 'small_talk'
+        if category != 'phone_call' and not self.spatial.visible(pos, opposite, radius=4):
+            return None
         projected = {**actor, 'needs': self.needs_at(actor)}
-        social = next((row for row in psychology.social_candidates(projected, other, self.now)
+        social = next((row for row in psychology.social_candidates(projected,
+                       {**other,'social_status':storyteller.social_status(other,self.actors),
+                        'needs':self.needs_at(other)}, self.now)
                        if row['category'] == category and row['allowed']), None)
         if not social:
             return None
+        if category=='undermine' and actor.get('workplace_id') not in {r['id'] for r in self.spatial.regions_at(pos)}:
+            return None
         distance = abs(opposite[0] - pos[0]) + abs(opposite[1] - pos[1])
-        priority = psychology.partner_priority(actor, other, distance, self.now)
+        priority = psychology.partner_priority(actor,
+            {**other,'social_status':storyteller.social_status(other,self.actors),
+             'needs':self.needs_at(other)}, distance, self.now)
         score = (projected['needs']['social']**2 * 1.9
                  + actor['preferences']['socializing'] * .16
                  + (social['score'] - .5) * .4
@@ -433,9 +659,118 @@ class World(StoryLife,LifeSystems):
                 'target_id': other['id'], 'anchor': list(pos), 'distance': 0,
                 'score': round(score, 5), 'terms': {'explicit_feasibility_check': True}}
 
-    def decide(self, aid, requested=None):
+    def _explicit_place_candidate(self, actor, request, *, verify_route=True):
+        """Validate a player-chosen destination, independently of the utility shortlist."""
+        kind = request.get('action')
+        if kind not in {'community_meet', 'visit_pool', 'visit_bar', 'browse_mall',
+                        'visit_townhall', 'exercise_gym', 'dance_club', 'read',
+                        'garden', 'stroll'} and not (isinstance(kind, str) and kind.startswith('leisure_')):
+            return None
+        definition = self.rules.actions.get(kind)
+        obj = self.objects.get(request.get('target_id'))
+        if not definition or not obj or obj.get('household_id') not in (None, actor['household_id']):
+            return None
+        if obj['kind'] not in definition['object_kinds'] or obj['condition'] <= .1:
+            return None
+        if actor['cooldowns'].get(kind, 0) > self.now or definition['cost'] > actor['money']:
+            return None
+        if kind in SERVICE_ACTIONS and not service_available({**actor, 'needs': self.needs_at(actor)}, kind, self.now):
+            return None
+        age = actor.get('age', 30)
+        if age < 18 and kind in {'visit_bar', 'dance_club'}:
+            return None
+        if kind.startswith('leisure_'):
+            activity = definition['leisure_activity']
+            tags = leisure_drama.LEISURE_ACTIVITIES[activity]['tags']
+            if activity in {'host_party', 'watch_movie', 'relax_at_home'} and obj.get('household_id') != actor['household_id']:
+                return None
+            if activity == 'visit_museum' or age < 18 and activity in {
+                    'ask_on_date', 'go_on_date', 'attend_party', 'karaoke', 'see_live_music'}:
+                return None
+            if age < 7 and activity == 'swim':
+                return None
+            minute = self.now % 86400
+            if 'party' in tags and not (minute >= 17 * 3600 or minute < 2 * 3600):
+                return None
+        if len(obj['reservations']) >= obj['capacity']:
+            return None
+        pos = self.position_at(actor)
+        reserved = {tuple(row['anchor']) for row in obj['reservations'].values()}
+        free_anchors = [anchor for anchor in obj['anchors'] if tuple(anchor) not in reserved
+                        and self.spatial.walkable(tuple(anchor))]
+        if not free_anchors:
+            return None
+        free_anchors.sort(key=lambda anchor: (abs(pos[0]-anchor[0])+abs(pos[1]-anchor[1]),anchor))
+        if verify_route:
+            route = None
+            for candidate_anchor in free_anchors:
+                candidate_path = self.spatial.path(pos, candidate_anchor)
+                if candidate_path is not None:
+                    route = (candidate_path, candidate_anchor)
+                    break
+            if route is None:
+                return None
+            path, anchor = route
+            distance = len(path)-1
+        else:
+            anchor = free_anchors[0]
+            distance = abs(pos[0]-anchor[0])+abs(pos[1]-anchor[1])
+        needs = self.needs_at(actor)
+        relief = sum(needs[n] ** 2 * min(1, amount) * 1.8
+                     for n, amount in definition['relief'].items())
+        score = relief + actor['preferences'].get(definition['preference'], .3) * .12
+        if kind.startswith('leisure_'):
+            score += .12 if needs['fun'] > .5 else -.12
+        score += self._life_bias(actor, kind) - distance * .0015
+        return {'kind': kind, 'target_id': obj['id'], 'anchor': anchor,
+                'distance': distance, 'score': round(score, 5),
+                'terms': {'explicit_feasibility_check': verify_route}}
+
+    def intervention_options(self, aid):
+        actor = self.actors[aid]
+        pos = self.position_at(actor)
+        contacts = []
+        projected = {**actor, 'needs': self.needs_at(actor)}
+        at_work = actor.get('workplace_id') in {row['id'] for row in self.spatial.regions_at(pos)}
+        for other in self.actors.values():
+            if other['id'] == aid or other['owner'] != 'procedural':
+                continue
+            nearby = self.spatial.visible(pos, self.position_at(other), radius=4)
+            if not nearby and other['id'] not in actor.get('relations', {}):
+                continue
+            ongoing = other.get('action')
+            if (actor['cooldowns'].get('chat', 0) > self.now or ongoing and
+                    (ongoing['phase'] != 'using' or ongoing['kind'] not in ('wait', 'relax', 'stroll'))):
+                continue
+            other_view = {**other, 'needs': self.needs_at(other),
+                          'social_status': storyteller.social_status(other, self.actors)}
+            categories = [row['category'] for row in psychology.social_candidates(projected, other_view, self.now)
+                          if row['allowed'] and (nearby or row['category'] == 'phone_call')
+                          and (row['category'] != 'undermine' or at_work)]
+            if categories:
+                relation = actor.get('relations', {}).get(other['id'], {})
+                contacts.append({'id': other['id'], 'name': other['name'],
+                                 'nearby': nearby, 'relationship': relation.get('kind', 'acquaintance'),
+                                 'categories': categories})
+        contacts.sort(key=lambda row: (not row['nearby'], row['name']))
+        places = []
+        for obj in self._known_objects(actor):
+            if not obj.get('building_id') or obj.get('household_id') not in (None, actor['household_id']):
+                continue
+            for kind in ('community_meet', 'visit_pool', 'visit_bar', 'browse_mall',
+                         'visit_townhall', 'exercise_gym', 'dance_club', 'read',
+                         'garden', 'stroll'):
+                if self._explicit_place_candidate(actor, {'action': kind, 'target_id': obj['id']}, verify_route=False):
+                    places.append({'action': kind, 'target_id': obj['id'],
+                                   'object': obj['name'], 'building_id': obj['building_id'],
+                                   'label': self.rules.actions[kind]['label']})
+        return {'actor_id': aid, 'version': actor['version'], 'owner': actor['owner'],
+                'fault': self.fault,
+                'contacts': contacts, 'places': places}
+
+    def decide(self, aid, requested=None, *, provider_fallback=False):
         actor=self.actors[aid]
-        if actor["action"] or actor["owner"]!="procedural" and requested is None:
+        if actor["action"] or actor["owner"]!="procedural" and requested is None and not provider_fallback:
             return
         self._repair_routine(aid)
         self._check_fears(aid)
@@ -450,6 +785,11 @@ class World(StoryLife,LifeSystems):
         recommendation=actor.get('player_recommendation')
         if (requested is None and recommendation and recommendation['status']=='pending'
                 and self.now < recommendation['expires_at']):
+            if not any(self._matches_recommendation(c, recommendation) for c in candidates):
+                explicit = (self._explicit_social_candidate(actor, recommendation)
+                            or self._explicit_place_candidate(actor, recommendation))
+                if explicit:
+                    candidates.append(explicit)
             for candidate in candidates:
                 if self._matches_recommendation(candidate,recommendation):
                     candidate['score']=round(candidate['score']+.65,5)
@@ -475,19 +815,24 @@ class World(StoryLife,LifeSystems):
         if kind=="work":
             reason="Work hours are active and today's work goal is unfinished"
         if kind=="chat":
-            return self._start_chat(aid,chosen,candidates,rejected,draw,reason)
-        narration=f"{actor['name']} chose {definition['label'].lower()}. {reason}."
+            return self._start_chat(aid,chosen,candidates,rejected,draw,reason,provider_fallback)
+        activity_label=(leisure_drama.scene_for(definition['leisure_activity'],
+            self.rng(aid,actor['decision_id']+1,'leisure_scene'))
+            if kind.startswith('leisure_') else definition['label'])
+        narration=f"{actor['name']} chose {activity_label.lower()}. {reason}."
         with self.transaction("decision.utility.v1",[aid],narration,[reason]) as tx:
             actor=self.edit("actors",aid)
             self.materialize(actor)
             actor["decision_id"]+=1
             self._resolve_recommendation(actor,chosen,candidates)
-            actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":kind,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"stable named softmax draw" if draw is not None else "validated external intent"}
+            actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":kind,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"procedural fallback while model stays opted in" if provider_fallback else "stable named softmax draw" if draw is not None else "validated external intent"}
             actor["thought"]={"text":definition["thought"],"trigger":f"decision_{actor['decision_id']}","since":self.now}
             duration=definition["duration"]
             travel=len(path)-1
             event_id=f"action_{aid}_{actor['decision_id']}"
-            actor["action"]={"id":event_id,"kind":kind,"label":definition["label"],"target_id":chosen["target_id"],"phase":"travel" if travel else "using","started_at":self.now,"arrives_at":self.now+travel,"ends_at":self.now+travel+duration,"duration":duration,"path":path,"reason":reason,"definition_version":self.rules.version,"reservation_id":event_id if chosen["target_id"] else None,"partner_id":None}
+            actor["action"]={"id":event_id,"kind":kind,"label":activity_label,"target_id":chosen["target_id"],"phase":"travel" if travel else "using","started_at":self.now,"arrives_at":self.now+travel,"ends_at":self.now+travel+duration,"duration":duration,"path":path,"reason":reason,"definition_version":self.rules.version,"reservation_id":event_id if chosen["target_id"] else None,"partner_id":None}
+            self._say(actor,{'action_kind':'party' if kind.startswith('leisure_') and 'party' in kind else 'hobby' if kind.startswith('leisure_') else kind,
+                             'job':actor['profile']['job'],'affect':actor['emotion']['type']})
             self._start_routine(actor, chosen)
             if chosen["target_id"]:
                 obj=self.edit("objects",chosen["target_id"])
@@ -512,6 +857,17 @@ class World(StoryLife,LifeSystems):
         self.materialize(actor)
         actor["position"]=action["path"][-1]
         action["phase"]="using"
+        if action['kind']=='work':
+            coworkers=coworkers_at_work(actor,self.actors,self.objects)
+            plan=work_life.build_shift_plan(actor,coworkers,action['duration'],self.rng(actor['id'],actor['decision_id'],'shift_plan'))
+            action['work_plan']=plan['steps']
+            action['work_step_index']=0
+            if plan['steps']:
+                first=plan['steps'][0]
+                action['label']=first['task']
+                action['current_microtask']=first['task']
+                self.schedule(self.now+first['duration_seconds'],'work_step',actor['id'],action['id'])
+                self._say(actor,{'action_kind':'work','job':actor['profile']['job']})
         actor["need_rates"]={k:rate/3600-definition["relief"].get(k,0)/action["duration"] for k,rate in self.rules.rates.items()}
         if action['kind']=='eat_recipe':
             # Concrete meals satisfy hunger only when that exact item is consumed.
@@ -569,13 +925,17 @@ class World(StoryLife,LifeSystems):
             if due<actor["action"]["ends_at"]:
                 self.schedule(due,"urgent",actor["id"],actor["action"]["id"])
 
-    def _start_chat(self, aid, chosen, candidates, rejected, draw, reason):
+    def _start_chat(self, aid, chosen, candidates, rejected, draw, reason, provider_fallback=False):
         actor=self.actors[aid]
         other=self.actors[chosen["target_id"]]
         category=chosen.get("social_category", "small_talk")
-        social = next(s for s in psychology.social_candidates({**actor,"needs":self.needs_at(actor)},other,self.now) if s["category"]==category)
+        social = next(s for s in psychology.social_candidates({**actor,"needs":self.needs_at(actor)},
+                       {**other,'social_status':storyteller.social_status(other,self.actors),
+                        'needs':self.needs_at(other)},self.now) if s["category"]==category)
         if not social["allowed"]:
             raise RejectedProposal(social["reason"])
+        if category=='undermine' and actor.get('workplace_id') not in {r['id'] for r in self.spatial.regions_at(self.position_at(actor))}:
+            raise RejectedProposal('Workplace rivalry requires both residents to meet at work')
         label=psychology.SOCIAL_CATEGORIES[category].get("label",category.replace("_"," "))
         topic=chosen.get('topic') or social.get('topic')
         topic_phrase=f" about {topic}" if topic else ''
@@ -593,7 +953,7 @@ class World(StoryLife,LifeSystems):
                 actor.update(psychology.update_fears(actor,"social_rejected",self.now,f"beat_{self.store.sequence+1:08}"))
                 self._appraise(actor,"Recipient declined")
                 self._appraise(other,"Expressed a social boundary")
-                actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":"chat","social_category":category,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"recipient declined; no shared action executed"}
+                actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":"chat","social_category":category,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"recipient declined; procedural provider fallback" if provider_fallback else "recipient declined; no shared action executed"}
                 self._perceive(actor,f"{other['name']} declined a conversation.",other["id"],"hearing")
                 self.schedule(self.now+1,"decision",aid,actor["decision_id"])
             self.metrics["declined_chats"]+=1
@@ -613,9 +973,10 @@ class World(StoryLife,LifeSystems):
                                   "label":f"{label}{topic_phrase} · {partner['name'].split()[0]}","target_id":partner["id"],"phase":"using","started_at":self.now,"arrives_at":self.now,"ends_at":self.now+duration,"duration":duration,"path":[list(person["position"])],"reason":"Both participants accepted this interaction","definition_version":self.rules.version,"reservation_id":None,"partner_id":partner["id"]}
                 person["thought"]={"text":f"I would like to spend a moment with {partner['name'].split()[0]}{topic_phrase}.","trigger":"accepted conversation","since":self.now}
                 self._begin_use(person)
+                self._say(person,{'social_category':category,'action_kind':'date' if category=='ask_date' else 'hobby'})
                 self._perceive(person,f"{partner['name']} agreed to spend time talking with me.",partner["id"],"hearing")
                 self._schedule_urgent(person)
-            actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":"chat","social_category":category,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"utility choice plus recipient consent"}
+            actor["last_decision"]={"at":self.now,"id":actor["decision_id"],"chosen":"chat","social_category":category,"candidates":candidates,"rejected":rejected,"random_draw":draw,"policy":"procedural provider fallback plus recipient consent" if provider_fallback else "utility choice plus recipient consent"}
         self.metrics["decisions"]+=1
 
     def _perceive(self, actor, content, source, modality):
@@ -669,7 +1030,66 @@ class World(StoryLife,LifeSystems):
             actor["emotion"].update(valence=-.35,arousal=.75 if label=="Afraid" else .5,intensity=.6,
                 expires_at=fear["expires_at"] if fear and fear["expires_at"]>self.now else social.get("expires_at") if social else None)
         actor["goals"][0]["progress"]=round(1-mean,3)
-        actor["goals"][1]["progress"]=min(1,actor["schedule"]["work_seconds"]/actor["schedule"]["work_target_seconds"])
+        actor["goals"][1]["progress"]=min(1,actor["schedule"]["work_seconds"]/max(1,actor["schedule"]["work_target_seconds"]))
+
+    def _say(self, actor, context):
+        actor['speech']={'text':self.speech.choose(context,self.rng(actor['id'],actor['decision_id'],
+            'speech:'+str(self.now)+':'+str(context))), 'since':self.now,'expires_at':self.now+480}
+
+    def _work_step(self, aid):
+        actor=self.actors[aid]
+        action=actor['action']
+        if not action or action['kind']!='work':return
+        index=action.get('work_step_index',0)
+        plan=action.get('work_plan',[])
+        if index>=len(plan):return
+        step=plan[index]
+        outcome=work_life.resolve_work_step(actor,step,self.rng(aid,actor['decision_id'],'work_step:'+str(index)))
+        check=percentile.resolve(actor,step['task'],
+            self.rng(aid,actor['decision_id'],'percentile_work:'+str(index)),
+            context={'at':self.now,'environment':8 if outcome['mishap'] else 0})
+        coworker=outcome.get('colleague_id')
+        if coworker and (coworker not in self.actors or not self.actors[coworker].get('action')
+                or self.actors[coworker]['action'].get('kind')!='work'
+                or self.actors[coworker]['action'].get('phase')!='using'
+                or self.actors[coworker].get('workplace_id')!=actor.get('workplace_id')):
+            coworker=None
+            outcome['interaction']=None
+        participant_ids=[aid]+([coworker] if coworker in self.actors else [])
+        narrative=f"{actor['name']} completed {step['task'].lower()}."
+        if outcome['interaction'] and coworker in self.actors:
+            narrative+=f" {actor['name']} and {self.actors[coworker]['name']} {outcome['interaction'].replace('_',' ')} at work."
+        if outcome['mishap']:narrative+=f" A {outcome['mishap'].replace('_',' ')} changed the result."
+        narrative+=f" W100 {check['roll']}/{check['threshold']}: {check['grade']}."
+        with self.transaction('work.microtask.v1',participant_ids,narrative,['seeded profession-specific outcome']):
+            actor=self.edit('actors',aid)
+            self.materialize(actor)
+            action=actor['action']
+            career=actor['career']
+            career['performance']=clamp(career.get('performance',.5)+outcome['performance_delta'])
+            career['performance']=clamp(career['performance']+
+                {'excellent':.016,'success':.006,'mixed':-.006,'setback':-.019}[check['grade']])
+            actor['aptitudes']['last_check']=check
+            if check['grade'] in {'excellent','success'}:
+                skill=check['skill']
+                actor['skills'][skill]=round(min(1,actor['skills'].get(skill,.15)+.0007),4)
+            actor['needs']['fun']=clamp(actor['needs']['fun']-outcome['fun_delta'])
+            actor['action']['work_step_index']=index+1
+            if index+1<len(plan):
+                following=plan[index+1]
+                action['label']=following['task']
+                action['current_microtask']=following['task']
+                self.schedule(self.now+following['duration_seconds'],'work_step',aid,action['id'])
+            self._say(actor,{'event':'failure' if outcome['mishap'] else '', 'action_kind':'work_microtask','job':actor['profile']['job']})
+            if coworker in self.actors and outcome['interaction']:
+                colleague=self.edit('actors',coworker)
+                self._social_complete(actor,colleague,
+                    'coordinate_work' if outcome['interaction']!='small_talk' else 'small_talk',
+                    'negative' if outcome['interaction']=='disagree' else 'positive')
+                colleague['speech']={'text':self.speech.choose({'relationship':'coworker'},self.rng(coworker,colleague['decision_id'],'coworker:'+str(self.now))),
+                    'since':self.now,'expires_at':self.now+360}
+                self._perceive(colleague,f"{actor['name']} {outcome['interaction'].replace('_',' ')} with me at work.",aid,'workplace')
+            self._appraise(actor,{'kind':'work_progress','text':narrative})
 
     def complete(self, aid):
         actor=self.actors[aid]
@@ -678,6 +1098,31 @@ class World(StoryLife,LifeSystems):
         partner=action.get("partner_id")
         if partner:
             participants.append(partner)
+        shared=[]
+        social_sites={'community_meet','visit_bar','visit_pool','dance_club','exercise_gym','visit_clinic',
+                      'school_day','kindergarten_day','attend_lecture','attend_seminar',
+                      'run_lab','study_library','campus_lunch','dorm_party'}
+        if action['kind'] in social_sites or action['kind'].startswith('leisure_'):
+            here=self.objects.get(action.get('target_id'),{}).get('building_id')
+            if here:
+                available=[other for other in self.actors.values() if other['id']!=aid
+                    and other.get('action') and other['action'].get('phase')=='using'
+                    and (other['action']['kind'] in social_sites or other['action']['kind'].startswith('leisure_'))
+                    and self.objects.get(other['action'].get('target_id'),{}).get('building_id')==here
+                    and self.spatial.visible(self.position_at(actor),self.position_at(other),radius=5)
+                    and actor['cooldowns'].get('shared:'+other['id'],0)<=self.now]
+                if available:
+                    scene_rng=self.rng(aid,actor['decision_id'],'shared_activity:'+action['id'])
+                    scene_rng.shuffle(available)
+                    for other in available:
+                        relation=actor.get('relations',{}).get(other['id'],{})
+                        interest=max(.04,min(.88,.18+.32*other.get('psychology',{}).get('big_five',{}).get('extraversion',.5)
+                            +.16*other.get('needs',{}).get('social',.3)+.16*relation.get('closeness',.2)
+                            -.22*relation.get('tension',0)))
+                        if scene_rng.random()<interest:
+                            shared.append(other['id'])
+                            participants.append(other['id'])
+                        if len(shared)>=3:break
         definition=self.rules.actions[action["kind"]]
         if action['kind'] in possessions.POSSESSION_ACTIONS and not self._step_available(actor,self.objects[action['target_id']],action['kind'],completion=True):
             self.interrupt(aid,'Concrete item precondition changed before completion')
@@ -690,13 +1135,15 @@ class World(StoryLife,LifeSystems):
             except StepUnavailable as exc:
                 self.interrupt(aid,f"Household precondition changed: {exc}")
                 return
-        finished_label=psychology.SOCIAL_CATEGORIES[action.get("social_category","small_talk")]["label"] if partner else definition['label']
+        finished_label=psychology.SOCIAL_CATEGORIES[action.get("social_category","small_talk")]["label"] if partner else action.get('label',definition['label'])
         with self.transaction("action.complete.v1",participants,f"{actor['name']} finished {finished_label.lower()}.",[action["reason"]]) as tx:
             person=self.edit("actors",aid)
             self.materialize(person)
             self._daily_complete(person, action)
             if action['kind']=='eat_recipe':
                 for key,amount in definition['relief'].items():person['needs'][key]=clamp(person['needs'][key]-amount)
+                if person.get('last_meal',{}).get('at')==self.now:
+                    tx['text']+=f" On the plate: {person['last_meal']['label']}."
             if action["kind"]=="work":
                 shift=careers.complete_shift(person,action['duration'],self.now,
                     f"beat_{self.store.sequence+1:08}",definition['income'])
@@ -704,6 +1151,121 @@ class World(StoryLife,LifeSystems):
                 person["money"]+=shift['income']
                 self.edit("world","economy")["earned"]+=shift['income']
                 person["schedule"]["work_seconds"]+=action["duration"]
+                security=work_life.evaluate_job_security(person,person['career']['performance'],
+                    self.rng(aid,person['decision_id'],'job_security'))
+                if security['event']=='fired':
+                    person['profile']['job']='Unemployed'
+                    person['career']['job']='Unemployed'
+                    person['workplace']=None
+                    person['workplace_id']=None
+                    person['schedule']['work_target_seconds']=0
+                    person['goals'][1].update(title='Find a new job',progress=0)
+                    self._say(person,{'event':'fired'})
+                    tx['text']+=f" {person['name']} was dismissed and can now seek a new job."
+                elif security['event']=='job_warning':
+                    person['thought']={'text':'My work is under review; I should pay attention.',
+                        'trigger':'job_warning','since':self.now}
+                    tx['text']+=f" {person['name']} received a work warning."
+            if action['kind']=='job_search':
+                openings=work_life.search_jobs(person,seed=self.rng(aid,person['decision_id'],'job_search'),limit=5)
+                if openings:
+                    search_rng=self.rng(aid,person['decision_id'],'job_opening')
+                    choice=search_rng.choices(openings,weights=[row['success_probability'] for row in openings],k=1)[0]
+                    proposal=work_life.evaluate_hire(person,choice['job'],
+                        self.rng(aid,person['decision_id'],'hiring'))
+                    if proposal['event']=='hired':
+                        person['profile']['job']=proposal['job']
+                        person['career']=careers.initial(person,self.now)
+                        person['workplace']=assigned_service_job(person,self.objects) or assigned_workplace(person,self.objects)
+                        person['workplace_id']=person['workplace']['workplace_id'] if person['workplace'] else None
+                        person['schedule'].update(start=person['career']['schedule_start'],
+                            end=person['career']['schedule_start']+8*3600,work_target_seconds=4*3600)
+                        person['goals'][1].update(title="Finish today's work",progress=0)
+                        self._say(person,{'event':'hired'})
+                        tx['text']+=f" {person['name']} was hired as {proposal['job']}."
+                    else:
+                        self._say(person,{'event':'failure'})
+                        tx['text']+=f" {person['name']}'s application was declined."
+                person['cooldowns']['job_search']=self.now+3600
+            if action['kind'] in {'school_day','kindergarten_day'}:
+                person['schedule']['work_seconds']+=action['duration']
+                tx['text']+=f" {person['name']} attended their scheduled learning day."
+            if action['kind'] in {'attend_lecture','attend_seminar','run_lab','study_library'}:
+                check=percentile.resolve(person,action['kind'],
+                    self.rng(aid,person['decision_id'],'percentile_campus:'+action['id']),
+                    skill='analysis' if action['kind']=='run_lab' else 'teaching' if action['kind']=='attend_seminar' else 'reading',
+                    context={'at':self.now,'environment':7 if action['kind']=='run_lab' else 0})
+                person['aptitudes']['last_check']=check
+                person.setdefault('education',{'university_student':False,'progress_hours':0.0})
+                person['education']['progress_hours']=round(person['education']['progress_hours']+
+                    action['duration']/3600*(1.2 if check['grade']=='excellent' else .4 if check['grade']=='setback' else 1),3)
+                if person['profile']['job']=='Student':
+                    person['schedule']['work_seconds']+=action['duration']
+                tx['text']+=f" Campus learning: W100 {check['roll']}/{check['threshold']} ({check['grade']})."
+            if action['kind'].startswith('leisure_'):
+                activity=definition['leisure_activity']
+                event=leisure_drama.resolve_social_event(person,None,activity,{},
+                    self.rng(aid,person['decision_id'],'leisure_event'))
+                person['last_leisure_event']={'at':self.now,'activity':activity,
+                                              'scene':action.get('label', definition['label']),
+                                              'kind':event['kind']}
+                if event['kind'] not in {'quiet','good_time'}:
+                    self._say(person,{'event':'fight' if event['kind']=='fight' else 'failure' if event['kind'] in {'minor_mishap','awkward_moment'} else 'party_started' if 'party' in activity else '',
+                                      'action_kind':'party' if 'party' in activity else 'hobby'})
+                    self._perceive(person,f"During {activity.replace('_',' ')}: {event['kind'].replace('_',' ')}.",aid,'participation')
+                    tx['text']+=f" A {event['kind'].replace('_',' ')} followed."
+            if shared:
+                context_kind='seminar debate' if action['kind']=='attend_seminar' else (
+                    'party banter' if action['kind']=='dorm_party' else 'shared conversation')
+                scene_members=[aid]+shared
+                person['last_group_scene']={'at':self.now,'kind':context_kind,
+                                            'participant_ids':scene_members}
+                for other_id in shared:
+                    companion=self.edit('actors',other_id)
+                    category='play_together' if person['age']<18 or companion['age']<18 else (
+                        'share_interest' if action['kind'] in {'attend_seminar','run_lab'} else 'tell_joke')
+                    check=percentile.resolve(person,category,
+                        self.rng(aid,person['decision_id'],'group_check:'+action['id']+':'+other_id),
+                        social=True,target=companion,
+                        context={'at':self.now,'actor_id':aid,'environment':4 if action['kind']=='dorm_party' else 0})
+                    outcome='negative' if check['grade']=='setback' else 'neutral' if check['grade']=='mixed' else 'positive'
+                    self._social_complete(person,companion,category,outcome)
+                    person['cooldowns']['shared:'+other_id]=self.now+1800
+                    companion['cooldowns']['shared:'+aid]=self.now+1800
+                    companion['last_group_scene']={'at':self.now,'kind':context_kind,
+                                                   'participant_ids':scene_members,'outcome':outcome}
+                    if check['grade']=='setback':
+                        self._appraise(companion,{'kind':'story_argument',
+                            'text':f"A joke or disagreement with {person['name']} landed badly.",
+                            'subject_id':aid})
+                    self._say(companion,{'social_category':'joke' if outcome!='negative' else 'set_boundary'})
+                    tx['text']+=f" {companion['name']} joined {context_kind} ({outcome}; W100 {check['roll']}/{check['threshold']})."
+                cross=storyteller.group_dynamic(person,[self.actors[oid] for oid in shared],
+                    self.rng(aid,person['decision_id'],'group_dynamic:'+action['id']))
+                if cross:
+                    first=self.edit('actors',cross['first_id'])
+                    second=self.edit('actors',cross['second_id'])
+                    self._social_complete(first,second,cross['category'],cross['outcome'])
+                    for member in (first,second):
+                        member['last_group_scene']['cross_turn']=cross['kind']
+                        self._perceive(member,cross['text'],aid,'participation')
+                    if cross['kind']=='mediated_disagreement':
+                        storyteller.adapt_style(person,'unexpected_support')
+                    tx['text']+=' '+cross['text']
+                self._say(person,{'social_category':'joke'})
+            incident=storyteller.incident_for(person,action,
+                self.rng(aid,person['decision_id'],'storyteller:'+action['id'])) if not partner else None
+            if incident:
+                evidence=f"beat_{self.store.sequence+1:08}"
+                transfer=storyteller.apply_incident(person,incident,self.now,evidence,action['kind'])
+                economy=self.edit('world','economy')
+                economy['earned' if transfer>=0 else 'spent']+=abs(transfer)
+                storyteller.adapt_style(person,incident['id'])
+                person['social_status']=storyteller.social_status(person,self.actors)
+                tx['rule']='storyteller.activity.v1'
+                tx['text']+=f" {incident['text']}"
+                tx['reasons'].append('Incident resolved only after '+action['kind']+' completed')
+                self._perceive(person,incident['text'],action['target_id'] or aid,'participation')
             pref=definition["preference"]
             if pref in person["skills"]:
                 person["skills"][pref]=min(1,person["skills"][pref]+.003)
@@ -716,9 +1278,79 @@ class World(StoryLife,LifeSystems):
                 category=action.get("social_category","small_talk")
                 if not action.get("social_effects_applied"):
                     other=self.edit("actors",partner)
+                    social_turn=storyteller.social_turn(person,other,category,
+                        self.rng(aid,person['decision_id'],'storyteller_social:'+action['id']))
+                    check=percentile.resolve(person,category,
+                        self.rng(aid,person['decision_id'],'percentile_social:'+action['id']),
+                        social=True,target=other,context={'at':self.now,'actor_id':aid})
+                    person['aptitudes']['last_check']=check
+                    tx['text']+=f" W100 {check['roll']}/{check['threshold']}: {check['grade']}."
                     # A resolved bilateral encounter changes both directions once.
-                    outcome="negative" if psychology.SOCIAL_CATEGORIES[category]["tone"]=="conflict" else "positive"
+                    outcome="negative" if psychology.SOCIAL_CATEGORIES[category]["tone"]=="conflict" or social_turn and social_turn['kind']=='argument' else "positive"
+                    if check['grade']=='setback' and category in {'tell_joke','compliment','flirt','gossip','undermine','challenge'}:
+                        outcome='negative'
+                    elif check['grade']=='mixed' and outcome=='positive':
+                        outcome='neutral'
                     self._social_complete(person,other,category,outcome)
+                    if social_turn:
+                        kind=social_turn['kind']
+                        if kind=='rumor':
+                            subject=social_turn['subject_id']
+                            storyteller.remember_rumor(other,subject,aid,self.now,f"beat_{self.store.sequence+1:08}")
+                            social_turn['text']=social_turn['text'].replace(subject,self.actors[subject]['name'])
+                        elif kind in {'argument','sabotage','sabotage_backfire','friendly_rivalry'}:
+                            for participant,rival_id in ((person,partner),(other,aid)):
+                                edge=participant['relations'][rival_id]
+                                edge['rivalry']=clamp(edge.get('rivalry',0)+(.04 if kind=='friendly_rivalry' else .12))
+                                if kind!='friendly_rivalry':
+                                    edge['tension']=clamp(edge.get('tension',0)+(.10 if kind=='argument' else .13))
+                                    edge['trust']=clamp(edge.get('trust',.35)-(.035 if kind=='sabotage' else .08))
+                            if kind=='sabotage':
+                                other['career']['performance']=clamp(other['career'].get('performance',.5)-.04)
+                            if kind=='sabotage_backfire':
+                                person['career']['performance']=clamp(person['career'].get('performance',.5)-.025)
+                        storyteller.adapt_style(person,kind)
+                        storyteller.adapt_style(other,kind)
+                        person['last_social_incident']={'kind':kind,'with':partner,'at':self.now}
+                        other['last_social_incident']={'kind':kind,'with':aid,'at':self.now}
+                        tx['text']+=' '+social_turn['text']
+                        tx['reasons'].append('Both participants completed '+category+' before social consequence')
+                        self._perceive(person,social_turn['text'],partner,'participation')
+                        self._perceive(other,social_turn['text'],aid,'participation')
+                        if kind in {'argument','sabotage_backfire','sabotage'}:
+                            for participant in (person,other):
+                                self._appraise(participant,{'kind':'story_argument' if kind=='argument' else 'story_sabotage_backfire',
+                                    'text':social_turn['text'],'subject_id':partner if participant is person else aid})
+                    person['social_status']=storyteller.social_status(person,self.actors)
+                    other['social_status']=storyteller.social_status(other,self.actors)
+                    relation=person.get('social_graph',{}).get(partner) or person.get('relations',{}).get(partner,{})
+                    romantic=(category=='express_affection' and person['age']>=18 and other['age']>=18
+                        and person.get('family',{}).get('partner_id')==partner
+                        and other.get('family',{}).get('partner_id')==aid
+                        and relation.get('layers',{}).get('family',{}).get('status') in (None,'none','unknown'))
+                    context={'tension':relation.get('tension',0),'closeness':relation.get('closeness',0),
+                        'both_adults':person['age']>=18 and other['age']>=18,
+                        'non_kin':romantic,'mutual_consent':romantic,'romantic':romantic,
+                        'committed':romantic,'trying_for_child':False,
+                        'private_at_home':romantic and person['home_id']==other['home_id']
+                            and any('bedroom' in region['name'].lower()
+                                for region in self.spatial.regions_at(person['position']))}
+                    drama=leisure_drama.resolve_social_event(person,other,
+                        'date' if romantic else 'work_chat' if category=='coordinate_work' else 'make_friends',
+                        context,self.rng(aid,person['decision_id'],'social_event'))
+                    if drama['kind'] not in {'quiet','good_time'}:
+                        for participant,other_id in ((person,partner),(other,aid)):
+                            graph=participant.get('social_graph',{})
+                            edge=graph.get(other_id) or participant.get('relations',{}).get(other_id)
+                            if edge:
+                                effects=drama['effects']
+                                edge['closeness']=clamp(edge.get('closeness',.5)+sum(effects.get('relationship',(0,0)))/200)
+                                edge['tension']=clamp(edge.get('tension',0)+sum(effects.get('tension',(0,0)))/200)
+                                edge['attraction']=clamp(edge.get('attraction',0)+sum(effects.get('romance',(0,0)))/200)
+                            participant['last_social_event']={'at':self.now,'with':other_id,'kind':drama['kind']}
+                            self._say(participant,{'event':'fight' if drama['kind']=='fight' else '',
+                                'action_kind':'kiss' if drama['kind']=='kiss' else 'argument' if drama['kind'] in {'argument','shouting_match','fight'} else 'date' if romantic else 'hobby'})
+                        tx['text']+=f" {person['name']} and {other['name']} had a {drama['kind'].replace('_',' ')}."
                     if other["action"] and other["action"]["id"]==action["id"]:
                         other["action"]["social_effects_applied"]=True
                 topic=f" about {action['topic']}" if action.get('topic') else ''
@@ -726,11 +1358,16 @@ class World(StoryLife,LifeSystems):
             else:
                 self._perceive(person,f"I finished {definition['label'].lower()}.",action["target_id"] or aid,"participation")
             self._release(person)
+            person['social_status']=storyteller.social_status(person,self.actors)
             person["cooldowns"][action["kind"]]=self.now+(600 if action["kind"]=="chat" else 30)
             if action['kind'] in SERVICE_ACTIONS:person['cooldowns'][action['kind']]=self.now+(86400 if action['kind'].startswith('visit_') else 7200)
             relief={k:round(value-person['needs'][k],4) for k,value in action.get('needs_when_started',{}).items()
                     if value-person['needs'][k]>.05 and definition['relief'].get(k,0)>0}
             self._appraise(person,{'kind':'activity_completed','category':action['kind'],'text':f"Completed {action['kind']}"})
+            if incident:
+                adverse=incident['money']<0 or sum(incident['needs'].values())>0
+                self._appraise(person,{'kind':'story_bad' if adverse else 'story_good',
+                    'text':incident['text'],'category':incident['id']})
             if relief:
                 self._appraise(person,{'kind':'need_relief','category':max(relief,key=relief.get),'relief':relief,
                     'text':'Actual need relief: '+', '.join(f'{k} {v:.0%}' for k,v in relief.items())})
@@ -808,6 +1445,8 @@ class World(StoryLife,LifeSystems):
                     self._schedule_urgent(actor)
             elif kind=="complete":
                 self.complete(aid)
+            elif kind=='work_step':
+                self._work_step(aid)
             elif kind=="urgent":
                 needs=self.needs_at(actor)
                 affected=self.rules.actions[action["kind"]]["relief"]
@@ -835,6 +1474,7 @@ class World(StoryLife,LifeSystems):
     def inspect(self, aid):
         actor=deepcopy(self.actors[aid])
         actor["needs"]=self.needs_at(self.actors[aid])
+        actor['social_status']=storyteller.social_status(self.actors[aid],self.actors)
         actor["position"]=list(self.position_at(self.actors[aid]))
         actor["locations"]=self.spatial.regions_at(actor["position"])
         actor["coverage"]=self.rules.data["coverage"]
@@ -859,7 +1499,7 @@ class World(StoryLife,LifeSystems):
             needs=self.needs_at(a)
             action=a["action"]
             carried={k:v for k,v in a["inventory"].items() if k in {"ingredients","prepared_meal","dirty_dish","food_scraps","groceries"}}
-            people.append({"id":a["id"],"name":a["name"],"household_id":a["household_id"],"home_id":a["home_id"],"position":self.position_at(a),"appearance":a["appearance"],"emotion":a["emotion"]["type"],"wellbeing":round(1-sum(needs.values())/len(needs),3),"action":deepcopy(action),"carried":carried,"version":a["version"],**self._story_projection(a)})
+            people.append({"id":a["id"],"name":a["name"],"household_id":a["household_id"],"home_id":a["home_id"],"position":self.position_at(a),"appearance":a["appearance"],"emotion":a["emotion"]["type"],"wellbeing":round(1-sum(needs.values())/len(needs),3),"action":deepcopy(action),"speech":a.get('speech') if a.get('speech',{}).get('expires_at',0)>self.now else None,"carried":carried,"version":a["version"],**self._story_projection(a)})
         counts={}
         for a in people:
             kind=a["action"]["kind"] if a["action"] else "idle"
@@ -906,6 +1546,25 @@ class World(StoryLife,LifeSystems):
             if owner=="procedural" and not actor["action"]:
                 self.schedule(self.now+1,"decision",aid,actor["decision_id"])
         return self.perspective(aid)
+
+    def set_decision_provider(self, aid, model, expected_version):
+        actor=self.actors[aid]
+        if actor['version']!=expected_version:
+            raise RejectedProposal('Stale actor component version')
+        if model is None and not actor.get('decision_provider'):
+            raise RejectedProposal('This resident has no active decision provider')
+        with self.transaction('authority.provider.v1',[aid],
+                f"{actor['name']} {'chose '+model+' for future decisions' if model else 'returned to procedural decisions'}.",
+                ['Player opt-in; existing action and reservations preserved']):
+            actor=self.edit('actors',aid)
+            actor['owner_epoch']+=1
+            actor['owner']='external' if model else 'procedural'
+            actor['decision_provider']={'model':model,'enabled_at':self.now,'status':'ready','failures':0} if model else None
+            actor['decision_provider_error']=None
+            if model is None and not actor['action']:
+                self.schedule(self.now+1,'decision',aid,actor['decision_id'])
+        return {'actor_id':aid,'model':model,'enabled':bool(model),
+                'owner_epoch':actor['owner_epoch'],'version':actor['version']}
 
     def invariants(self):
         errors=self._story_invariants()
@@ -971,4 +1630,6 @@ class World(StoryLife,LifeSystems):
 
     def close(self):
         try:self.save()
-        finally:self.store.close()
+        finally:
+            self.store.close()
+            self.speech.close()

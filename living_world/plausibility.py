@@ -9,13 +9,24 @@ from collections import Counter, deque
 
 def _reachable_in_building(spatial, building):
     bx, by, width, height = (building[k] for k in ('x', 'y', 'w', 'h'))
+    residence=building['id']=='student_dorm'
+    allowed=[(bx,by,width,height)]
+    if residence:
+        allowed.extend((b['x'],b['y'],b['w'],b['h']) for b in spatial.buildings
+                       if b.get('parent_building')=='student_dorm')
+    portals=spatial.planning_metadata.get('portals',[]) if residence else []
     start = tuple(building['door'])
     seen, queue = {start}, deque([start])
     while queue:
         x, y = queue.popleft()
-        for point in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+        adjacent=[(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
+        for portal in portals:
+            if tuple(portal['from'])==(x,y):adjacent.append(tuple(portal['to']))
+            if tuple(portal['to'])==(x,y):adjacent.append(tuple(portal['from']))
+        for point in adjacent:
             px, py = point
-            if (bx <= px < bx + width and by <= py < by + height
+            if (any(ax <= px < ax + aw and ay <= py < ay + ah
+                    for ax,ay,aw,ah in allowed)
                     and point not in seen and spatial.walkable(point)):
                 seen.add(point)
                 queue.append(point)
@@ -46,7 +57,9 @@ def audit(world):
             finding('insufficient_sleep_capacity', 'home', home['building_id'],
                     f'{len(members)} residents; {sum(o["capacity"] for o in bedrooms)} bed places',
                     'home occupancy and bedroom generator', 'error')
-        if not tables or max(o['capacity'] for o in tables) < len(members):
+        dining_capacity=(sum(o['capacity'] for o in tables) if home['id']=='student_residence'
+                         else max((o['capacity'] for o in tables),default=0))
+        if dining_capacity < len(members):
             finding('insufficient_dining_capacity', 'home', home['building_id'],
                     f'{len(members)} residents; no suitably sized dining table',
                     'dining room generator', 'error')
@@ -60,7 +73,8 @@ def audit(world):
 
     for actor in world.actors.values():
         workplace = actor.get('workplace')
-        if not workplace or workplace.get('target_id') not in world.objects:
+        if actor['profile']['job'] not in {'Pupil','Kindergarten child','Retired','Unemployed','Student'} and (
+                not workplace or workplace.get('target_id') not in world.objects):
             finding('missing_workplace', 'person', actor['id'],
                     f'{actor["profile"]["job"]} has no physical station',
                     'occupation-to-building assignment', 'error')

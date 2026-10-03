@@ -62,6 +62,13 @@ JOB_STATIONS = {
     "Mechanic": ("carpenter_station", "workshop"),
     "Programmer": ("office_station", "office_hub"),
     "Civic planner": ("townhall_desk", "town_hall"),
+    "Kindergarten educator": ("kindergarten_desk", "kindergarten"),
+    "Lifeguard": ("lifeguard_station", "pool"),
+    "Bartender": ("bar_counter", "bar"),
+    "Club DJ": ("dj_booth", "nightclub"),
+    "Professor": ("lectern", "university"),
+    "Researcher": ("biology_bench", "university"),
+    "University administrator": ("university_desk", "university"),
 }
 
 
@@ -70,6 +77,12 @@ def _records(objects):
 
 
 def _home_object(actor, objects, kind):
+    if actor.get('household_id')=='student_residence' and kind in {'bed','wardrobe','table'}:
+        choices=[obj for obj in _records(objects) if obj['kind']==kind
+                 and obj.get('household_id')=='student_residence']
+        slot=max(0,int(actor['id'].rsplit('_',1)[-1])-45)
+        index=min(slot,len(choices)-1) if kind!='table' else min(int(slot>=6),len(choices)-1)
+        return choices[index] if choices else None
     return next((obj for obj in _records(objects)
                  if obj["kind"] == kind and obj.get("household_id") == actor["household_id"]), None)
 

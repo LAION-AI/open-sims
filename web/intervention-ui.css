@@ -1,0 +1,24 @@
+#intervention-dialog{border:0;border-radius:18px;padding:0;max-width:min(850px,94vw);width:850px;max-height:88vh;background:#f8f5ec;color:#303a33;box-shadow:0 24px 80px #172a2590}
+#intervention-dialog::backdrop{background:#152521a9}
+.intervention-shell{padding:24px;max-height:88vh;overflow:auto}
+.intervention-shell header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+.intervention-shell h2{margin:4px 0 7px;font-size:25px}
+.intervention-shell header p{max-width:660px;line-height:1.45;margin:0 0 16px;color:#677167}
+.intervention-shell header button{border:0;background:#e7e9dc;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:23px}
+.intervention-shell nav{display:flex;gap:8px;border-bottom:1px solid #d6dbcc;padding-bottom:12px}
+.intervention-shell nav button,.intervention-options button,.intervention-places button{border:1px solid #ccd6c6;background:#fff;border-radius:10px;padding:10px 13px;color:#34483f;cursor:pointer;text-align:left}
+.intervention-shell nav button.active,.intervention-contact-list button.active{background:#dbeacb;border-color:#91ae82}
+.intervention-search{display:block;font-size:12px;color:#5c6a60;margin:14px 0 10px}
+.intervention-search input{display:block;width:100%;font:inherit;font-size:15px;padding:9px 11px;margin-top:5px;border-radius:9px;border:1px solid #c8d2c3;background:#fff;color:#24372d}
+.intervention-columns{display:grid;grid-template-columns:minmax(210px,32%) 1fr;gap:18px}
+.intervention-contact-list{max-height:400px;overflow:auto;display:grid;align-content:start;gap:5px}
+.intervention-contact-list button{border:1px solid transparent;background:#f0f1e9;border-radius:9px;text-align:left;padding:10px;cursor:pointer;color:#34483f}
+.intervention-contact-list small,.intervention-places small{display:block;color:#6c776c;margin-top:4px}
+.intervention-choice{min-height:250px;padding:4px 0}
+.intervention-choice h3{margin:0 0 6px}.intervention-choice p{color:#657267;margin:0 0 13px}
+.intervention-options,.intervention-places{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+.intervention-options button:hover,.intervention-places button:hover{background:#e7f2dc;border-color:#8cae7e}
+.intervention-options button:disabled,.intervention-places button:disabled{opacity:.45;cursor:not-allowed}
+.intervention-places{max-height:430px;overflow:auto}
+#intervention-status{color:#944a36;min-height:1.3em}
+@media(max-width:640px){.intervention-columns{grid-template-columns:1fr}.intervention-contact-list{max-height:160px}.intervention-options,.intervention-places{grid-template-columns:1fr}}

@@ -13,14 +13,18 @@ class ExpandedLifeTests(unittest.TestCase):
         for seed in (0, 1, 7, 73):
             map_ = LivingNeighborhood(seed)
             kinds = Counter(obj['kind'] for obj in map_.objects.values())
-            self.assertEqual(kinds['wardrobe'], 20)
+            self.assertEqual(kinds['wardrobe'], 30)
+            self.assertEqual(sum(o['kind']=='wardrobe' and str(o.get('household_id','')).startswith('household_')
+                                 for o in map_.objects.values()),20)
             self.assertEqual(kinds['dining_chair'], 60)
             self.assertGreaterEqual(len(map_.objects), 500)
             for home in map_.households:
                 building = next(b for b in map_.buildings if b['id'] == home['building_id'])
-                wardrobe = map_.objects[building['wardrobe_id']]
-                self.assertEqual(wardrobe['household_id'], home['id'])
-                self.assertIsNotNone(map_.path(building['door'], wardrobe['anchors'][0]))
+                wardrobes = [o for o in map_.objects.values() if o['kind'] == 'wardrobe'
+                             and o.get('household_id') == home['id']]
+                self.assertTrue(wardrobes)
+                self.assertTrue(all(map_.path(building['door'], wardrobe['anchors'][0])
+                                    for wardrobe in wardrobes))
 
     def test_new_world_careers_possessions_audit_and_old_hashes(self):
         world = World(seed=73, layout='neighborhood-v1')
@@ -32,13 +36,14 @@ class ExpandedLifeTests(unittest.TestCase):
             path_queries = world.spatial.path_queries
             report = audit(world)
             self.assertEqual(world.spatial.path_queries, path_queries)
-            self.assertEqual(report['objects'], 522)
-            self.assertEqual({row['code'] for row in report['findings']}, {'school_population_not_modelled'})
+            self.assertEqual(report['objects'], 667)
+            self.assertEqual({row['code'] for row in report['findings']}, set())
             for actor in world.actors.values():
                 self.assertEqual(actor['career']['job'], actor['profile']['job'])
-                self.assertTrue(any(a['kind'] == 'career' for a in actor['psychology']['ambitions']))
-                wardrobe = next(o for o in world.objects.values() if o.get('household_id') == actor['household_id'] and o['kind'] == 'wardrobe')
-                self.assertTrue(any(item['location'].get('id') == wardrobe['id'] for item in actor['belongings']))
+                if 18 <= actor['age'] < 66:
+                    self.assertTrue(any(a['kind'] == 'career' for a in actor['psychology']['ambitions']))
+                wardrobes = {o['id'] for o in world.objects.values() if o.get('household_id') == actor['household_id'] and o['kind'] == 'wardrobe'}
+                self.assertTrue(any(item['location'].get('id') in wardrobes for item in actor['belongings']))
             self.assertEqual(world.canonical_state(), before)
         finally:
             world.close()

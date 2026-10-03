@@ -11,17 +11,20 @@ class NeighborhoodIntegrationTests(unittest.TestCase):
     def test_all_residents_have_usable_homes_jobs_and_story_state(self):
         world=World(seed=73,layout='neighborhood-v1')
         try:
-            self.assertEqual(len(world.actors),44)
-            self.assertEqual(len(world.spatial.households),20)
+            self.assertEqual(len(world.actors),54)
+            self.assertEqual(len(world.spatial.households),21)
             self.assertEqual(world.invariants(),[])
             self.assertEqual(world.meta['map']['layout'],'neighborhood-v1')
             for actor in world.actors.values():
                 self.assertTrue(world.spatial.walkable(tuple(actor['position'])))
                 self.assertTrue(actor['belongings'])
                 self.assertIn('affect',actor)
-                self.assertIsNotNone(actor['workplace'],actor['profile']['job'])
-                station=world.objects[actor['workplace']['target_id']]
-                self.assertIsNotNone(world.spatial.path(actor['position'],station['anchors'][0]))
+                if actor['profile']['job'] in {'Pupil','Kindergarten child','Retired','Student'}:
+                    self.assertIsNone(actor['workplace'])
+                else:
+                    self.assertIsNotNone(actor['workplace'],actor['profile']['job'])
+                    station=world.objects[actor['workplace']['target_id']]
+                    self.assertIsNotNone(world.spatial.path(actor['position'],station['anchors'][0]))
             world.advance(1800)
             self.assertEqual(world.invariants(),[])
             self.assertEqual(world.store.replay(),world.canonical_state())

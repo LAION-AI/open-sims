@@ -1,10 +1,13 @@
 """Local HTTP/WebSocket interface; all clients observe the same Python world."""
 import asyncio
 from contextlib import asynccontextmanager, suppress
+import json
 from pathlib import Path
+import os
 import time
+from urllib.parse import urlsplit
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
@@ -12,11 +15,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from .engine import World, RejectedProposal
 from . import affect, possessions
 from .object_inspection import inspect_object
+from .insights import build_world_insights
 from .plausibility import audit as audit_plausibility
 from .generation.api import create_generation_router
 from .generation.city_api import create_city_router
 from .workshop.api import create_workshop_router
 from .workshop.library import Library
+from . import openrouter_control
 
 ROOT=Path(__file__).resolve().parent.parent
 
@@ -48,6 +53,16 @@ class Recommendation(BaseModel):
     ttl_seconds: int = Field(default=1800, ge=60, le=3600)
 
 
+class PlayerRecommendation(BaseModel):
+    """Local UI command; the coordinator reads the current version atomically."""
+    model_config=ConfigDict(extra='forbid')
+    actor_id: str
+    action: str
+    target_id: str | None = None
+    social_category: str | None = Field(default=None, max_length=40)
+    ttl_seconds: int = Field(default=1800, ge=60, le=3600)
+
+
 class RecommendationCancel(BaseModel):
     model_config=ConfigDict(extra='forbid')
     expected_version: int
@@ -57,6 +72,13 @@ class Transfer(BaseModel):
     model_config=ConfigDict(extra="forbid")
     owner: str = Field(pattern="^(procedural|external)$")
     expected_epoch: int
+
+
+class DecisionProviderToggle(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    enabled: bool
+    model: str | None = None
+    expected_version: int
 
 
 class Capture(BaseModel):
@@ -83,6 +105,11 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
         app.state.lock=asyncio.Lock()
         app.state.capture_lock=asyncio.Semaphore(1)
         app.state.capture_task=None
+        app.state.provider_pending={}
+        app.state.provider_last_attempt={}
+        app.state.provider_failures={}
+        app.state.provider_next_attempt={}
+        app.state.provider_generation=0
 
         async def run_clock():
             last=time.perf_counter()
@@ -108,22 +135,144 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
                             remainder-=seconds
                     else:
                         remainder=0
-                    if current-saved_at>10:
+                    if current-saved_at>10 and not world.fault:
                         try:world.save()
                         except Exception as exc:
                             world.fault=f'Save failed; simulation paused: {type(exc).__name__}: {exc}'
                             world.paused=True
                         saved_at=current
 
+        def provider_fallback(world, aid, model, message, status='retrying', failures=0,
+                              expected_epoch=None):
+            actor=world.actors.get(aid)
+            if (not actor or (actor.get('decision_provider') or {}).get('model')!=model
+                    or expected_epoch is not None and actor['owner_epoch']!=expected_epoch):
+                return
+            if (actor.get('decision_provider_error')!=message
+                    or actor['decision_provider'].get('status')!=status
+                    or actor['decision_provider'].get('failures')!=failures):
+                with world.transaction('external.decision.deferred.v1',[aid],
+                        f"{actor['name']} kept their model preference while a procedural decision covered a temporary gap.",
+                        [status]):
+                    person=world.edit('actors',aid)
+                    person['decision_provider_error']=message
+                    person['decision_provider']['status']=status
+                    person['decision_provider']['failures']=failures
+            if not world.actors[aid]['action']:
+                try:
+                    world.decide(aid,provider_fallback=True)
+                except RejectedProposal:
+                    # Keep the preference. The next provider loop will re-evaluate
+                    # current affordances instead of turning the model off.
+                    app.state.provider_next_attempt[aid]=max(
+                        app.state.provider_next_attempt.get(aid,0),time.monotonic()+2)
+
+        async def resolve_provider(aid, model, description, key, generation):
+            try:
+                async with app.state.provider_semaphore:
+                    decision=await asyncio.to_thread(openrouter_control.request_decision,model,description,key=key)
+                async with app.state.lock:
+                    if generation!=app.state.provider_generation:return
+                    w=app.state.world
+                    actor=w.actors.get(aid)
+                    if (not actor or actor['action'] or (actor.get('decision_provider') or {}).get('model')!=model
+                            or actor['owner_epoch']!=description['owner_epoch']):return
+                    if w.now-description['described_at']>900:
+                        provider_fallback(w,aid,model,'World time moved too far during the model call; current choices used instead',
+                                          status='ready',expected_epoch=description['owner_epoch'])
+                        return
+                    selected=openrouter_control.sample_option(decision,w.rng(aid,actor['decision_id']+1,'provider_choice'))
+                    intent={**description['options'][selected],'actor_id':aid,
+                        'owner_epoch':description['owner_epoch'],'expected_version':actor['version']}
+                    try:w.submit_intent(intent)
+                    except RejectedProposal:
+                        provider_fallback(w,aid,model,'That option changed before it could begin; procedural fallback used',
+                                          status='ready',expected_epoch=description['owner_epoch'])
+                        return
+                    app.state.provider_failures.pop(aid,None)
+                    app.state.provider_next_attempt.pop(aid,None)
+                    with w.transaction('external.decision.trace.v1',[aid],
+                            f"{actor['name']} accepted a bounded decision from {model}.",
+                            ['Model selected among coordinator-feasible options']):
+                        person=w.edit('actors',aid)
+                        person['decision_provider']['status']='connected'
+                        person['decision_provider']['failures']=0
+                        person['decision_provider_error']=None
+                        person['last_decision']['provider']={
+                            'model':model,'confidence':decision['confidence'],
+                            'probabilities':decision['probabilities'],'selected':selected}
+            except Exception as exc:
+                # Remote bodies, credentials and transport details never enter the journal.
+                async with app.state.lock:
+                    if generation!=app.state.provider_generation:return
+                    w=app.state.world
+                    actor=w.actors.get(aid)
+                    if actor and actor.get('decision_provider') and actor['decision_provider']['model']==model:
+                        failures=app.state.provider_failures.get(aid,0)+1
+                        app.state.provider_failures[aid]=failures
+                        retryable=getattr(exc,'retryable',True)
+                        delay=min(120,3*2**min(failures,5)) if retryable else 300
+                        app.state.provider_next_attempt[aid]=time.monotonic()+delay
+                        message=str(exc) if isinstance(exc,openrouter_control.ProviderUnavailable) else \
+                            f'Decision service unavailable ({type(exc).__name__}); retrying later'
+                        provider_fallback(w,aid,model,message,failures=failures,
+                                          expected_epoch=description['owner_epoch'])
+            finally:
+                if app.state.provider_pending.get(aid) is asyncio.current_task():
+                    app.state.provider_pending.pop(aid,None)
+
+        async def run_providers():
+            while True:
+                await asyncio.sleep(.35)
+                key=provider_key()
+                async with app.state.lock:
+                    w=app.state.world
+                    if w.paused or w.fault:continue
+                    current=time.monotonic()
+                    for aid,actor in w.actors.items():
+                        provider=actor.get('decision_provider')
+                        if (not provider or actor['action'] or aid in app.state.provider_pending
+                                or current-app.state.provider_last_attempt.get(aid,0)<1.5):continue
+                        if not key:
+                            provider_fallback(w,aid,provider['model'],
+                                              'No session key is configured; procedural fallback is active',
+                                              status='needs_key',failures=app.state.provider_failures.get(aid,0))
+                            continue
+                        if current<app.state.provider_next_attempt.get(aid,0):
+                            provider_fallback(w,aid,provider['model'],
+                                              actor.get('decision_provider_error') or 'Retrying later',
+                                              failures=app.state.provider_failures.get(aid,0))
+                            continue
+                        if len(app.state.provider_pending)>=3:break
+                        try:description=openrouter_control.describe_actor(w,aid)
+                        except Exception:
+                            provider_fallback(w,aid,provider['model'],
+                                              'Could not prepare the current choices; procedural fallback used',
+                                              failures=app.state.provider_failures.get(aid,0))
+                            app.state.provider_next_attempt[aid]=current+5
+                            continue
+                        app.state.provider_last_attempt[aid]=current
+                        app.state.provider_pending[aid]=asyncio.create_task(resolve_provider(
+                            aid,provider['model'],description,key,app.state.provider_generation))
+
+        app.state.provider_semaphore=asyncio.Semaphore(3)
         task=asyncio.create_task(run_clock())
+        provider_task=asyncio.create_task(run_providers())
         yield
         task.cancel()
+        provider_task.cancel()
+        for pending in app.state.provider_pending.values():pending.cancel()
         with suppress(asyncio.CancelledError):
             await task
+        with suppress(asyncio.CancelledError):
+            await provider_task
+        if app.state.provider_pending:
+            await asyncio.gather(*app.state.provider_pending.values(),return_exceptions=True)
         app.state.world.close()
         library.close()
 
     app=FastAPI(title="Mosswood · Procedural Living World",version="0.1.0",lifespan=lifespan)
+    app.state.openrouter_key=None  # Memory only: never checkpointed or returned.
     app.include_router(create_generation_router())
     app.include_router(create_city_router())
     app.include_router(create_workshop_router(library))
@@ -132,16 +281,114 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
         if aid not in app.state.world.actors:
             raise HTTPException(404,"Resident not found")
 
+    def provider_key():
+        return app.state.openrouter_key or os.environ.get('OPENROUTER_API_KEY','').strip()
+
+    def local_settings_request(request: Request):
+        client=request.client.host if request.client else ''
+        if client not in {'127.0.0.1','::1','testclient'}:
+            raise HTTPException(403,'Settings are available only from the local computer')
+        origin=request.headers.get('origin')
+        if origin and urlsplit(origin).netloc != request.headers.get('host'):
+            raise HTTPException(403,'Cross-origin settings request rejected')
+
     @app.get("/api/health")
     async def health():
         async with app.state.lock:
             w=app.state.world
-            return {"status":"fault" if w.fault else "ok","fault":w.fault,"invariants":w.invariants(),"population":len(w.actors),"households":20,"llm_enabled":False,"simulation_fields":False}
+            return {"status":"fault" if w.fault else "ok","fault":w.fault,"invariants":w.invariants(),"population":len(w.actors),
+                    "households":sum(h.get('household_kind')!='student_residence' for h in w.spatial.households),
+                    "residential_units":len(w.spatial.households),
+                    "llm_enabled":any(a.get('decision_provider') for a in w.actors.values()),
+                    "external_decision_configured":bool(provider_key()),"simulation_fields":False}
+
+    @app.get('/api/decision-providers')
+    async def decision_providers():
+        return {'configured':bool(provider_key()),'models':openrouter_control.MODELS,
+                'credential_location':'runtime memory or server environment',
+                'scope':'per opted-in Sim; at most three concurrent model requests'}
+
+    @app.get('/api/settings/openrouter-key')
+    async def openrouter_key_status(request: Request):
+        local_settings_request(request)
+        return Response(content=json.dumps({'configured':bool(provider_key()),
+                        'source':'runtime' if app.state.openrouter_key else 'environment' if openrouter_control.configured() else 'none'}),
+                        media_type='application/json',headers={'Cache-Control':'no-store'})
+
+    @app.post('/api/settings/openrouter-key')
+    async def set_openrouter_key(request: Request):
+        local_settings_request(request)
+        if request.headers.get('content-type','').split(';')[0].strip().lower()!='application/json':
+            raise HTTPException(415,'JSON request required')
+        try:
+            body=await request.json()
+        except (ValueError,UnicodeError):
+            raise HTTPException(422,'Invalid JSON request') from None
+        if not isinstance(body,dict) or set(body)!={'key'} or not isinstance(body['key'],str):
+            raise HTTPException(422,'A key string is required')
+        key=body['key'].strip()
+        if not 1<=len(key)<=512:
+            raise HTTPException(422,'Key must contain 1–512 characters')
+        async with app.state.lock:
+            app.state.openrouter_key=key
+            app.state.provider_generation+=1
+            for pending in app.state.provider_pending.values():
+                pending.cancel()
+            app.state.provider_pending.clear()
+            app.state.provider_failures.clear()
+            app.state.provider_next_attempt.clear()
+            app.state.provider_last_attempt.clear()
+        return Response(content='{"configured":true,"source":"runtime"}',media_type='application/json',
+                        headers={'Cache-Control':'no-store'})
+
+    @app.delete('/api/settings/openrouter-key')
+    async def forget_openrouter_key(request: Request):
+        local_settings_request(request)
+        async with app.state.lock:
+            app.state.openrouter_key=None
+            app.state.provider_generation+=1
+            for pending in app.state.provider_pending.values():
+                pending.cancel()
+            app.state.provider_pending.clear()
+            app.state.provider_failures.clear()
+            app.state.provider_next_attempt.clear()
+            app.state.provider_last_attempt.clear()
+        return Response(content=json.dumps({'configured':bool(provider_key()),
+                        'source':'environment' if openrouter_control.configured() else 'none'}),
+                        media_type='application/json',headers={'Cache-Control':'no-store'})
+
+    @app.post('/api/actors/{aid}/decision-provider')
+    async def toggle_decision_provider(aid:str,body:DecisionProviderToggle):
+        actor_or_404(aid)
+        if body.enabled and not provider_key():
+            raise HTTPException(503,'Set an OpenRouter key in Settings or the server environment.')
+        if body.enabled and body.model not in openrouter_control.MODELS:
+            raise HTTPException(422,'Unsupported decision model')
+        async with app.state.lock:
+            w=app.state.world
+            if body.enabled and w.actors[aid]['owner']=='external' and not w.actors[aid].get('decision_provider'):
+                raise HTTPException(409,'Resident already belongs to another external controller')
+            try:
+                result=w.set_decision_provider(aid,body.model if body.enabled else None,body.expected_version)
+                pending=app.state.provider_pending.get(aid)
+                if pending:
+                    pending.cancel()
+                    app.state.provider_pending.pop(aid,None)
+                app.state.provider_failures.pop(aid,None)
+                app.state.provider_next_attempt.pop(aid,None)
+                app.state.provider_last_attempt.pop(aid,None)
+                return result
+            except RejectedProposal as exc:raise HTTPException(409,str(exc)) from exc
 
     @app.get('/api/plausibility')
     async def plausibility():
         async with app.state.lock:
             return audit_plausibility(app.state.world)
+
+    @app.get('/api/insights')
+    async def insights():
+        async with app.state.lock:
+            return build_world_insights(app.state.world)
 
     @app.get("/api/world")
     async def geometry():
@@ -158,6 +405,12 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
         actor_or_404(aid)
         async with app.state.lock:
             return app.state.world.inspect(aid)
+
+    @app.get('/api/actors/{aid}/interventions')
+    async def interventions(aid:str):
+        actor_or_404(aid)
+        async with app.state.lock:
+            return app.state.world.intervention_options(aid)
 
     @app.get('/api/objects/{oid}')
     async def object_details(oid:str):
@@ -257,6 +510,20 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
             except RejectedProposal as exc:
                 raise HTTPException(409,str(exc)) from exc
 
+    @app.post('/api/player/recommendations')
+    async def player_recommend(body:PlayerRecommendation):
+        """Avoid a second round trip and version race in the player menu."""
+        async with app.state.lock:
+            actor_or_404(body.actor_id)
+            world=app.state.world
+            if world.fault:
+                raise HTTPException(503,f'Simulation angehalten: {world.fault}')
+            payload={**body.model_dump(), 'expected_version':world.actors[body.actor_id]['version']}
+            try:
+                return world.recommend(body.actor_id,payload)
+            except RejectedProposal as exc:
+                raise HTTPException(409,str(exc)) from exc
+
     @app.post('/api/recommendations/{aid}/cancel')
     async def cancel_recommendation(aid:str,body:RecommendationCancel):
         async with app.state.lock:
@@ -328,6 +595,18 @@ def create_app(database="data/mosswood.sqlite3",seed=42,port=8765,layout='legacy
     @app.get('/expanded-life')
     async def expanded_life():
         return FileResponse(ROOT/'docs'/'expanded_life.html')
+
+    @app.get('/agentic-daily-life')
+    async def agentic_daily_life():
+        return FileResponse(ROOT/'docs'/'agentic_daily_life.html')
+
+    @app.get('/social-storyteller')
+    async def social_storyteller():
+        return FileResponse(ROOT/'docs'/'social_storyteller.html')
+
+    @app.get('/campus-social-w100')
+    async def campus_social_w100():
+        return FileResponse(ROOT/'docs'/'campus_social_w100.html')
 
     @app.get('/plausibility-plan', include_in_schema=False)
     async def plausibility_plan():

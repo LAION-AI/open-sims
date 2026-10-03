@@ -1,0 +1,26 @@
+{
+  "isolated_database": true,
+  "page_errors": [],
+  "checks": {
+    "age_groups": {
+      "child": 3,
+      "teen": 3,
+      "adult": 36,
+      "elder": 2
+    },
+    "child_label": "Kind · 9 · Pupil",
+    "teen_label": "Teenager · 15 · Pupil",
+    "adult_label": "Erwachsen · 49 · Baker",
+    "elder_label": "Senior:in · 73 · Retired",
+    "provider_checkbox": true,
+    "provider_disabled_without_key": true,
+    "new_buildings": [
+      "kindergarten",
+      "pool",
+      "bar",
+      "community_center"
+    ],
+    "html_doc": 200,
+    "no_page_errors": true
+  }
+}

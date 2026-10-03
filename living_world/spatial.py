@@ -210,6 +210,12 @@ class SpatialService:
             return self._cache[key]
         self.path_queries += 1
         prefer_paths=bool(getattr(self,'planning_metadata',{}).get('layout_id'))
+        portal_neighbors={}
+        for portal in getattr(self,'planning_metadata',{}).get('portals',[]):
+            a,b=tuple(portal['from']),tuple(portal['to'])
+            weight=max(1,int(portal.get('seconds',8)))
+            portal_neighbors.setdefault(a,[]).append((b,weight))
+            portal_neighbors.setdefault(b,[]).append((a,weight))
         frontier=[(0,0,start)]
         previous={start:None}
         costs={start:0}
@@ -221,6 +227,14 @@ class SpatialService:
                     result.append(list(current))
                     current=previous[current]
                 result.reverse()
+                if portal_neighbors:
+                    expanded=[result[0]]
+                    for a,b in zip(result,result[1:]):
+                        portal_cost=next((weight for destination,weight in
+                                          portal_neighbors.get(tuple(a),()) if destination==tuple(b)),1)
+                        expanded.extend([list(a) for _ in range(portal_cost-1)])
+                        expanded.append(b)
+                    result=expanded
                 if len(self._cache)>4096:
                     self._cache.clear()
                 self._cache[key]=result
@@ -228,14 +242,18 @@ class SpatialService:
             if cost!=costs[current]:
                 continue
             x,y=current
-            for nxt in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
+            neighbors=[((x+1,y),None),((x-1,y),None),
+                       ((x,y+1),None),((x,y-1),None)]
+            neighbors.extend(portal_neighbors.get(current,()))
+            for nxt,portal_cost in neighbors:
                 if not self.walkable(nxt):
                     continue
                 terrain=self.cells[nxt[1]*self.width+nxt[0]]
                 # New districts prefer sidewalks and paths over cutting through
                 # lawns or walking along traffic lanes. Travel time still uses
                 # the actual returned one-metre path, not this preference cost.
-                step_cost=({GRASS:6,ROAD:3}.get(terrain,1) if prefer_paths else 1)
+                step_cost=portal_cost if portal_cost is not None else (
+                    {GRASS:6,ROAD:3}.get(terrain,1) if prefer_paths else 1)
                 new_cost=cost+step_cost
                 if new_cost < costs.get(nxt,10**9):
                     costs[nxt]=new_cost

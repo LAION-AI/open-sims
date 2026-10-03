@@ -11,6 +11,12 @@ SERVICE_ACTIONS={
     'visit_clinic':service('Attending a clinic appointment',['hospital_desk'],900,{'comfort':.18},5),
     'visit_fire_station':service('Visiting the fire station open desk',['fire_stationdesk'],600,{'fun':.22},0,'reading'),
     'browse_mall':service('Browsing the shopping center',['mall_counter'],900,{'fun':.42},0,'walking'),
+    'school_day':service('Attending class',['school_student_chair'],3600,{'fun':.08,'social':.08},0,'reading'),
+    'kindergarten_day':service('Playing and learning at kindergarten',['kindergarten_mat'],3600,{'fun':.22,'social':.12},0,'socializing'),
+    'visit_pool':service('Swimming at the pool',['pool_water'],1500,{'fun':.58,'comfort':.12},4,'walking'),
+    'visit_bar':service('Meeting friends at the bar',['bar_counter'],900,{'fun':.38,'social':.25},7,'socializing'),
+    'community_meet':service('Joining a neighborhood gathering',['community_table'],1200,{'fun':.35,'social':.32},0,'socializing'),
+    'visit_patient':service('Visiting someone at hospital',['hospital_bed'],600,{'social':.24,'comfort':.06},0,'socializing'),
 }
 SERVICE_JOBS={
     'Nurse':('hospital_desk','hospital'),'Firefighter':('fire_stationdesk','fire_station'),
@@ -19,6 +25,13 @@ SERVICE_JOBS={
 }
 
 def service_available(actor,kind,now):
+    age=actor.get('age',30)
+    if kind=='kindergarten_day':return 4<=age<7 and 8*3600<=now%86400<15*3600
+    if kind=='school_day':return 7<=age<18 and 8*3600<=now%86400<15*3600
+    if kind=='visit_bar':return age>=18 and (now%86400>=16*3600 or now%86400<1*3600)
+    if kind=='visit_pool':return age>=7 and 8*3600<=now%86400<21*3600
+    if kind=='community_meet':return 9*3600<=now%86400<21*3600
+    if kind=='visit_patient':return 10*3600<=now%86400<19*3600
     if kind=='dance_club':return now%86400>=18*3600 or now%86400<2*3600
     if kind in {'visit_townhall','visit_clinic','visit_fire_station'}:
         return 9*3600<=now%86400<17*3600 and actor.get('cooldowns',{}).get(kind,0)<=now

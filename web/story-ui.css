@@ -9,6 +9,7 @@
 .story-affect.compact .affect-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 .story-primary{font-size:10px;color:#758b75;margin:-2px 0 10px}.story-primary b{color:#486b55}
 .person-photo{object-fit:cover;image-rendering:pixelated;border:1px solid #dce6d5}
+.person-row .person-avatar{width:42px;height:46px;border-radius:7px}
 .affect-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .affect-card{border:1px solid #e6e9dc;border-radius:8px;background:#fbfbf4;padding:10px;min-width:0}
 .affect-card-heading{display:flex;align-items:center;gap:6px;min-width:0}

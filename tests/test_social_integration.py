@@ -1,6 +1,8 @@
 """Executed social-system acceptance tests; no engine fixtures fabricate history."""
 from copy import deepcopy
 import unittest
+from unittest.mock import patch
+import random
 
 from living_world.engine import RejectedProposal, World
 
@@ -40,14 +42,15 @@ class SocialIntegrationTests(unittest.TestCase):
             other["relations"][actor["id"]].update(closeness=.80, trust=.80)
         before_a = deepcopy(actor["relations"][other["id"]])
         before_b = deepcopy(other["relations"][actor["id"]])
-        consent_draw = w.rng(other["id"], f"{actor['id']}:{actor['decision_id'] + 1}", "chat_consent").random()
-        self.assertLess(consent_draw, .95, "fixed test pair must accept its explicit availability fixture")
-
-        self._request(actor["id"], other["id"], "small_talk")
+        original_rng=w.rng
+        with patch.object(w,'rng',side_effect=lambda aid,decision,purpose:
+                random.Random(1) if purpose=='chat_consent' else original_rng(aid,decision,purpose)):
+            self._request(actor["id"], other["id"], "small_talk")
         action = w.actors[actor["id"]]["action"]
         self.assertEqual(action["social_category"], "small_talk")
         self.assertEqual(action["partner_id"], other["id"])
-        w.advance(action["duration"])
+        with patch('living_world.engine.leisure_drama.resolve_social_event',return_value={'kind':'quiet'}):
+            w.advance(action["duration"])
 
         actor, other = w.actors[actor["id"]], w.actors[other["id"]]
         relation_a, relation_b = actor["relations"][other["id"]], other["relations"][actor["id"]]
@@ -80,6 +83,36 @@ class SocialIntegrationTests(unittest.TestCase):
         self.assertNotEqual(committed["family"]["partner_id"], stranger["id"])
         with self.assertRaises(RejectedProposal):
             self._request(committed["id"], stranger["id"], "express_affection")
+
+    def test_story_argument_requires_completed_mutual_chat_and_reaches_both_journals(self):
+        w=self.world
+        actor,other=self._isolate_pair('resident_001','resident_002')
+        with w.transaction('test.story.accept',[actor['id'],other['id']],
+                           'Both participants are presently open to a conversation.'):
+            w.edit('actors',other['id'])['psychology']['big_five']['agreeableness']=1.0
+        before=deepcopy(w.actors[actor['id']]['relations'][other['id']])
+        original_rng=w.rng
+        with patch.object(w,'rng',side_effect=lambda aid,decision,purpose:
+                random.Random(1) if purpose=='chat_consent' else original_rng(aid,decision,purpose)):
+            self._request(actor['id'],other['id'],'small_talk')
+        action=w.actors[actor['id']]['action']
+        self.assertIsNotNone(action)
+        self.assertEqual(w.actors[actor['id']]['relations'][other['id']]['closeness'],before['closeness'])
+        story={'kind':'argument','text':'A small disagreement became an argument.'}
+        with (patch('living_world.engine.storyteller.social_turn',return_value=story),
+              patch('living_world.engine.leisure_drama.resolve_social_event',return_value={'kind':'quiet'})):
+            w.advance(action['duration'])
+        a,b=w.actors[actor['id']],w.actors[other['id']]
+        self.assertLess(a['relations'][b['id']]['closeness'],before['closeness'])
+        self.assertGreater(a['relations'][b['id']]['rivalry'],0)
+        self.assertEqual(a['last_social_incident']['kind'],'argument')
+        self.assertEqual(b['last_social_incident']['kind'],'argument')
+        self.assertIn(a['emotion']['type'],{'Tense','Disappointed','Afraid'})
+        for person in (a,b):
+            self.assertTrue(any(story['text'] in beat['narration']
+                                for beat in w.store.recent(person['id'],limit=8)))
+        self.assertEqual(w.invariants(),[])
+        self.assertEqual(w.store.replay(),w.canonical_state())
 
     def test_declined_flirt_does_not_force_partnership_or_shared_action(self):
         w = self.world

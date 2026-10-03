@@ -27,12 +27,24 @@ CAREERS = {
     'Mechanic': ('craft', 'Repair workshop equipment', 1.05, 8),
     'Programmer': ('analysis', 'Build an office tool', 1.10, 9),
     'Civic planner': ('administration', 'Review a neighborhood plan', 1.10, 9),
+    'Kindergarten educator': ('teaching', 'Guide early learning', 1.00, 8),
+    'Lifeguard': ('response', 'Watch the swimming lanes', 1.00, 9),
+    'Bartender': ('service', 'Mix and serve drinks', 1.00, 17),
+    'Club DJ': ('music', 'Prepare the evening set', 1.05, 18),
+    'Professor': ('teaching', 'Lead a university seminar', 1.25, 9),
+    'Researcher': ('analysis', 'Run a careful laboratory study', 1.18, 9),
+    'University administrator': ('administration', 'Coordinate campus services', 1.06, 9),
 }
 LEVEL_THRESHOLDS = (0, 8, 24, 48)
 
 
 def initial(actor, now=0):
     job = actor.get('profile', {}).get('job', 'Independent artist')
+    if job in {'Kindergarten child','Pupil','Retired','Student'}:
+        return {'job':job,'skill':None,'task':'Play and learn' if job=='Kindergarten child' else 'Attend school' if job=='Pupil' else 'Attend university' if job=='Student' else 'Enjoy retirement',
+                'pay_factor':0,'level':0,'experience_hours':0.0,'completed_shifts':0,
+                'performance':.5,'started_at':now,'last_shift':None,
+                'schedule_start':9*3600 if job=='Student' else 8*3600+30*60,'evidence_id':'initialization'}
     skill, task, factor, start = CAREERS.get(job, CAREERS['Independent artist'])
     return {'job': job, 'skill': skill, 'task': task, 'pay_factor': factor,
             'level': 1, 'experience_hours': 0.0, 'completed_shifts': 0,

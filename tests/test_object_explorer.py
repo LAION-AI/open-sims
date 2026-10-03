@@ -44,7 +44,7 @@ class ObjectExplorerTests(unittest.TestCase):
             w=client.app.state.world
             chair=next(o for o in w.objects.values() if o['kind']=='school_student_chair')
             data=inspect_object(w,chair['id'])
-            self.assertEqual(data['actions'],[])
+            self.assertEqual([action['id'] for action in data['actions']],['school_day'])
             self.assertFalse(data['object']['blocking'])
             data['object']['anchors'].clear()
             self.assertTrue(chair['anchors'])

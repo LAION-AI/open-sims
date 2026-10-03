@@ -12,22 +12,22 @@ class NeighborhoodTests(unittest.TestCase):
 
     def test_new_save_contract_and_mixed_use(self):
         place = self.map
-        self.assertEqual((place.width, place.height), (128, 180))
-        self.assertEqual(len(place.households), 20)
+        self.assertEqual((place.width, place.height), (128, 326))
+        self.assertEqual(len(place.households), 21)
         self.assertEqual([h["id"] for h in place.households],
-                         [f"household_{i:02}" for i in range(1, 21)])
+                         [f"household_{i:02}" for i in range(1, 21)]+['student_residence'])
         self.assertEqual([b["id"] for b in place.buildings[:20]],
                          [f"home_{i:02}" for i in range(1, 21)])
-        self.assertEqual(len(place.buildings), 33)
+        self.assertEqual(len(place.buildings), 41)
         metadata = place.planning_metadata
         self.assertEqual(metadata["layout_id"], "neighborhood-v1")
-        self.assertEqual(metadata["runtime_floors"], [0])
-        self.assertEqual(metadata["validated_entrances"], 33)
+        self.assertEqual(metadata["runtime_floors"], [0, 1, 2])
+        self.assertEqual(metadata["validated_entrances"], 41)
         self.assertEqual(metadata["validated_object_anchors"],
                          sum(len(o["anchors"]) for o in place.objects.values()))
         self.assertEqual({road["class"] for road in metadata["roads"]},
                          {"arterial", "local", "pedestrian"})
-        self.assertEqual(len(metadata["parks"]), 2)
+        self.assertEqual(len(metadata["parks"]), 3)
         self.assertEqual(place.public_data()["planning_metadata"], metadata)
         for b in place.buildings:
             self.assertIsNotNone(place.path(b["frontage"], b["door"]))
@@ -71,14 +71,19 @@ class NeighborhoodTests(unittest.TestCase):
         place = self.map
         service_ids = {"school", "studio", "workshop", "cafe", "shop", "gym",
                        "nightclub", "town_hall", "hospital", "fire_station",
-                       "office_hub", "supermarket", "shopping_center"}
+                       "office_hub", "supermarket", "shopping_center",
+                       "kindergarten", "pool", "bar", "community_center",
+                       "university", "student_dorm", "student_dorm_floor_1",
+                       "student_dorm_floor_2"}
         self.assertEqual({b["id"] for b in place.buildings[20:]}, service_ids)
         station_kinds = {"teacher_station", "illustrator_station", "designer_station",
                          "carpenter_station", "tailor_station", "gardener_station",
                          "cafe_counter", "shop_counter", "gym_station",
                          "nightclub_floor", "townhall_desk", "hospital_desk",
                          "fire_stationdesk", "office_station", "supermarket_checkout",
-                         "mall_counter"}
+                         "mall_counter", "kindergarten_desk", "kindergarten_mat",
+                         "pool_water", "lifeguard_station", "bar_counter", "dj_booth",
+                         "community_table"}
         self.assertTrue(station_kinds.issubset({o["kind"] for o in place.objects.values()}))
         chairs = [o for o in place.objects.values() if o["kind"] == "school_student_chair"]
         desks = [o for o in place.objects.values() if o["kind"] == "school_student_desk"]
@@ -117,7 +122,7 @@ class NeighborhoodTests(unittest.TestCase):
         self.assertNotEqual(first.buildings, other.buildings)
         for seed in range(8):
             place = LivingNeighborhood(seed)
-            self.assertEqual(place.planning_metadata["validated_entrances"], 33)
+            self.assertEqual(place.planning_metadata["validated_entrances"], 41)
             self.assertEqual(place.planning_metadata["validated_object_anchors"],
                              sum(len(obj["anchors"]) for obj in place.objects.values()))
 

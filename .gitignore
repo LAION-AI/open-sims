@@ -23,3 +23,5 @@ __pycache__/
 *.log
 artifacts/**/*.tmp
 artifacts/**/*.part
+artifacts/test_tmp/
+artifacts/edge_profile/

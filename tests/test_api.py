@@ -35,9 +35,30 @@ class ApiTests(unittest.TestCase):
                 self.assertEqual(client.get(path).status_code,200,path)
             person=client.get('/api/actors/resident_001').json()
             self.assertEqual(len(person['psychology']['big_five']),5)
-            self.assertEqual(len(person['social_categories']),20)
-            self.assertIsNotNone(person['workplace']['target_id'])
+            self.assertGreaterEqual(len(person['social_categories']),24)
+            if person['profile']['job']!='Retired':
+                self.assertIsNotNone(person['workplace']['target_id'])
+            else:
+                self.assertIsNone(person['workplace'])
             self.assertEqual(client.get('/not-a-document.md').status_code,404)
+
+    def test_campus_save_exposes_students_floors_and_inspection(self):
+        with TestClient(create_app(database=':memory:',seed=73,layout='neighborhood-v1',paused=True)) as client:
+            health=client.get('/api/health').json()
+            self.assertEqual(health['population'],54)
+            self.assertEqual(health['households'],20)
+            self.assertEqual(health['residential_units'],21)
+            world=client.get('/api/world').json()
+            self.assertEqual(world['planning_metadata']['runtime_floors'],[0,1,2])
+            self.assertEqual(len(world['planning_metadata']['portals']),2)
+            state=client.get('/api/state').json()
+            self.assertTrue(state['paused'])
+            self.assertEqual(sum(a['household_id']=='student_residence' for a in state['actors']),10)
+            person=client.get('/api/actors/resident_045').json()
+            self.assertEqual(person['profile']['job'],'Student')
+            self.assertEqual(person['household_id'],'student_residence')
+            for path in ('/campus-social-w100','/static/campus-ui.css','/static/app.js'):
+                self.assertEqual(client.get(path).status_code,200,path)
 
 
 if __name__=='__main__':

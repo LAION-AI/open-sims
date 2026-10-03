@@ -5,7 +5,7 @@ The live renderer and inspect endpoints never cause observations or decisions.
 """
 from copy import deepcopy
 
-from . import psychology
+from . import psychology, storyteller
 from . import possessions
 from . import careers
 from .daily_life import (DAILY_ACTIONS, StepUnavailable, apply_step, assigned_workplace,
@@ -15,14 +15,35 @@ from .daily_life import (DAILY_ACTIONS, StepUnavailable, apply_step, assigned_wo
 class LifeSystems:
     def _life_components(self, new_world):
         if new_world:
-            for aid, patch in psychology.initial_family_profiles(self.actors).items():
+            for aid, patch in psychology.initial_family_profiles(self.actors,
+                    include_minors=getattr(self,'layout','legacy')=='neighborhood-v1').items():
                 self.actors[aid].update(patch)
         for aid, actor in self.actors.items():
             actor.update(psychology.migrate_existing_actor(actor, self.rng(aid, 0, "psychology"), self.now))
+            if new_world and actor['household_id']=='student_residence':
+                actor['age']=18+self.rng(aid,0,'student_age').randrange(7)
+                actor['profile']['job']='Student'
+                actor['goals'][1]['title']='Attend university'
+                actor['schedule'].update(start=9*3600,end=15*3600,
+                    work_target_seconds=3*3600,work_seconds=0)
+            actor['appearance']['age']=actor['age']
+            if new_world and actor['age']<18:
+                actor['profile']['job']='Kindergarten child' if actor['age']<7 else 'Pupil'
+                actor['goals'][1]['title']='Play and learn' if actor['age']<7 else 'Attend school'
+                actor['schedule'].update(start=8*3600+30*60,end=15*3600,
+                    work_target_seconds=3*3600,work_seconds=0)
+            if new_world and actor['age']>=66:
+                actor['profile']['job']='Retired'
+                actor['goals'][1]['title']='Enjoy the day'
+                actor['schedule']['work_target_seconds']=0
+            if new_world and self.layout=='neighborhood-v1' and aid=='resident_027':
+                # Staff the new bar even though its original round-robin slot
+                # fell on a child. This is a new-save fixture, never a migration.
+                actor['profile']['job']='Bartender'
             actor.setdefault("routine", None)
             actor.setdefault("family", {"parent_ids": [], "partner_id": None, "relationship_status": "unspecified"})
             actor.setdefault('career', careers.initial(actor, self.now))
-            if new_world:
+            if new_world and 18<=actor['age']<66 and actor['profile']['job']!='Student':
                 actor['schedule']['start'] = actor['career']['schedule_start']
                 actor['schedule']['end'] = actor['schedule']['start'] + 8 * 3600
             actor["workplace"] = assigned_workplace(actor, self.objects)
@@ -190,11 +211,14 @@ class LifeSystems:
             self._apply_actor_patch(person, psychology.observe(person, other["id"], cue, self.now, evidence, "participation"))
             tone=psychology.SOCIAL_CATEGORIES[category]["tone"]
             feeling=("Disappointed" if person is actor else "Reserved") if outcome=="declined" else (
+                "Tense" if tone in {"conflict","tension"} else "Disappointed") if outcome=="negative" else (
                 "Affectionate" if tone=="romance" else "Tense" if tone in {"conflict","tension"} else
                 "Relieved" if tone=="repair" else "Playful" if tone=="play" else "Connected")
             person["psychology"]["social_appraisal"]={"type":feeling,"category":category,
                 "outcome":outcome,"evidence_id":evidence,"subject_id":other['id'],"expires_at":self.now+900,
                 "adult_relation":person.get('age',0)>=18 and other.get('age',0)>=18 and tone=='romance'}
+            if outcome in {'positive','accepted'} and category in {'express_affection','check_in','offer_help'}:
+                storyteller.adapt_style(person,'affection')
 
     def _check_fears(self, aid):
         actor = self.actors[aid]

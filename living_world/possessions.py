@@ -49,6 +49,19 @@ RECIPES = {
                           "serve_recipe", "eat_recipe")},
 }
 
+DISH_VARIANTS = {
+    'pizza': ('Vegetable pizza', 'Tomato flatbread', 'Garden vegetable tart'),
+    'pancake': ('Breakfast pancakes', 'Golden crêpes', 'Savory egg crêpes'),
+}
+
+
+def dish_variant(actor, recipe, now):
+    """Concrete dish names vary by cook and day without altering recipe contracts."""
+    suffix=actor['id'].rsplit('_',1)[-1]
+    number=int(suffix) if suffix.isdigit() else sum(map(ord,actor['id']))
+    choices=DISH_VARIANTS[recipe]
+    return choices[(number+now//86400)%len(choices)]
+
 MAX_CONSUMED = 64
 
 
@@ -177,6 +190,10 @@ def plan_outfit(actor, objects, now):
 
 def _home_object(actor, objects, kind):
     values = objects.values() if isinstance(objects, dict) else objects
+    if actor.get('household_id')=='student_residence' and kind=='table':
+        choices=[o for o in values if o['kind']=='table' and o.get('household_id')=='student_residence']
+        slot=max(0,int(actor['id'].rsplit('_',1)[-1])-45)
+        return choices[min(int(slot>=6),len(choices)-1)] if choices else None
     return next((o for o in values if o["kind"] == kind
                  and o.get("household_id") == actor["household_id"]), None)
 
@@ -283,9 +300,11 @@ def apply_step(actor, obj, kind, now):
                                  f"Missing {k}") for k in RECIPES[recipe]["ingredients"]]
         for ingredient in ingredients:
             _consume(ingredient, now)
-        _, serial = _new(actor, items, serial, recipe, recipe.title(),
+        dish=dish_variant(actor,recipe,now)
+        _, serial = _new(actor, items, serial, recipe, dish,
                          _location("carried", aid),
-                         {"stage": "raw" if recipe == "pizza" else "batter", "prepared_at": now})
+                         {"stage": "raw" if recipe == "pizza" else "batter", "prepared_at": now,
+                          "dish": dish})
         state["mess"] += 1
         inventory["food_scraps"] = inventory.get("food_scraps", 0) + 1
     elif kind == "load_pizza_oven":

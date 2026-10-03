@@ -100,6 +100,12 @@ def _effect_ids(cause: dict, needs: dict) -> list[tuple[str, float, int, str | N
         effects.extend((("anger", .64, 900, None), ("embarrassment", .36, 900, None)))
     elif kind in {"social_rejection", "rejected"} or outcome == "declined":
         effects.extend((("disappointment", .48, 900, None), ("embarrassment", .24, 600, None)))
+    elif kind == "story_good":
+        effects.extend((("elation", .46, 1500, None), ("contentment", .36, 1800, None)))
+    elif kind == "story_bad":
+        effects.extend((("disappointment", .48, 1500, None), ("distress", .35, 1800, None)))
+    elif kind in {"story_argument", "story_sabotage_backfire"}:
+        effects.extend((("anger", .52, 1200, None), ("disappointment", .28, 1200, None)))
     elif kind == "goal_completed" or (kind == "activity_completed" and category in {
             "work", "creative_hobby", "craft", "bake_pizza", "cook_pancake"}):
         # Completing an arbitrary atomic action is not an achievement.  Pride
@@ -413,6 +419,8 @@ def _relationship_roles(actor: dict, target: dict, relation: dict) -> list[str]:
         roles.append('coworker')
     if layers.get('household', {}).get('status') not in (None, 'none'):
         roles.append('housemate')
+    if float(relation.get('rivalry', 0)) >= .3:
+        roles.append('rival')
     return roles or ['acquaintance']
 
 
@@ -420,6 +428,8 @@ def _relationship_feeling(qualities: dict) -> str:
     """A readable appraisal of relation *scores*, not the target's current emotion."""
     if qualities['tension'] >= .55:
         return 'tense'
+    if qualities.get('rivalry', 0) >= .3:
+        return 'competitive'
     if qualities['attraction'] >= .55 and qualities['closeness'] >= .35:
         return 'attracted'
     if qualities['closeness'] >= .65 and qualities['trust'] >= .6:
@@ -441,8 +451,8 @@ def social_graph_projection(actor: dict, actors, now: int) -> dict:
             continue
         layers = relation.get("layers", {})
         types = sorted(key for key, value in layers.items() if isinstance(value, dict) and value.get("status") not in (None, "none"))
-        qualities = {key: _clamp(relation.get(key, 0)) for key in ("closeness", "trust", "respect", "attraction", "tension")}
-        importance = _clamp(.38 * qualities["closeness"] + .27 * qualities["trust"] + .20 * qualities["respect"] + .10 * qualities["attraction"] + (.05 if types else 0))
+        qualities = {key: _clamp(relation.get(key, 0)) for key in ("closeness", "trust", "respect", "attraction", "tension", "rivalry")}
+        importance = _clamp(.35 * qualities["closeness"] + .25 * qualities["trust"] + .18 * qualities["respect"] + .10 * qualities["attraction"] + .07 * qualities['rivalry'] + (.05 if types else 0))
         target = by_id[target_id]
         reverse = target.get('relations', {}).get(actor.get('id'))
         reciprocal = None
@@ -459,8 +469,13 @@ def social_graph_projection(actor: dict, actors, now: int) -> dict:
     known_ids = {node["id"] for node in nodes}
     observed = actor.get("psychology", {}).get("theory_of_mind", {}).get("known_people", {})
     observed_not_known = sorted(target_id for target_id in observed if target_id in actor_ids and target_id not in known_ids)
+    heard_of_not_known = [
+        {'id':target_id,'source_id':info.get('source_id'),'confidence':info.get('confidence','low')}
+        for target_id,info in sorted(actor.get('heard_of',{}).items())
+        if target_id in actor_ids and target_id not in known_ids]
     return {"viewer_id": actor.get("id"), "generated_at": now,
             "nodes": sorted(nodes, key=lambda row: (-row["importance"], row["id"])),
             "edges": sorted(edges, key=lambda row: (-row["importance"], row["target"])),
             "observed_not_known": observed_not_known,
+            "heard_of_not_known": heard_of_not_known,
             "privacy": "explicit directional relation scores from both participants; current affect, needs, thoughts and beliefs are excluded"}

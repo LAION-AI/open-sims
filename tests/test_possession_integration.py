@@ -8,7 +8,9 @@ the canonical ledger state that a client would actually observe.
 import unittest
 
 from living_world.engine import RejectedProposal, World
+from living_world import possessions
 from living_world.daily_life import daily_state
+from living_world.storyteller import INCIDENTS
 
 
 class PossessionIntegrationTests(unittest.TestCase):
@@ -103,6 +105,9 @@ class PossessionIntegrationTests(unittest.TestCase):
         self.request_and_finish(actor["id"], "eat_recipe")
         consumed = self.item(w.actors[actor["id"]], pizza_id)
         self.assertEqual(consumed["location"]["type"], "consumed")
+        self.assertIn(consumed['label'], possessions.DISH_VARIANTS['pizza'])
+        self.assertEqual(w.actors[actor['id']]['last_meal']['label'],consumed['label'])
+        self.assertIn(consumed['label'], w.store.recent(actor['id'],limit=1)[0]['narration'])
         all_pizzas = [item for person in w.actors.values() for item in person["belongings"]
                       if item["id"] == pizza_id]
         self.assertEqual(len(all_pizzas), 1)
@@ -149,7 +154,12 @@ class PossessionIntegrationTests(unittest.TestCase):
         w.decide(actor["id"], {"action": "buy_groceries"})
         self.assertEqual(w.objects[w.actors[actor["id"]]["action"]["target_id"]]["kind"], "supermarket_checkout")
         self.finish(actor["id"])
-        self.assertEqual(w.actors[actor["id"]]["money"], before_money - 20)
+        incident=w.actors[actor['id']].get('last_story_incident')
+        incidental=next((event['money'] for event in INCIDENTS if incident and event['id']==incident['id']),0)
+        self.assertEqual(w.actors[actor["id"]]["money"], before_money - 20 + incidental)
+        if incident:
+            self.assertEqual(incident['trigger'],'buy_groceries')
+            self.assertIn(incident['text'],w.store.recent(actor['id'],1)[0]['narration'])
         self.request_and_finish(actor["id"], "stock_fridge")
         self.assertEqual(daily_state(w.objects[fridge["id"]])["pantry_stock"], 8)
         self.assertNotIn("groceries", w.actors[actor["id"]]["inventory"])

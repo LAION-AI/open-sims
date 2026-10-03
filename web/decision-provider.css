@@ -1,0 +1,17 @@
+.provider-block{padding:15px;border:1px solid #d9e3cb;border-radius:10px;background:#f7faf1;margin-top:18px}
+.provider-toggle,.provider-model-label{display:flex;align-items:center;gap:9px;margin:11px 0;color:#425e46;font-size:11px}
+.provider-toggle input{accent-color:#759460}
+.provider-model-label select{min-width:0;flex:1;border:1px solid #c5d3b8;border-radius:6px;background:#fff;color:#354b36;padding:7px}
+.provider-note{font-size:10px!important;margin:6px 0 0}
+.provider-warning{padding:8px 10px;border:1px solid #e3d1ae;border-radius:7px;background:#fff7e8;color:#846642!important;line-height:1.5}
+.settings-dialog{width:min(440px,calc(100vw - 28px));border:1px solid #cbd9c2;border-radius:14px;background:#fffef6;color:#354b36;padding:26px 30px;box-shadow:0 22px 70px #172e2455}
+.settings-dialog::backdrop{background:#14231c88}
+.settings-dialog form{position:relative;display:grid;gap:12px}
+.settings-dialog h2{font:30px/1.1 Georgia,serif;margin:0}
+.settings-dialog p,.settings-dialog small{font-size:12px;line-height:1.55;color:#667864;margin:0}
+.settings-dialog label{font-size:11px;font-weight:700}
+.settings-dialog input{width:100%;box-sizing:border-box;border:1px solid #bacdb4;border-radius:7px;padding:11px;background:#fff;font-size:14px}
+.settings-actions{display:flex;gap:8px;flex-wrap:wrap}
+.settings-actions button{border:1px solid #4f7356;border-radius:7px;background:#3f694d;color:white;padding:9px 12px;font-size:11px;cursor:pointer}
+.settings-actions button+button{background:transparent;color:#4f7356}
+.settings-close{position:absolute;right:0;top:-6px;border:0;background:none;color:#59705a;font-size:24px;cursor:pointer}

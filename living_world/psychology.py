@@ -15,8 +15,7 @@ ADULT_AGE = 18
 MAX_OBSERVATIONS = 12
 
 # A category is a mechanical interaction family, rather than generated dialogue.
-# Romantic categories are deliberately opt-in and guarded by consent, adulthood,
-# and an explicit non-kin relation.
+# Romantic categories are guarded by consent, adulthood, and non-kinship.
 SOCIAL_CATEGORIES = {
     "greet": {"label": "Greet", "duration_seconds": 45, "tone": "warm", "base": .35},
     "small_talk": {"label": "Small talk", "duration_seconds": 180, "tone": "warm", "base": .42},
@@ -38,6 +37,23 @@ SOCIAL_CATEGORIES = {
     "flirt": {"label": "Flirt", "duration_seconds": 120, "tone": "romance", "base": .24, "romantic": True},
     "ask_date": {"label": "Ask for date", "duration_seconds": 90, "tone": "romance", "base": .20, "romantic": True},
     "express_affection": {"label": "Express affection", "duration_seconds": 120, "tone": "romance", "base": .25, "romantic": True},
+    "ask_help": {"label": "Ask for help", "duration_seconds": 210, "tone": "care", "base": .30},
+    "undermine": {"label": "Discuss work performance", "duration_seconds": 150, "tone": "conflict", "base": .08},
+    "share_news": {"label": "Share news", "duration_seconds": 150, "tone": "warm", "base": .30},
+    "challenge": {"label": "Friendly challenge", "duration_seconds": 240, "tone": "play", "base": .24},
+    "phone_call": {"label": "Phone call", "duration_seconds": 240, "tone": "warm", "base": .39},
+    "deep_talk": {"label": "Deep conversation", "duration_seconds": 420, "tone": "care", "base": .30},
+    "comfort": {"label": "Comfort", "duration_seconds": 240, "tone": "care", "base": .35},
+    "ask_favor": {"label": "Ask a favor", "duration_seconds": 180, "tone": "care", "base": .26},
+    "collaborate_project": {"label": "Work on a project together", "duration_seconds": 480, "tone": "task", "base": .30},
+    "persuade": {"label": "Try to persuade", "duration_seconds": 240, "tone": "task", "base": .25},
+    "make_plans": {"label": "Make plans", "duration_seconds": 210, "tone": "warm", "base": .35},
+    "invite_to_dinner": {"label": "Invite to dinner", "duration_seconds": 150, "tone": "warm", "base": .32},
+    "tell_story": {"label": "Tell a story", "duration_seconds": 240, "tone": "play", "base": .33},
+    "tease": {"label": "Playful teasing", "duration_seconds": 90, "tone": "play", "base": .30},
+    "debate": {"label": "Debate an idea", "duration_seconds": 300, "tone": "task", "base": .28},
+    "provoke": {"label": "Provoke", "duration_seconds": 100, "tone": "conflict", "base": .13},
+    "argue": {"label": "Start an argument", "duration_seconds": 240, "tone": "conflict", "base": .12},
 }
 
 _ACTION_FACTORS = {
@@ -94,7 +110,7 @@ def _trait_labels(big_five: dict[str, float]) -> list[str]:
 
 
 def social_category_definitions() -> dict:
-    """Return a copy of the 20 public category contracts for UI and planners."""
+    """Return a copy of the public category contracts for UI and planners."""
     return deepcopy(SOCIAL_CATEGORIES)
 
 
@@ -146,12 +162,27 @@ def initialize_psychology(actor: dict, rng, now: int = 0) -> dict:
         {"id": "fear_dogs", "kind": "dogs", "intensity": _clamp(.04 + _rng_value(rng, 0, .45)), "last_updated": now},
         {"id": "fear_job_loss", "kind": "job_loss", "intensity": _clamp(.04 + _rng_value(rng, 0, .45)), "last_updated": now},
     ]
-    return {"schema_version": SCHEMA_VERSION, "big_five": big_five,
+    if actor.get('age',30)<18:
+        fears=[fear for fear in fears if fear['kind']!='job_loss']
+        development={'kind':'learning','title':'Learn and make friends'}
+    elif actor.get('age',30)>=66 and actor.get('profile',{}).get('job')=='Retired':
+        fears=[fear for fear in fears if fear['kind']!='job_loss']
+        development={'kind':'community','title':'Share experience with neighbors'}
+    else:
+        development={'kind':'career','title':_career_title(actor)}
+    social_style = {"drive": _clamp(_rng_value(rng, .12, .93)),
+                    "competitiveness": _clamp(_rng_value(rng, .1, .9)),
+                    "ruthlessness": _clamp(_rng_value(rng, .03, .55)),
+                    "compassion": _clamp(_rng_value(rng, .3, .95)),
+                    "presentation": _clamp(_rng_value(rng, .2, .9)),
+                    "preferences": {key: _clamp(_rng_value(rng, .1, .9)) for key in
+                                    ("kindness", "status", "presentation", "shared_interests")}}
+    return {"schema_version": SCHEMA_VERSION, "big_five": big_five, "social_style": social_style,
             "traits": _trait_labels(big_five),
             "ambitions": [{"id": "ambition_primary", "kind": ambition_kind, "title": ambition_title,
                            "progress": 0.0, "completed": False, "updated_at": now},
-                          {"id": "ambition_career", "kind": "career",
-                           "title": _career_title(actor),
+                          {"id": "ambition_career", "kind": development['kind'],
+                           "title": development['title'],
                            "progress": 0.0, "completed": False, "updated_at": now},
                           {"id": "ambition_hobby", "kind": "hobby",
                            "activity": hobbies[0], "title": "Practice " + hobbies[0],
@@ -172,6 +203,9 @@ def migrate_existing_actor(actor: dict, rng, now: int = 0) -> dict:
     else:
         psychology = deepcopy(actor["psychology"])
         psychology.setdefault("schema_version", SCHEMA_VERSION)
+        style=psychology.setdefault('social_style',{})
+        for key,value in initialize_psychology(actor, rng, now)['social_style'].items():
+            style.setdefault(key,value)
         psychology.setdefault("theory_of_mind", {"known_people": {}, "max_observations_per_person": MAX_OBSERVATIONS, "policy": "direct_observations_only"})
         patch["psychology"] = psychology
     return patch
@@ -263,7 +297,7 @@ def _kinship(actor: dict, other: dict, by_id: dict[str, dict]) -> str:
     return "none"
 
 
-def initial_family_profiles(actors) -> dict:
+def initial_family_profiles(actors, include_minors=False) -> dict:
     """Return an authored *new-world-only* adult family fixture.
 
     Apply this before :func:`initialize_social_graph`.  It supplies explicit
@@ -288,8 +322,24 @@ def initial_family_profiles(actors) -> dict:
         9: (25, [7, 8], None, "single"), 10: (31, [], None, "single"),
     }
     patch = {}
+    household_members = {}
+    for person in people:
+        household_members.setdefault(person.get('household_id'), []).append(person['id'])
+    household_order = {identifier:index for index,identifier in enumerate(household_members)}
     for index, person in enumerate(people):
         age, parent_indexes, partner_index, status = authored.get(index, (22 + (index * 7) % 39, [], None, "single"))
+        if include_minors and index >= 11:
+            members=household_members[person.get('household_id')]
+            house_index=household_order[person.get('household_id')]
+            if len(members)==3 and person['id']==members[-1]:
+                age=5 if house_index%2==0 else 9
+            elif len(members)==2 and person['id']==members[-1] and house_index in {9,14,19}:
+                age=15
+            if age<18:
+                parent_indexes=[ids.index(members[0])]
+                if len(members)==3 and members[1]!=person['id']:
+                    parent_indexes.append(ids.index(members[1]))
+                status='child' if age<13 else 'teen'
         patch[person["id"]] = {"age": age, "family": {"parent_ids": [ids[p] for p in parent_indexes],
                                                            "partner_id": ids[partner_index] if partner_index is not None else None,
                                                            "relationship_status": status}}
@@ -392,6 +442,11 @@ def action_bias(actor: dict, kind: str, now: int | None = None) -> float:
         score += (float(actor.get("preferences", {}).get(preference, .5)) - .5) * .65
     if action_kind in ("chat", "socialize"):
         score -= (float(five.get("neuroticism", .5)) - .5) * .15
+    drive=float(actor.get('psychology',{}).get('social_style',{}).get('drive',.5))
+    if action_kind in {'work','read','craft'}:
+        score+=(drive-.5)*.26
+    elif action_kind in {'relax','walk'}:
+        score-=(drive-.5)*.12
     psychology = actor.get("psychology", {})
     hobby_kind = _hobby_kind(action_kind)
     for hobby in psychology.get("hobbies", []):
@@ -446,9 +501,17 @@ def _romance_allowed(actor: dict, other: dict, relation: dict) -> tuple[bool, st
     own_family, other_family = _family(actor), _family(other)
     own_preferences = actor.get("relationship_preferences", {})
     other_preferences = other.get("relationship_preferences", {})
-    if own_family.get("partner_id") not in (None, other.get("id")) and own_preferences.get("nonmonogamous") is not True:
+    def rare_boundary_risk(person, counterpart):
+        style = person.get("psychology", {}).get("social_style", {})
+        edge = person.get("relations", {}).get(counterpart.get("id"), {})
+        return (float(person.get("needs", {}).get("fun", 0)) > .75
+                and float(style.get("ruthlessness", 0)) > .35
+                and float(edge.get("attraction", 0)) > .35)
+    if (own_family.get("partner_id") not in (None, other.get("id"))
+            and own_preferences.get("nonmonogamous") is not True and not rare_boundary_risk(actor, other)):
         return False, "actor is committed to another partner"
-    if other_family.get("partner_id") not in (None, actor.get("id")) and other_preferences.get("nonmonogamous") is not True:
+    if (other_family.get("partner_id") not in (None, actor.get("id"))
+            and other_preferences.get("nonmonogamous") is not True and not rare_boundary_risk(other, actor)):
         return False, "recipient is committed to another partner"
     if other_preferences.get("romance_opt_in") is False:
         return False, "recipient has not opted in to romance"
@@ -462,10 +525,23 @@ def _social_context(actor: dict, other: dict, relation: dict, category: str) -> 
         shared_workplace = bool(_workplace_id(actor)) and _workplace_id(actor) == _workplace_id(other)
         if coworker.get("status") in (None, "none") and not shared_workplace:
             return False, "coordinate work requires a shared workplace or coworker link"
+    if category == "undermine":
+        if int(actor.get('age', ADULT_AGE)) < ADULT_AGE or int(other.get('age', ADULT_AGE)) < ADULT_AGE:
+            return False, "workplace rivalry requires adult coworkers"
+        if not _workplace_id(actor) or _workplace_id(actor) != _workplace_id(other):
+            return False, "undermining requires a shared workplace"
     if category in ("apologize", "reconcile") and float(relation.get("tension", 0)) < .035:
         return False, f"{category} requires an existing tension"
     if category == 'confide' and float(relation.get('trust', 0)) < .30:
         return False, 'confiding requires a minimum of trust'
+    if category == 'deep_talk' and float(relation.get('trust', 0)) < .18:
+        return False, 'a deep conversation requires some trust'
+    if category == 'collaborate_project' and (float(relation.get('trust', 0)) < .10
+            and relation['layers']['coworker'].get('status') in (None, 'none')):
+        return False, 'a joint project requires rapport or a coworker link'
+    if category == 'phone_call' and other.get('id') not in actor.get('relations', {}) \
+            and other.get('household_id') != actor.get('household_id'):
+        return False, 'a phone call requires a known contact'
     if category == 'express_affection' and float(relation['layers']['romance'].get('score', 0)) < .08:
         return False, 'affection requires an existing romantic connection'
     if category == 'ask_date' and (float(relation.get('attraction', 0)) < .04
@@ -493,6 +569,9 @@ def partner_priority(actor: dict, other: dict, distance: int, now: int) -> float
     score += .045 if household else 0
     score -= .18 if recently_met else 0
     score -= min(.12, max(0, distance) * .025)
+    style = actor.get("psychology", {}).get("social_style", {})
+    score += float(style.get("compassion", .5)) * max(0, max(other.get("needs", {}).values(), default=0) - .65) * .15
+    score += float(style.get("competitiveness", .5)) * float(other.get("social_status", .5)) * .04
     return round(score, 4)
 
 
@@ -511,13 +590,20 @@ def _tom_social_modifier(actor: dict, subject_id: str, category: str, now: int) 
 
 
 def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
-    """Score all 20 social categories from actor-local data; does not presume acceptance."""
+    """Score all social categories from actor-local data; never presume acceptance."""
     relation = _relation(actor, other)
     five = _big_five(actor)
     other_five = _big_five(other)
     social_need = float(actor.get("needs", {}).get("social", .5))
     connection = (float(relation["closeness"]) + float(relation["trust"])) / 2
     topics = shared_topics(actor, other)
+    style = actor.get("psychology", {}).get("social_style", {})
+    other_style = other.get("psychology", {}).get("social_style", {})
+    prefs = style.get("preferences", {})
+    appeal = (float(prefs.get("kindness", .5)) * float(other_style.get("compassion", .5))
+              + float(prefs.get("status", .5)) * float(other.get("social_status", .5))
+              + float(prefs.get("presentation", .5)) * float(other_style.get("presentation", .5))
+              + float(prefs.get("shared_interests", .5)) * bool(topics)) / max(.001, sum(float(v) for v in prefs.values()) or 2)
     results = []
     for category, definition in SOCIAL_CATEGORIES.items():
         allowed, reason = _social_context(actor, other, relation, category)
@@ -532,6 +618,7 @@ def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
             willingness -= other_five.get("agreeableness", .5) * .20
         if tone == "romance":
             willingness += relation["layers"]["romance"].get("score", 0) * .20
+            willingness += (appeal - .5) * .25
         if tone == "care":
             willingness += connection * .12
         score = definition["base"] + affinity * .28 + social_need * .24 + connection * .30
@@ -541,10 +628,30 @@ def social_candidates(actor: dict, other: dict, now: int) -> list[dict]:
             willingness += .08 if topics else -.04
         if category == 'coordinate_work' and _workplace_id(actor) == _workplace_id(other):
             score += .09
+            score += (float(style.get('drive',.5))-.5)*.18
         if category == 'check_in' and relation['layers']['family'].get('status') not in (None, 'none'):
             score += .08
         if tone == "conflict": score -= five.get("agreeableness", .5) * .22
         if tone == "romance": score += relation["layers"]["romance"].get("score", 0) * .26
+        if tone == "romance": score += (appeal - .5) * .30
+        if tone == "romance" and actor.get("family", {}).get("partner_id") not in (None, other.get("id")):
+            score -= .55
+            willingness -= .25
+        if category == "offer_help":
+            score += float(style.get("compassion", .5)) * max(0, max(other.get("needs", {}).values(), default=0) - .55) * .3
+        if category == "ask_help":
+            score += max(0, max(actor.get("needs", {}).values(), default=0) - .55) * .25
+            willingness += float(other_style.get("compassion", .5)) * .20
+        if category in {"challenge", "undermine", "debate", "persuade", "argue", "provoke"}:
+            score += (float(style.get("competitiveness", .5)) - .5) * .30
+        if category in {'provoke', 'argue'}:
+            score += float(relation.get('tension', 0)) * .28 + (float(style.get('ruthlessness', .5))-.5)*.20 - .26
+            willingness -= .18
+        if category == 'comfort':
+            score += float(style.get('compassion', .5)) * max(0, max(other.get('needs', {}).values(), default=0)-.4) * .25
+        if category == "undermine":
+            score += (float(style.get("ruthlessness", .5)) - .5) * .25 - .30
+            willingness -= .35
         if not allowed: score = -1.0
         results.append({"category": category, "score": round(max(-1., min(1., score)), 4),
                         "probability": round(max(0., min(1., score if allowed else 0.)), 4),
@@ -593,7 +700,10 @@ def apply_social(actor: dict, other: dict, category: str, outcome: str, now: int
         tone = SOCIAL_CATEGORIES[category]["tone"]
         if tone == "romance":
             relation["attraction"] = _unit(float(relation.get("attraction", 0)) + (dc if outcome in ("positive", "accepted") else dc / 2))
-        if tone == "tension":
+        if tone == "conflict":
+            relation["tension"] = _unit(float(relation.get("tension", 0)) + (.09 if outcome in ("positive", "accepted") else .035))
+            relation["respect"] = _unit(float(relation.get("respect", .35)) - .04)
+        elif tone == "tension":
             relation["tension"] = _unit(float(relation.get("tension", 0)) + (.045 if outcome in ("positive", "accepted") else .015))
             relation["respect"] = _unit(float(relation.get("respect", .35)) - (.025 if outcome in ("positive", "accepted") else 0))
         elif tone == "boundary":
